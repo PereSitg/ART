@@ -14,29 +14,29 @@
   {
     "nom": "Santiago Rusiñol i Prats",
     "tipus": "Artista / Escriptor",
-    "resum": "Figura clau del modernisme català, pintor, escriptor i dramaturg. Va convertir Sitges en la meca del Modernisme amb les seves Festes Modernistes.",
+    "resum": "Figura clau del modernisme català. Va fundar el Cau Ferrat a Sitges, convertint la vila en un referent cultural europeu.",
     "analisis_obres": [
       {
-        "titol": "La morfina",
-        "explicacio_artistica": "Una obra mestra que reflecteix el costat decadent i psicològic del Modernisme, amb un ús magistral de la llum i el color."
+        "titol": "La morfina (1894)",
+        "explicacio_artistica": "Una de les seves pintures més famoses del període de París, que mostra la part més fosca i introspectiva del Modernisme."
+      },
+      {
+        "titol": "La nena de la clavellina (1893)",
+        "explicacio_artistica": "Pintada a Sitges, és un exemple perfecte del simbolisme rusiñolià amb la llum blanca mediterrània."
       },
       {
         "titol": "Jardins d'Espanya",
-        "explicacio_artistica": "Sèrie de pintures de jardins on Rusiñol capta la malenconia i la bellesa de la natura domada."
-      }
-    ],
-    "url": "https://ca.wikipedia.org/wiki/Santiago_Rusi%C3%B1ol_i_Prats"
-  },
-  {
-    "nom": "Ramon Casas i Carbó",
-    "tipus": "Pintor",
-    "resum": "Conegut pels seus retrats de l'elit barcelonina i per la seva col·laboració amb Rusiñol al Cau Ferrat de Sitges.",
-    "analisis_obres": [
+        "explicacio_artistica": "Sèrie on explora la malenconia dels jardins abandonats, amb una gran càrrega poètica."
+      },
       {
-        "titol": "Plein Air",
-        "explicacio_artistica": "Captura l'atmosfera de la vida quotidiana amb una pinzellada solta i moderna."
+        "titol": "El pati blau (1891)",
+        "explicacio_artistica": "Pintura icònica realitzada a Sitges on el color blau i la llum creen una atmosfera màgica."
+      },
+      {
+        "titol": "Retrat de Ramon Casas (1890)",
+        "explicacio_artistica": "Mostra la seva gran habilitat per al retrat i la relació d'amistat amb l'altre gran pintor del Modernisme."
       }
     ],
-    "url": "https://ca.wikipedia.org/wiki/Ramon_Casas_i_Carb%C3%B3"
+    "url": "https://museusdesitges.cat/ca/museu/cau-ferrat/santiago-rusinol"
   }
 ]
