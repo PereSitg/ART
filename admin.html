@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Generador de Blocs SitgesArt</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .form-box { max-width: 600px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px; }
+        input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; cursor: pointer; }
+        #output { background: #000; color: #0f0; padding: 15px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Nou Bloc per al JSON</h2>
+        <input type="text" id="nom" placeholder="Nom de l'artista o museu">
+        <input type="text" id="tipus" placeholder="Tipus (Pintor, Monument, etc.)">
+        <textarea id="resum" placeholder="Resum general"></textarea>
+        <input type="text" id="obra1" placeholder="Títol Obra 1">
+        <textarea id="exp1" placeholder="Explicació Obra 1"></textarea>
+        <input type="text" id="url" placeholder="URL de referència">
+        <button onclick="generar()">Generar Codi JSON</button>
+        <div id="output">El codi apareixerà aquí...</div>
+    </div>
+
+    <script>
+        function generar() {
+            const dades = {
+                nom: document.getElementById('nom').value,
+                tipus: document.getElementById('tipus').value,
+                resum: document.getElementById('resum').value,
+                analisis_obres: [{
+                    titol: document.getElementById('obra1').value,
+                    explicacio_artistica: document.getElementById('exp1').value
+                }],
+                url: document.getElementById('url').value
+            };
+            // Mostra el codi amb una coma al davant per facilitar l'enganxat
+            document.getElementById('output').innerText = ",\n" + JSON.stringify(dades, null, 2);
+        }
+    </script>
+</body>
+</html>
