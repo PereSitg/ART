@@ -3,105 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arxiu d'Art de Sitges</title>
+    <title>Sitges Art AI | Arxiu Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* ESTIL MINIMALISTA TIPUS MUSEU */
-        body { font-family: 'Georgia', serif; background-color: #ffffff; color: #1a1a1a; margin: 0; padding: 40px; line-height: 1.6; }
-        .container { max-width: 700px; margin: 0 auto; }
-        
-        header { border-bottom: 1px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
-        h1 { font-weight: normal; font-size: 2.5rem; margin: 0; letter-spacing: -1px; }
-        
-        .search-box { 
-            width: 100%; padding: 15px 0; font-size: 1.2rem; border: none; 
-            border-bottom: 2px solid #333; outline: none; margin-bottom: 50px;
-            font-family: 'Helvetica', sans-serif;
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #60a5fa;
+            --glass: rgba(15, 23, 42, 0.8);
         }
 
-        .entitat { margin-bottom: 60px; }
-        .tipus { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; color: #666; font-family: sans-serif; }
-        h2 { font-size: 1.8rem; margin: 10px 0; font-weight: normal; }
-        .resum { font-style: italic; color: #444; margin-bottom: 20px; }
-        
-        .obra-destacada { padding-left: 20px; border-left: 1px solid #ccc; margin: 15px 0; }
-        .obra-titol { font-family: sans-serif; font-weight: bold; font-size: 0.9rem; display: block; }
-        .obra-desc { font-size: 0.9rem; color: #555; }
-        
-        footer { margin-top: 100px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
-        a { color: #000; text-decoration: underline; }
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(96, 165, 250, 0.1) 0, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex; justify-content: center;
+            align-items: flex-start; padding-top: 5vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%; max-width: 900px;
+            display: flex; flex-direction: column; gap: 2.5rem;
+        }
+
+        header {
+            text-align: center;
+            animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        header .logo {
+            font-size: clamp(3rem, 8vw, 4.5rem);
+            font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.5rem;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        header .logo span {
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem; font-weight: 500;
+        }
+
+        .search-container {
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 0.75rem 1.5rem;
+            display: flex; align-items: center;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .search-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        input {
+            flex: 1; background: transparent; border: none;
+            outline: none; color: white; font-size: 1.15rem;
+            padding: 0.5rem 0; letter-spacing: 0.02em;
+        }
+
+        .results-section {
+            width: 100%; margin-bottom: 5rem;
+            display: flex; flex-direction: column; gap: 1.5rem;
+        }
+
+        .response-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 2.5rem; border-radius: 28px;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ai-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 1.5rem;
+        }
+
+        .ai-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent); padding: 0.5rem 1.25rem;
+            border-radius: 100px; font-size: 0.7rem;
+            font-weight: 800; text-transform: uppercase;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .obra-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--primary);
+            padding: 1rem; margin: 1rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .obra-titol {
+            color: var(--accent); font-weight: 700;
+            font-size: 0.95rem; display: block; margin-bottom: 4px;
+        }
+
+        footer {
+            text-align: center; color: #475569;
+            font-size: 0.85rem; margin-top: 2rem; padding-bottom: 2rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        a:hover { color: white; text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Art de Sitges</h1>
-        <p>Base de dades de cultura i patrimoni.</p>
+        <div class="logo">Sitges<span>Art</span></div>
+        <p class="subtitle">Explora el patrimoni artístic amb tecnologia intel·ligent</p>
     </header>
 
-    <input type="text" id="buscador" class="search-box" placeholder="Escriu per cercar...">
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" id="buscador" placeholder="Busca un artista, museu o obra..." autocomplete="off">
+        </div>
+    </div>
 
-    <div id="resultats">
+    <div id="resultats" class="results-section">
         </div>
 
     <footer>
-        <p>Arxiu digital de Sitges. Dades obtingudes mitjançant Python i Wikipedia.</p>
+        Dades de la Viquipèdia i Fundació Stämpfli • Sitges 2026
     </footer>
 </div>
 
 <script>
     let dades = [];
 
-    // Carreguem el JSON
-    async function carregarDades() {
+    // Carregar dades des del JSON
+    async function inicialitzar() {
+        const resultatsDiv = document.getElementById('resultats');
         try {
             const resposta = await fetch('biblioteca_sitges_premium.json');
-            if (!resposta.ok) throw new Error("No trobo el fitxer JSON");
+            if (!resposta.ok) throw new Error("No s'ha trobat el JSON");
             dades = await resposta.json();
-            console.log("Dades carregades:", dades);
-            renderitzar(dades); // Mostra-ho tot de sortida
+            renderitzar(dades); // Mostrem tot al principi
         } catch (error) {
-            document.getElementById('resultats').innerHTML = "Error carregant les dades. Revisa el nom del fitxer JSON.";
+            resultatsDiv.innerHTML = `
+                <div class="response-card" style="border-color: #f87171;">
+                    <h2 style="color: #f87171;">⚠️ Error de sistema</h2>
+                    <p>No s'ha pogut carregar la base de dades. Revisa que el fitxer <b>biblioteca_sitges_premium.json</b> estigui al repositori.</p>
+                </div>`;
         }
     }
 
     function renderitzar(llista) {
-        const div = document.getElementById('resultats');
-        div.innerHTML = "";
-        
+        const resultatsDiv = document.getElementById('resultats');
+        resultatsDiv.innerHTML = "";
+
         if (llista.length === 0) {
-            div.innerHTML = "<p>No s'han trobat coincidències.</p>";
+            resultatsDiv.innerHTML = "<p style='text-align:center; color:var(--text-secondary)'>No hi ha resultats per a aquesta cerca.</p>";
             return;
         }
 
         llista.forEach(item => {
-            let obres = "";
+            let obresHTML = "";
             if (item.analisis_obres) {
                 item.analisis_obres.forEach(o => {
-                    obres += `
-                        <div class="obra-destacada">
-                            <span class="obra-titol">${o.titol}</span>
-                            <span class="obra-desc">${o.explicacio_artistica || ''}</span>
+                    obresHTML += `
+                        <div class="obra-box">
+                            <span class="obra-titol">🖼️ ${o.titol || o.title}</span>
+                            <p style="font-size:0.85rem; color:var(--text-secondary)">${o.explicacio_artistica || ''}</p>
                         </div>`;
                 });
             }
 
-            div.innerHTML += `
-                <div class="entitat">
-                    <span class="tipus">${item.tipus || 'Cultura'}</span>
-                    <h2>${item.nom}</h2>
-                    <p class="resum">${item.resum}</p>
-                    <div class="obres-llista">${obres}</div>
-                    <a href="${item.url}" target="_blank">Veure font original</a>
+            resultatsDiv.innerHTML += `
+                <div class="response-card">
+                    <div class="ai-header">
+                        <span class="ai-badge">${item.tipus || 'Cultura'}</span>
+                    </div>
+                    <h2 style="margin-bottom:1rem;">${item.nom}</h2>
+                    <p style="line-height:1.7; color:#e2e8f0; margin-bottom:1.5rem;">${item.resum}</p>
+                    ${obresHTML}
+                    <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--card-border);">
+                        <a href="${item.url}" target="_blank">Veure font oficial →</a>
+                    </div>
                 </div>
             `;
         });
     }
 
-    // Buscador en temps real
-    document.getElementById('buscador').addEventListener('input', (e) => {
-        const text = e.target.value.toLowerCase();
-        const filtrades = dades.filter(d => 
+    // Lògica del cercador
+    const inputBuscador = document.getElementById('buscador');
+
+    inputBuscador.addEventListener('input', () => {
+        const text = inputBuscador.value.toLowerCase().trim();
+        const filtrats = dades.filter(d => 
             d.nom.toLowerCase().includes(text) || 
             d.resum.toLowerCase().includes(text)
         );
+        renderitzar(filtrats);
+    });
+
+    // Per si premen Intro (encara que ja filtra en temps real)
+    inputBuscador.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+
+    // Iniciar app
+    inicialitzar();
+</script>
+
+</body>
+</html>
