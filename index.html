@@ -1,66 +1,107 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arxiu d'Art de Sitges</title>
+    <style>
+        /* ESTIL MINIMALISTA TIPUS MUSEU */
+        body { font-family: 'Georgia', serif; background-color: #ffffff; color: #1a1a1a; margin: 0; padding: 40px; line-height: 1.6; }
+        .container { max-width: 700px; margin: 0 auto; }
+        
+        header { border-bottom: 1px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+        h1 { font-weight: normal; font-size: 2.5rem; margin: 0; letter-spacing: -1px; }
+        
+        .search-box { 
+            width: 100%; padding: 15px 0; font-size: 1.2rem; border: none; 
+            border-bottom: 2px solid #333; outline: none; margin-bottom: 50px;
+            font-family: 'Helvetica', sans-serif;
+        }
+
+        .entitat { margin-bottom: 60px; }
+        .tipus { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; color: #666; font-family: sans-serif; }
+        h2 { font-size: 1.8rem; margin: 10px 0; font-weight: normal; }
+        .resum { font-style: italic; color: #444; margin-bottom: 20px; }
+        
+        .obra-destacada { padding-left: 20px; border-left: 1px solid #ccc; margin: 15px 0; }
+        .obra-titol { font-family: sans-serif; font-weight: bold; font-size: 0.9rem; display: block; }
+        .obra-desc { font-size: 0.9rem; color: #555; }
+        
+        footer { margin-top: 100px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px; }
+        a { color: #000; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Art de Sitges</h1>
+        <p>Base de dades de cultura i patrimoni.</p>
+    </header>
+
+    <input type="text" id="buscador" class="search-box" placeholder="Escriu per cercar...">
+
+    <div id="resultats">
+        </div>
+
+    <footer>
+        <p>Arxiu digital de Sitges. Dades obtingudes mitjançant Python i Wikipedia.</p>
+    </footer>
+</div>
+
 <script>
     let dades = [];
 
-    // Intentem carregar el fitxer amb un missatge d'error si falla
-    fetch('biblioteca_sitges_premium.json')
-        .then(response => {
-            if (!response.ok) throw new Error("No s'ha pogut carregar el JSON");
-            return response.json();
-        })
-        .then(data => {
-            dades = data;
-            console.log("Dades carregades correctament:", dades.length, "entitats");
-            renderitzar(dades); // Mostra-ho tot al principi
-        })
-        .catch(error => {
-            console.error("Error criticitat:", error);
-            document.getElementById('resultats').innerHTML = 
-                `<p style="color:red">Error: No s'han pogut carregar les dades. 
-                Assegura't que el fitxer 'biblioteca_sitges_premium.json' és a la mateixa carpeta.</p>`;
-        });
+    // Carreguem el JSON
+    async function carregarDades() {
+        try {
+            const resposta = await fetch('biblioteca_sitges_premium.json');
+            if (!resposta.ok) throw new Error("No trobo el fitxer JSON");
+            dades = await resposta.json();
+            console.log("Dades carregades:", dades);
+            renderitzar(dades); // Mostra-ho tot de sortida
+        } catch (error) {
+            document.getElementById('resultats').innerHTML = "Error carregant les dades. Revisa el nom del fitxer JSON.";
+        }
+    }
 
-    const buscador = document.getElementById('buscador');
-    const resultatsDiv = document.getElementById('resultats');
-
-    buscador.addEventListener('input', () => {
-        const query = buscador.value.toLowerCase().trim();
+    function renderitzar(llista) {
+        const div = document.getElementById('resultats');
+        div.innerHTML = "";
         
-        // Si el buscador està buit, tornem a mostrar-ho tot
-        if (query === "") {
-            renderitzar(dades);
+        if (llista.length === 0) {
+            div.innerHTML = "<p>No s'han trobat coincidències.</p>";
             return;
         }
 
-        const filtrats = dades.filter(d => 
-            (d.nom && d.nom.toLowerCase().includes(query)) || 
-            (d.resum && d.resum.toLowerCase().includes(query))
-        );
-        renderitzar(filtrats);
-    });
-
-    function renderitzar(llista) {
-        resultatsDiv.innerHTML = llista.length > 0 ? "" : "<p style='text-align:center'>No s'han trobat resultats.</p>";
         llista.forEach(item => {
-            let obresHTML = "";
-            if(item.analisis_obres) {
+            let obres = "";
+            if (item.analisis_obres) {
                 item.analisis_obres.forEach(o => {
-                    obresHTML += `
-                        <div class="obra-box">
-                            <span class="obra-titol">🖼️ ${o.titol}</span>
-                            <small>${o.explicacio_artistica || 'Sense descripció disponible.'}</small>
+                    obres += `
+                        <div class="obra-destacada">
+                            <span class="obra-titol">${o.titol}</span>
+                            <span class="obra-desc">${o.explicacio_artistica || ''}</span>
                         </div>`;
                 });
             }
 
-            resultatsDiv.innerHTML += `
-                <div class="card">
-                    <span class="tag">${item.tipus || 'Cultura'}</span>
+            div.innerHTML += `
+                <div class="entitat">
+                    <span class="tipus">${item.tipus || 'Cultura'}</span>
                     <h2>${item.nom}</h2>
-                    <p>${item.resum}</p>
-                    <div>${obresHTML}</div>
-                    <p style="margin-top:20px"><a href="${item.url}" target="_blank">Llegir biografia completa &rarr;</a></p>
+                    <p class="resum">${item.resum}</p>
+                    <div class="obres-llista">${obres}</div>
+                    <a href="${item.url}" target="_blank">Veure font original</a>
                 </div>
             `;
         });
     }
-</script>
+
+    // Buscador en temps real
+    document.getElementById('buscador').addEventListener('input', (e) => {
+        const text = e.target.value.toLowerCase();
+        const filtrades = dades.filter(d => 
+            d.nom.toLowerCase().includes(text) || 
+            d.resum.toLowerCase().includes(text)
+        );
