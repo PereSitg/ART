@@ -1,0 +1,21 @@
+[
+  {
+    "nom": "Fundació Stämpfli - Art Contemporani",
+    "tipus": "Museu / Fundació",
+    "resum": "Un dels centres d'art contemporani més importants de Catalunya, situat a l'antic Mercat del Peix de Sitges.",
+    "obres_destacades": [
+      "Col·lecció de 90 obres d'artistes internacionals",
+      "Obres de Pere Stämpfli",
+      "Exposicions d'art contemporani de la segona meitat del segle XX"
+    ],
+    "analisis_obres": [
+      {
+        "titol": "L'obra de Pere Stämpfli",
+        "explicacio_artistica": "Centrada sovint en la cultura de l'automòbil i l'estètica del pneumàtic, elevada a la categoria d'art pop i hiperrealista.",
+        "url_detall": "https://www.fundacio-stampfli.org/"
+      }
+    ],
+    "contingut_complet": "La Fundació Stämpfli és el fruit del mecenatge del matrimoni Pere i Anna Maria Stämpfli. Reuneix una col·lecció d'art contemporani única amb artistes de la Figuration Narrative i el Nou Realisme.",
+    "url": "https://www.fundacio-stampfli.org/"
+  }
+]

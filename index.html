@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Art i Història de Sitges</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .search-box { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #ddd; border-radius: 25px; margin-bottom: 20px; }
+        .card { border-left: 5px solid #3498db; background: #fafafa; padding: 20px; margin-bottom: 20px; border-radius: 4px; }
+        .obra { background: #fff; border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 4px; }
+        .relacions { color: #e67e22; font-weight: bold; font-size: 0.9em; }
+        .tag { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎨 Cercador d'Art de Sitges</h1>
+    <input type="text" id="buscador" class="search-box" placeholder="Busca un artista, museu o obra (ex: Rusiñol, Stämpfli...)">
+    
+    <div id="resultats">
+        <p style="text-align: center; color: #888;">Escriu el nom d'un personatge o monument per començar.</p>
+    </div>
+</div>
+
+<script>
+    let dades = [];
+
+    // Carreguem el teu JSON (GitHub servirà aquest fitxer)
+    fetch('biblioteca_sitges_premium.json')
+        .then(response => response.json())
+        .then(data => dades = data);
+
+    const buscador = document.getElementById('buscador');
+    const resultatsDiv = document.getElementById('resultats');
+
+    buscador.addEventListener('input', () => {
+        const query = buscador.value.toLowerCase();
+        if (query.length < 2) { resultatsDiv.innerHTML = ""; return; }
+
+        const filtrats = dades.filter(d => 
+            d.nom.toLowerCase().includes(query) || 
+            d.resum.toLowerCase().includes(query)
+        );
+
+        renderizar(filtrats);
+    });
+
+    function renderizar(llista) {
+        resultatsDiv.innerHTML = "";
+        llista.forEach(item => {
+            let obresHTML = "";
+            if(item.analisis_obres) {
+                item.analisis_obres.forEach(o => {
+                    obresHTML += `<div class="obra"><strong>${o.titol}:</strong> ${o.explicacio_artistica}</div>`;
+                });
+            }
+
+            resultatsDiv.innerHTML += `
+                <div class="card">
+                    <h2>${item.nom} <span style="font-size: 0.5em; vertical-align: middle;" class="tag">${item.tipus || 'Cultura'}</span></h2>
+                    <p>${item.resum}</p>
+                    <div class="obres-seccio">
+                        <strong>Obres destacades:</strong>
+                        ${obresHTML}
+                    </div>
+                    <p class="relacions">🔗 Més info: <a href="${item.url}" target="_blank">Viquipèdia</a></p>
+                </div>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>
