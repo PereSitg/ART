@@ -2,76 +2,155 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Art i Història de Sitges</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitges Art Experience</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        .search-box { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #ddd; border-radius: 25px; margin-bottom: 20px; }
-        .card { border-left: 5px solid #3498db; background: #fafafa; padding: 20px; margin-bottom: 20px; border-radius: 4px; }
-        .obra { background: #fff; border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 4px; }
-        .relacions { color: #e67e22; font-weight: bold; font-size: 0.9em; }
-        .tag { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; }
+        /* CSS PROFESSIONAL INTEGRAT */
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --gold: #d4af37;
+            --bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), 
+                              url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80');
+            background-attachment: fixed;
+            background-size: cover;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .search-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
+
+        .tag {
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .obra-box {
+            background: rgba(52, 152, 219, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .obra-titol { font-weight: bold; color: #2c3e50; display: block; margin-bottom: 5px; }
+
+        .footer { text-align: center; padding: 40px; font-size: 0.9rem; color: #666; }
+
+        a { color: var(--accent); text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <h1>SITGES ART HERITAGE</h1>
+    <p>Explora el llegat del Modernisme i l'Art Contemporani</p>
+</div>
+
 <div class="container">
-    <h1>🎨 Cercador d'Art de Sitges</h1>
-    <input type="text" id="buscador" class="search-box" placeholder="Busca un artista, museu o obra (ex: Rusiñol, Stämpfli...)">
-    
-    <div id="resultats">
-        <p style="text-align: center; color: #888;">Escriu el nom d'un personatge o monument per començar.</p>
+    <div class="search-container">
+        <input type="text" id="buscador" class="search-box" placeholder="Cerca artistes, obres o museus...">
     </div>
+
+    <div id="resultats"></div>
+</div>
+
+<div class="footer">
+    Projecte d'Art de Sitges &copy; 2026 | Dades extretes de la Viquipèdia i Fundació Stämpfli
 </div>
 
 <script>
     let dades = [];
 
-    // Carreguem el teu JSON (GitHub servirà aquest fitxer)
+    // Carregar el JSON
     fetch('biblioteca_sitges_premium.json')
         .then(response => response.json())
-        .then(data => dades = data);
+        .then(data => {
+            dades = data;
+            // Mostrar tot al principi
+            renderitzar(dades);
+        });
 
     const buscador = document.getElementById('buscador');
     const resultatsDiv = document.getElementById('resultats');
 
     buscador.addEventListener('input', () => {
         const query = buscador.value.toLowerCase();
-        if (query.length < 2) { resultatsDiv.innerHTML = ""; return; }
-
         const filtrats = dades.filter(d => 
             d.nom.toLowerCase().includes(query) || 
-            d.resum.toLowerCase().includes(query)
+            d.resum.toLowerCase().includes(query) ||
+            (d.analisis_obres && d.analisis_obres.some(o => o.titol.toLowerCase().includes(query)))
         );
-
-        renderizar(filtrats);
+        renderitzar(filtrats);
     });
 
-    function renderizar(llista) {
-        resultatsDiv.innerHTML = "";
+    function renderitzar(llista) {
+        resultatsDiv.innerHTML = llista.length > 0 ? "" : "<p style='text-align:center'>No s'han trobat resultats.</p>";
         llista.forEach(item => {
             let obresHTML = "";
             if(item.analisis_obres) {
-                item.analisis_obres.forEach(o => {
-                    obresHTML += `<div class="obra"><strong>${o.titol}:</strong> ${o.explicacio_artistica}</div>`;
-                });
-            }
-
-            resultatsDiv.innerHTML += `
-                <div class="card">
-                    <h2>${item.nom} <span style="font-size: 0.5em; vertical-align: middle;" class="tag">${item.tipus || 'Cultura'}</span></h2>
-                    <p>${item.resum}</p>
-                    <div class="obres-seccio">
-                        <strong>Obres destacades:</strong>
-                        ${obresHTML}
-                    </div>
-                    <p class="relacions">🔗 Més info: <a href="${item.url}" target="_blank">Viquipèdia</a></p>
-                </div>
-            `;
-        });
-    }
-</script>
-
-</body>
-</html>
+                item
