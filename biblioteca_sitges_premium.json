@@ -16,27 +16,46 @@
     "tipus": "Artista / Escriptor",
     "resum": "Figura clau del modernisme català. Va fundar el Cau Ferrat a Sitges, convertint la vila en un referent cultural europeu.",
     "analisis_obres": [
-      {
-        "titol": "La morfina (1894)",
-        "explicacio_artistica": "Una de les seves pintures més famoses del període de París, que mostra la part més fosca i introspectiva del Modernisme."
-      },
-      {
-        "titol": "La nena de la clavellina (1893)",
-        "explicacio_artistica": "Pintada a Sitges, és un exemple perfecte del simbolisme rusiñolià amb la llum blanca mediterrània."
-      },
-      {
-        "titol": "Jardins d'Espanya",
-        "explicacio_artistica": "Sèrie on explora la malenconia dels jardins abandonats, amb una gran càrrega poètica."
-      },
-      {
-        "titol": "El pati blau (1891)",
-        "explicacio_artistica": "Pintura icònica realitzada a Sitges on el color blau i la llum creen una atmosfera màgica."
-      },
-      {
-        "titol": "Retrat de Ramon Casas (1890)",
-        "explicacio_artistica": "Mostra la seva gran habilitat per al retrat i la relació d'amistat amb l'altre gran pintor del Modernisme."
-      }
+      { "titol": "La morfina", "explicacio_artistica": "Obra mestra del simbolisme decadentista." },
+      { "titol": "La nena de la clavellina", "explicacio_artistica": "Llum blanca de Sitges en estat pur." },
+      { "titol": "El pati blau", "explicacio_artistica": "L'obra més icònica de la seva etapa a Sitges." }
     ],
     "url": "https://museusdesitges.cat/ca/museu/cau-ferrat/santiago-rusinol"
+  },
+  {
+    "nom": "Charles Deering",
+    "tipus": "Filantrop / Col·leccionista",
+    "resum": "Magnat industrial nord-americà que va finançar la construcció del Palau de Maricel, transformant un antic hospital en una joia arquitectònica.",
+    "analisis_obres": [
+      {
+        "titol": "Col·lecció Maricel",
+        "explicacio_artistica": "Va reunir una col·lecció impressionant d'art espanyol, des del romànic fins al segle XIX."
+      }
+    ],
+    "url": "https://museusdesitges.cat/ca/museu/maricel"
+  },
+  {
+    "nom": "Miquel Utrillo i Morlius",
+    "tipus": "Enginyer / Crític d'Art",
+    "resum": "L'ideòleg darrere del conjunt de Maricel. Va ser un dels promotors del Modernisme i el Noucentisme a Sitges.",
+    "analisis_obres": [
+      {
+        "titol": "Arquitectura de Maricel",
+        "explicacio_artistica": "Disseny conceptual que barreja elements gòtics, renaixentistes i populars."
+      }
+    ],
+    "url": "https://ca.wikipedia.org/wiki/Miquel_Utrillo_i_Morlius"
+  },
+  {
+    "nom": "Museu del Cau Ferrat",
+    "tipus": "Museu",
+    "resum": "Casa-taller de Santiago Rusiñol. Considerat el temple del Modernisme, conté obres de Picasso, El Greco i col·leccions de ferro forjat.",
+    "analisis_obres": [
+      {
+        "titol": "Col·lecció de Ferros",
+        "explicacio_artistica": "Més de 700 peces de ferro forjat que Rusiñol va col·leccionar durant tota la seva vida."
+      }
+    ],
+    "url": "https://museusdesitges.cat/ca/museu/cau-ferrat"
   }
 ]
