@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art AI | Arxiu Digital</title>
+    <title>Sitges Art</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -85,12 +85,12 @@
 <div class="container">
     <header>
         <div class="logo">Sitges<span>Art</span></div>
-        <p style="color: var(--text-secondary)">Arxiu Digital de Patrimoni i Cultura</p>
+        <p style="color: var(--text-secondary)">Explora l'art i la història</p>
     </header>
 
     <div class="search-section">
         <div class="search-container">
-            <input type="text" id="buscador" placeholder="Busca un artista, museu o obra..." autocomplete="off">
+            <input type="text" id="buscador" placeholder="Escriu un nom..." autocomplete="off">
         </div>
     </div>
 
@@ -105,18 +105,23 @@
 <script>
     let dades = [];
 
-    // 1. Carregar dades
+    // Funció per normalitzar text (treure accents per facilitar la cerca)
+    function normalitzar(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     async function carregar() {
+        const div = document.getElementById('resultats');
         try {
             const res = await fetch('biblioteca_sitges_premium.json');
+            if (!res.ok) throw new Error();
             dades = await res.json();
-            renderitzar(dades); // Mostra tot l'arxiu al principi
+            renderitzar(dades); 
         } catch (e) {
-            document.getElementById('resultats').innerHTML = "<p>Error carregant el fitxer JSON.</p>";
+            div.innerHTML = "<p style='text-align:center;'>Esperant dades del fitxer JSON...</p>";
         }
     }
 
-    // 2. Pintar dades
     function renderitzar(llista) {
         const div = document.getElementById('resultats');
         div.innerHTML = "";
@@ -140,30 +145,31 @@
 
             div.innerHTML += `
                 <div class="response-card">
-                    <span class="ai-badge">${item.tipus || 'CULTURA'}</span>
+                    <span class="ai-badge">${item.tipus || 'INFO'}</span>
                     <h2 style="font-size:1.8rem; margin-bottom:1rem;">${item.nom}</h2>
                     <p style="line-height:1.7; color:#e2e8f0;">${item.resum}</p>
                     ${obres}
                     <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--card-border);">
-                        <a href="${item.url}" target="_blank">Font Oficial →</a>
+                        <a href="${item.url}" target="_blank">Més informació →</a>
                     </div>
                 </div>
             `;
         });
     }
 
-    // 3. Lògica del Cercador
     const input = document.getElementById('buscador');
     input.addEventListener('input', () => {
-        const val = input.value.toLowerCase().trim();
-        const filtrats = dades.filter(d => 
-            d.nom.toLowerCase().includes(val) || 
-            d.resum.toLowerCase().includes(val)
-        );
+        const val = normalitzar(input.value.trim());
+        
+        const filtrats = dades.filter(d => {
+            const nomNom = normalitzar(d.nom || "");
+            const resumNom = normalitzar(d.resum || "");
+            return nomNom.includes(val) || resumNom.includes(val);
+        });
+        
         renderitzar(filtrats);
     });
 
-    // Aturar el botó Intro per evitar recàrregues
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') e.preventDefault();
     });
