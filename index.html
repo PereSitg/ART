@@ -18,10 +18,7 @@
             --glass: rgba(15, 23, 42, 0.8);
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             background: var(--bg-dark);
@@ -35,112 +32,52 @@
             overflow-x: hidden;
         }
 
-        .container {
-            width: 90%; max-width: 900px;
-            display: flex; flex-direction: column; gap: 2.5rem;
-        }
+        .container { width: 90%; max-width: 900px; display: flex; flex-direction: column; gap: 2.5rem; }
 
-        header {
-            text-align: center;
-            animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        header .logo {
-            font-size: clamp(3rem, 8vw, 4.5rem);
-            font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.5rem;
+        header { text-align: center; animation: fadeInDown 1s ease-out; }
+        header .logo { 
+            font-size: clamp(3rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; 
             background: linear-gradient(to bottom, #ffffff, #94a3b8);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        header .logo span {
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        header .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem; font-weight: 500;
-        }
+        header .logo span { background: linear-gradient(to right, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .search-container {
-            width: 100%;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 0.75rem 1.5rem;
-            display: flex; align-items: center;
+            width: 100%; background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border); border-radius: 20px;
+            padding: 1rem 1.5rem; display: flex; align-items: center;
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .search-container:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--primary-glow);
-            transform: translateY(-2px);
         }
 
         input {
-            flex: 1; background: transparent; border: none;
-            outline: none; color: white; font-size: 1.15rem;
-            padding: 0.5rem 0; letter-spacing: 0.02em;
+            flex: 1; background: transparent; border: none; outline: none;
+            color: white; font-size: 1.2rem; padding: 0.5rem 0;
         }
 
-        .results-section {
-            width: 100%; margin-bottom: 5rem;
-            display: flex; flex-direction: column; gap: 1.5rem;
-        }
+        .results-section { width: 100%; margin-top: 1rem; display: flex; flex-direction: column; gap: 1.5rem; }
 
         .response-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+            background: var(--card-bg); border: 1px solid var(--card-border);
             padding: 2.5rem; border-radius: 28px;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .ai-header {
-            display: flex; justify-content: space-between;
-            align-items: center; margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         .ai-badge {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent); padding: 0.5rem 1.25rem;
-            border-radius: 100px; font-size: 0.7rem;
-            font-weight: 800; text-transform: uppercase;
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            background: rgba(59, 130, 246, 0.1); color: var(--accent);
+            padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.7rem;
+            font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 1rem; display: inline-block;
         }
 
         .obra-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid var(--primary);
-            padding: 1rem; margin: 1rem 0;
-            border-radius: 0 12px 12px 0;
+            background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--primary);
+            padding: 1rem; margin: 1rem 0; border-radius: 0 12px 12px 0;
         }
 
-        .obra-titol {
-            color: var(--accent); font-weight: 700;
-            font-size: 0.95rem; display: block; margin-bottom: 4px;
-        }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        footer {
-            text-align: center; color: #475569;
-            font-size: 0.85rem; margin-top: 2rem; padding-bottom: 2rem;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        a { color: var(--accent); text-decoration: none; font-weight: 600; }
-        a:hover { color: white; text-decoration: underline; }
+        a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -148,7 +85,7 @@
 <div class="container">
     <header>
         <div class="logo">Sitges<span>Art</span></div>
-        <p class="subtitle">Explora el patrimoni artístic amb tecnologia intel·ligent</p>
+        <p style="color: var(--text-secondary)">Arxiu Digital de Patrimoni i Cultura</p>
     </header>
 
     <div class="search-section">
@@ -160,89 +97,78 @@
     <div id="resultats" class="results-section">
         </div>
 
-    <footer>
-        Dades de la Viquipèdia i Fundació Stämpfli • Sitges 2026
+    <footer style="text-align:center; padding: 40px; color: #475569; font-size: 0.8rem;">
+        Sitges Art Project &copy; 2026
     </footer>
 </div>
 
 <script>
     let dades = [];
 
-    // Carregar dades des del JSON
-    async function inicialitzar() {
-        const resultatsDiv = document.getElementById('resultats');
+    // 1. Carregar dades
+    async function carregar() {
         try {
-            const resposta = await fetch('biblioteca_sitges_premium.json');
-            if (!resposta.ok) throw new Error("No s'ha trobat el JSON");
-            dades = await resposta.json();
-            renderitzar(dades); // Mostrem tot al principi
-        } catch (error) {
-            resultatsDiv.innerHTML = `
-                <div class="response-card" style="border-color: #f87171;">
-                    <h2 style="color: #f87171;">⚠️ Error de sistema</h2>
-                    <p>No s'ha pogut carregar la base de dades. Revisa que el fitxer <b>biblioteca_sitges_premium.json</b> estigui al repositori.</p>
-                </div>`;
+            const res = await fetch('biblioteca_sitges_premium.json');
+            dades = await res.json();
+            renderitzar(dades); // Mostra tot l'arxiu al principi
+        } catch (e) {
+            document.getElementById('resultats').innerHTML = "<p>Error carregant el fitxer JSON.</p>";
         }
     }
 
+    // 2. Pintar dades
     function renderitzar(llista) {
-        const resultatsDiv = document.getElementById('resultats');
-        resultatsDiv.innerHTML = "";
+        const div = document.getElementById('resultats');
+        div.innerHTML = "";
 
         if (llista.length === 0) {
-            resultatsDiv.innerHTML = "<p style='text-align:center; color:var(--text-secondary)'>No hi ha resultats per a aquesta cerca.</p>";
+            div.innerHTML = "<p style='text-align:center; color:var(--text-secondary)'>No hi ha coincidències.</p>";
             return;
         }
 
         llista.forEach(item => {
-            let obresHTML = "";
+            let obres = "";
             if (item.analisis_obres) {
                 item.analisis_obres.forEach(o => {
-                    obresHTML += `
+                    obres += `
                         <div class="obra-box">
-                            <span class="obra-titol">🖼️ ${o.titol || o.title}</span>
-                            <p style="font-size:0.85rem; color:var(--text-secondary)">${o.explicacio_artistica || ''}</p>
+                            <b style="color:var(--accent); font-size:0.9rem;">🖼️ ${o.titol}</b>
+                            <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:5px;">${o.explicacio_artistica || ''}</p>
                         </div>`;
                 });
             }
 
-            resultatsDiv.innerHTML += `
+            div.innerHTML += `
                 <div class="response-card">
-                    <div class="ai-header">
-                        <span class="ai-badge">${item.tipus || 'Cultura'}</span>
-                    </div>
-                    <h2 style="margin-bottom:1rem;">${item.nom}</h2>
-                    <p style="line-height:1.7; color:#e2e8f0; margin-bottom:1.5rem;">${item.resum}</p>
-                    ${obresHTML}
+                    <span class="ai-badge">${item.tipus || 'CULTURA'}</span>
+                    <h2 style="font-size:1.8rem; margin-bottom:1rem;">${item.nom}</h2>
+                    <p style="line-height:1.7; color:#e2e8f0;">${item.resum}</p>
+                    ${obres}
                     <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--card-border);">
-                        <a href="${item.url}" target="_blank">Veure font oficial →</a>
+                        <a href="${item.url}" target="_blank">Font Oficial →</a>
                     </div>
                 </div>
             `;
         });
     }
 
-    // Lògica del cercador
-    const inputBuscador = document.getElementById('buscador');
-
-    inputBuscador.addEventListener('input', () => {
-        const text = inputBuscador.value.toLowerCase().trim();
+    // 3. Lògica del Cercador
+    const input = document.getElementById('buscador');
+    input.addEventListener('input', () => {
+        const val = input.value.toLowerCase().trim();
         const filtrats = dades.filter(d => 
-            d.nom.toLowerCase().includes(text) || 
-            d.resum.toLowerCase().includes(text)
+            d.nom.toLowerCase().includes(val) || 
+            d.resum.toLowerCase().includes(val)
         );
         renderitzar(filtrats);
     });
 
-    // Per si premen Intro (encara que ja filtra en temps real)
-    inputBuscador.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-        }
+    // Aturar el botó Intro per evitar recàrregues
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') e.preventDefault();
     });
 
-    // Iniciar app
-    inicialitzar();
+    carregar();
 </script>
 
 </body>
