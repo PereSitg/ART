@@ -16,7 +16,7 @@
             background: var(--bg-dark);
             background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
             color: var(--text-primary); min-height: 100vh; display: flex; 
-            justify-content: center; align-items: flex-start; padding-top: 5vh;
+            justify-content: center; align-items: flex-start; padding-top: 15vh;
         }
         .container { width: 90%; max-width: 900px; display: flex; flex-direction: column; gap: 2rem; }
         header { text-align: center; margin-bottom: 1rem; }
@@ -29,7 +29,7 @@
         }
         input {
             width: 100%; background: transparent; border: none; outline: none;
-            color: white; font-size: 1.25rem; font-weight: 500;
+            color: white; font-size: 1.25rem; font-weight: 500; text-align: center;
         }
         #resultats { margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 5rem; }
         .response-card {
@@ -57,7 +57,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="buscador" placeholder="Cerca un nom o paraula clau..." autocomplete="off">
+        <input type="text" id="buscador" placeholder="Quin artista busques?" autocomplete="off">
     </div>
 
     <div id="resultats"></div>
@@ -66,20 +66,32 @@
 <script>
     let dades = [];
 
+    // Funció per normalitzar text (treure accents)
+    function normalitzar(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     async function inicialitzar() {
         try {
-            // Saltem el cache per carregar el JSON més nou
             const res = await fetch('biblioteca_sitges_premium.json?t=' + Date.now());
             dades = await res.json();
-            renderitzar(dades);
+            // NO cridem a renderitzar(dades) aquí per mantenir la pantalla neta
         } catch (e) {
-            document.getElementById('resultats').innerHTML = "<p style='text-align:center'>Error carregar dades.</p>";
+            console.error("Error carregant dades.");
         }
     }
 
     function renderitzar(llista) {
         const div = document.getElementById('resultats');
-        div.innerHTML = llista.length ? "" : "<p style='text-align:center; color:gray;'>No hi ha coincidències.</p>";
+        const cercadorValue = document.getElementById('buscador').value.trim();
+        
+        // Si el buscador està buit, no pintis res
+        if (cercadorValue === "") {
+            div.innerHTML = "";
+            return;
+        }
+
+        div.innerHTML = llista.length ? "" : "<p style='text-align:center; color:gray;'>No s'han trobat coincidències.</p>";
         
         llista.forEach(item => {
             let obres = "";
@@ -98,7 +110,7 @@
                     <p style="color:#e2e8f0; line-height:1.8; font-size:1.1rem;">${item.resum}</p>
                     ${obres}
                     <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--card-border);">
-                        <a href="${item.url}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">Veure font oficial →</a>
+                        <a href="${item.url}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">Saber-ne més →</a>
                     </div>
                 </div>`;
         });
@@ -106,15 +118,20 @@
 
     const buscador = document.getElementById('buscador');
     buscador.addEventListener('input', () => {
-        const text = buscador.value.toLowerCase().trim();
+        const text = normalitzar(buscador.value.trim());
+        
+        if (text === "") {
+            renderitzar([]); // Neteja la pantalla
+            return;
+        }
+
         const filtrats = dades.filter(d => 
-            (d.nom && d.nom.toLowerCase().includes(text)) || 
-            (d.resum && d.resum.toLowerCase().includes(text))
+            normalitzar(d.nom || "").includes(text) || 
+            normalitzar(d.resum || "").includes(text)
         );
         renderitzar(filtrats);
     });
 
-    // Ignorar tecla Enter per evitar recàrregues
     buscador.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
 
     inicialitzar();
