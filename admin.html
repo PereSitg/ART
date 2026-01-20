@@ -2,43 +2,100 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Generador de Blocs SitgesArt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sitges Art</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; padding: 20px; }
-        .form-box { max-width: 600px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px; }
-        input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; cursor: pointer; }
-        #output { background: #000; color: #0f0; padding: 15px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; }
+        body { background: #020617; color: white; font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px 20px; }
+        .admin-card { max-width: 600px; margin: auto; background: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { margin-bottom: 20px; font-size: 1.5rem; color: #3b82f6; text-align: center; }
+        label { display: block; margin-top: 15px; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #020617; color: white; font-size: 1rem; outline: none; }
+        input:focus { border-color: #3b82f6; }
+        button { width: 100%; padding: 15px; margin-top: 30px; background: #3b82f6; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        button:hover { background: #2563eb; transform: translateY(-2px); }
+        .status { margin-top: 15px; text-align: center; font-size: 0.9rem; font-weight: 500; }
     </style>
 </head>
 <body>
-    <div class="form-box">
-        <h2>Nou Bloc per al JSON</h2>
-        <input type="text" id="nom" placeholder="Nom de l'artista o museu">
-        <input type="text" id="tipus" placeholder="Tipus (Pintor, Monument, etc.)">
-        <textarea id="resum" placeholder="Resum general"></textarea>
-        <input type="text" id="obra1" placeholder="Títol Obra 1">
-        <textarea id="exp1" placeholder="Explicació Obra 1"></textarea>
-        <input type="text" id="url" placeholder="URL de referència">
-        <button onclick="generar()">Generar Codi JSON</button>
-        <div id="output">El codi apareixerà aquí...</div>
+
+<div class="admin-card">
+    <h1>Publicar a Sitges Art</h1>
+    
+    <label>Nom</label>
+    <input type="text" id="nom" placeholder="Ex: Miquel Utrillo">
+
+    <label>Tipus</label>
+    <input type="text" id="tipus" placeholder="Ex: Pintor / Arquitecte">
+
+    <label>Resum principal</label>
+    <textarea id="resum" rows="3" placeholder="Breu descripció..."></textarea>
+
+    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-top: 20px;">
+        <label style="margin-top: 0;">Obra destacada (Títol)</label>
+        <input type="text" id="titol_obra" placeholder="Ex: Construcció de Maricel">
+        <label>Anàlisi de l'obra</label>
+        <textarea id="desc_obra" rows="3" placeholder="Explicació artística..."></textarea>
     </div>
 
-    <script>
-        function generar() {
-            const dades = {
+    <label>URL de referència</label>
+    <input type="text" id="url" placeholder="https://...">
+
+    <button onclick="enviarDada()">PUBLICAR A LA WEB</button>
+    <div id="status" class="status"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // --- AQUÍ HAS D'ENGANXAR LES TEVES CLAUS DE FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "LA_TEVA_API_KEY",
+        authDomain: "EL_TEU_PROJECTE.firebaseapp.com",
+        projectId: "EL_TEU_PROJECTE",
+        storageBucket: "EL_TEU_PROJECTE.appspot.com",
+        messagingSenderId: "EL_TEU_SENDER_ID",
+        appId: "LA_TEVA_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.enviarDada = async function() {
+        const status = document.getElementById('status');
+        const btn = document.querySelector('button');
+        
+        try {
+            btn.innerText = "Publicant...";
+            btn.disabled = true;
+
+            const novaEntrada = {
                 nom: document.getElementById('nom').value,
                 tipus: document.getElementById('tipus').value,
                 resum: document.getElementById('resum').value,
                 analisis_obres: [{
-                    titol: document.getElementById('obra1').value,
-                    explicacio_artistica: document.getElementById('exp1').value
+                    titol: document.getElementById('titol_obra').value,
+                    explicacio_artistica: document.getElementById('desc_obra').value
                 }],
-                url: document.getElementById('url').value
+                url: document.getElementById('url').value,
+                data: new Date()
             };
-            // Mostra el codi amb una coma al davant per facilitar l'enganxat
-            document.getElementById('output').innerText = ",\n" + JSON.stringify(dades, null, 2);
+
+            await addDoc(collection(db, "obres"), novaEntrada);
+            
+            status.innerHTML = "✅ Publicat amb èxit!";
+            status.style.color = "#10b981";
+            document.querySelectorAll('input, textarea').forEach(i => i.value = "");
+            
+        } catch (e) {
+            status.innerHTML = "❌ Error: " + e.message;
+            status.style.color = "#ef4444";
+        } finally {
+            btn.innerText = "PUBLICAR A LA WEB";
+            btn.disabled = false;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
