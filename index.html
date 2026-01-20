@@ -104,7 +104,8 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        .source-link a:hover { color: white; text-decoration: underline; }
 
         footer { text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 4rem; line-height: 1.6; }
 
@@ -127,7 +128,7 @@
         </section>
 
         <section id="resultats" class="results-section">
-            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu...</p>
+            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu de Sitges...</p>
         </section>
 
         <footer>
@@ -140,64 +141,68 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CREDENCIALS REALS PERE BADIA
         const firebaseConfig = {
-            apiKey: "AIzaSyAsS12345-ExampleKey", 
-            authDomain: "sitgesart-81676.firebaseapp.com",
-            projectId: "sitgesart-81676",
-            storageBucket: "sitgesart-81676.appspot.com",
-            messagingSenderId: "1074123456789",
-            appId: "1:1074123456789:web:abcdef123456"
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee",
+            measurementId: "G-7G51JP9CFS"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let dadesGlobals = [];
 
-        // Funció de renderitzat ara fora de l'onSnapshot per seguretat
         function renderitzar(llista) {
             const contenidor = document.getElementById('resultats');
             if (!llista || llista.length === 0) {
-                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat.</p>";
+                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat que coincideixi.</p>";
                 return;
             }
 
             contenidor.innerHTML = llista.map(obra => `
                 <div class="response-card">
-                    <span class="ai-badge">${obra.tipus || 'ARXIU'}</span>
+                    <span class="ai-badge">${obra.tipus || 'PATRIMONI'}</span>
                     <div class="ai-content">
-                        <h2>${obra.nom || 'Sense nom'}</h2>
-                        <p>${obra.resum || ''}</p>
+                        <h2>${obra.nom || 'Sense títol'}</h2>
+                        <p>${obra.resum || 'Sense descripció.'}</p>
                     </div>
                     ${(obra.font || obra.url) ? `
                         <div class="source-link">
                             ${obra.font ? `<span>FONT: <strong>${obra.font}</strong></span>` : ''}
-                            ${obra.url ? `<br><a href="${obra.url}" target="_blank">Veure article original →</a>` : ''}
+                            ${obra.url ? `<br><a href="${obra.url}" target="_blank">Llegir crònica completa →</a>` : ''}
                         </div>
                     ` : ''}
                 </div>
             `).join('');
         }
 
-        // Escolta de dades
+        // Connectem amb la col·lecció "obres"
         onSnapshot(collection(db, "obres"), (snapshot) => {
             dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderitzar(dadesGlobals);
+        }, (error) => {
+            console.error("Error Firebase:", error);
+            document.getElementById('resultats').innerHTML = "<p style='text-align:center; color:red;'>Error de connexió: Revisa les regles de Firestore.</p>";
         });
 
-        // Buscador millorat amb protecció contra nuls
+        // Buscador
         document.getElementById('buscador').addEventListener('input', (e) => {
             const cerca = e.target.value.toLowerCase().trim();
             
-            if (!cerca) {
+            if (cerca === "") {
                 renderitzar(dadesGlobals);
                 return;
             }
 
             const filtrades = dadesGlobals.filter(o => {
-                const n = (o.nom || "").toLowerCase();
-                const r = (o.resum || "").toLowerCase();
-                const f = (o.font || "").toLowerCase();
-                return n.includes(cerca) || r.includes(cerca) || f.includes(cerca);
+                const nom = (o.nom || "").toLowerCase();
+                const resum = (o.resum || "").toLowerCase();
+                const font = (o.font || "").toLowerCase();
+                return nom.includes(cerca) || resum.includes(cerca) || font.includes(cerca);
             });
 
             renderitzar(filtrades);
