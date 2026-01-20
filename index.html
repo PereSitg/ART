@@ -104,8 +104,7 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-        .source-link a:hover { color: white; text-decoration: underline; }
+        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
         footer { text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 4rem; line-height: 1.6; }
 
@@ -118,7 +117,7 @@
     <div class="container">
         <header>
             <div class="logo">Sitges<span>Art</span></div>
-            <div class="subtitle">Arxiu Històric i Digital de Sitges</div>
+            <div class="subtitle">Art i Intel·ligència Artificial</div>
         </header>
 
         <section class="search-section">
@@ -128,8 +127,7 @@
         </section>
 
         <section id="resultats" class="results-section">
-            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu de Sitges...</p>
-        </section>
+            </section>
 
         <footer>
             Sitges Art & Història 2026 • Pere Badia i Lorenz<br>
@@ -141,7 +139,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CREDENCIALS REALS PERE BADIA
         const firebaseConfig = {
             apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
             authDomain: "sitgesart.firebaseapp.com",
@@ -156,19 +153,33 @@
         const db = getFirestore(app);
         let dadesGlobals = [];
 
-        function renderitzar(llista) {
+        function renderitzar(llista, textCerca) {
             const contenidor = document.getElementById('resultats');
-            if (!llista || llista.length === 0) {
-                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat que coincideixi.</p>";
+            
+            // Si el cercador es buida, netegem la pantalla
+            if (!textCerca || textCerca.length === 0) {
+                contenidor.innerHTML = "";
                 return;
             }
 
-            contenidor.innerHTML = llista.map(obra => `
+            if (!llista || llista.length === 0) {
+                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat per a la teva consulta.</p>";
+                return;
+            }
+
+            // Priorització de Biografies: comparem el camp 'tipus'
+            const llistaOrdenada = [...llista].sort((a, b) => {
+                const aEsBio = (a.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
+                const bEsBio = (b.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
+                return bEsBio - aEsBio;
+            });
+
+            contenidor.innerHTML = llistaOrdenada.map(obra => `
                 <div class="response-card">
-                    <span class="ai-badge">${obra.tipus || 'PATRIMONI'}</span>
+                    <span class="ai-badge">${obra.tipus || 'CULTURA'}</span>
                     <div class="ai-content">
                         <h2>${obra.nom || 'Sense títol'}</h2>
-                        <p>${obra.resum || 'Sense descripció.'}</p>
+                        <p>${obra.resum || ''}</p>
                     </div>
                     ${(obra.font || obra.url) ? `
                         <div class="source-link">
@@ -180,21 +191,17 @@
             `).join('');
         }
 
-        // Connectem amb la col·lecció "obres"
+        // Escolta passiva: només guarda les dades, no renderitza res en entrar
         onSnapshot(collection(db, "obres"), (snapshot) => {
             dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderitzar(dadesGlobals);
-        }, (error) => {
-            console.error("Error Firebase:", error);
-            document.getElementById('resultats').innerHTML = "<p style='text-align:center; color:red;'>Error de connexió: Revisa les regles de Firestore.</p>";
         });
 
-        // Buscador
+        // Event de cerca
         document.getElementById('buscador').addEventListener('input', (e) => {
             const cerca = e.target.value.toLowerCase().trim();
             
             if (cerca === "") {
-                renderitzar(dadesGlobals);
+                renderitzar([], "");
                 return;
             }
 
@@ -205,7 +212,7 @@
                 return nom.includes(cerca) || resum.includes(cerca) || font.includes(cerca);
             });
 
-            renderitzar(filtrades);
+            renderitzar(filtrades, cerca);
         });
     </script>
 </body>
