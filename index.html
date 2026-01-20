@@ -5,16 +5,17 @@
     <title>Sitges Art & Història</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* RECUPEREM EL TEU ESTIL ORIGINAL */
         body { background-color: #f8fafc; color: #1e293b; }
         .obra-card { 
             background: white; 
-            border-radius: 12px; 
+            border-radius: 8px; 
             padding: 20px; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            border-top: 4px solid #3b82f6;
-            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-top: 4px solid #3b82f6; /* La línia blava característica */
+            transition: transform 0.2s ease;
         }
-        .obra-card:hover { transform: scale(1.02); }
+        .obra-card:hover { transform: translateY(-3px); }
         .tag { 
             font-size: 0.7rem; 
             font-weight: bold; 
@@ -23,33 +24,34 @@
             background: #eff6ff; 
             padding: 2px 8px; 
             border-radius: 4px; 
+            display: inline-block;
+            margin-bottom: 10px;
         }
     </style>
 </head>
-<body class="p-6 md:p-12">
+<body class="p-8">
 
     <div class="max-w-6xl mx-auto">
-        <h1 class="text-4xl font-bold mb-2 text-slate-800">Sitges: Art i Història</h1>
-        <p class="mb-8 text-slate-500">Cercador de patrimoni, cases d'indians i cròniques locals.</p>
+        <h1 class="text-3xl font-bold mb-1">Sitges: Art i Història</h1>
+        <p class="text-slate-500 mb-8">Cercador de patrimoni i cròniques de la Blanca Subur.</p>
 
         <div class="flex flex-col md:flex-row gap-4 mb-10">
             <input type="text" id="buscador" onkeyup="filtrarContingut()" 
-                   placeholder="Escriu per buscar (casa, artista, font...)" 
-                   class="flex-1 p-3 rounded-lg border border-slate-300 outline-none focus:border-blue-500">
+                   placeholder="Busca per nom, tema o font..." 
+                   class="flex-1 p-3 rounded border border-slate-300 outline-none focus:border-blue-500">
             
             <select id="filtreTipus" onchange="filtrarContingut()" 
-                    class="p-3 rounded-lg border border-slate-300 bg-white">
+                    class="p-3 rounded border border-slate-300 bg-white">
                 <option value="tots">Tots els estils</option>
                 <option value="Modernisme">Modernisme</option>
                 <option value="Història Local (Criticartt)">Història Criticartt</option>
                 <option value="Arquitectura">Arquitectura</option>
-                <option value="Cinema">Cinema</option>
                 <option value="Art Contemporani">Art Contemporani</option>
             </select>
         </div>
 
         <div id="resultats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p class="col-span-full text-center text-slate-400">Carregant dades de Sitges...</p>
+            <p class="text-slate-400">Carregant la base de dades...</p>
         </div>
     </div>
 
@@ -57,6 +59,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // LES TEVES CREDENCIALS REALS
         const firebaseConfig = {
             apiKey: "AIzaSyAsS12345-ExampleKey", 
             authDomain: "sitgesart-81676.firebaseapp.com",
@@ -70,6 +73,7 @@
         const db = getFirestore(app);
         let totesLesObres = [];
 
+        // Escolta activa de la base de dades
         onSnapshot(collection(db, "obres"), (snapshot) => {
             totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderitzar(totesLesObres);
@@ -80,19 +84,19 @@
             contenidor.innerHTML = llista.map(obra => `
                 <div class="obra-card">
                     <span class="tag">${obra.tipus || 'General'}</span>
-                    <h3 class="text-xl font-bold mt-2 mb-2 text-slate-800">${obra.nom}</h3>
+                    <h3 class="text-xl font-bold mb-2">${obra.nom}</h3>
                     <p class="text-slate-600 text-sm mb-4">${obra.resum || ''}</p>
                     
                     ${obra.font ? `
-                        <div class="mt-2 pt-2 border-t border-slate-100">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Font:</p>
-                            <p class="text-xs text-blue-800 font-semibold">${obra.font}</p>
+                        <div class="mt-4 pt-2 border-t border-slate-100">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Font d'informació:</p>
+                            <p class="text-xs text-blue-700 font-semibold">${obra.font}</p>
                         </div>
                     ` : ''}
 
                     ${obra.url ? `
-                        <a href="${obra.url}" target="_blank" class="text-blue-500 text-xs font-bold mt-4 inline-block hover:underline">
-                            LLEGIR ARTICLE ORIGINAL →
+                        <a href="${obra.url}" target="_blank" class="text-blue-500 text-xs font-bold mt-3 inline-block hover:underline">
+                            VEURE ARTICLE ORIGINAL →
                         </a>
                     ` : ''}
                 </div>
@@ -103,7 +107,9 @@
             const text = document.getElementById('buscador').value.toLowerCase();
             const filtre = document.getElementById('filtreTipus').value;
             const filtrades = totesLesObres.filter(o => {
-                const matchText = (o.nom?.toLowerCase().includes(text)) || (o.resum?.toLowerCase().includes(text)) || (o.font?.toLowerCase().includes(text));
+                const matchText = (o.nom?.toLowerCase().includes(text)) || 
+                                 (o.resum?.toLowerCase().includes(text)) || 
+                                 (o.font?.toLowerCase().includes(text));
                 const matchFiltre = filtre === "tots" || o.tipus === filtre;
                 return matchText && matchFiltre;
             });
