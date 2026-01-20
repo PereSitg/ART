@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art & IA 2026</title>
+    <title>Sitges Art i Intel·ligència Artificial</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,50 +38,55 @@
         header { text-align: center; animation: fadeInDown 1s ease; }
         header .logo { font-size: clamp(3rem, 8vw, 4.5rem); font-weight: 800; background: linear-gradient(to bottom, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         header .logo span { background: linear-gradient(to right, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header .subtitle { color: var(--text-secondary); font-size: 1.2rem; margin-top: 0.5rem; font-weight: 500; }
 
-        /* BARRA DE CERCA (RECUPERADA) */
         .search-container {
-            width: 100%;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 0.75rem 1rem 0.75rem 1.5rem;
-            display: flex;
-            align-items: center;
+            width: 100%; background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border); border-radius: 20px;
+            padding: 0.75rem 1rem 0.75rem 1.5rem; display: flex; align-items: center;
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            margin-top: 1rem;
         }
 
         input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.15rem; }
+        input::placeholder { color: #475569; }
 
-        .actions { display: flex; gap: 0.5rem; }
-        .btn-action {
-            background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
-            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        #send-btn { 
+            background: var(--primary); color: white; border: none; 
+            width: 44px; height: 44px; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            transition: all 0.2s;
         }
-        #send-btn { background: var(--primary); color: white; }
+        #send-btn:hover { background: #2563eb; transform: scale(1.05); }
 
-        /* TARGETA DE RESPOSTA */
         .response-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 2.5rem;
-            border-radius: 28px;
-            margin-top: 2rem;
-            display: none; /* S'activa en cercar */
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            padding: 2.5rem; border-radius: 28px; margin-top: 1.5rem;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.6s ease;
         }
 
-        /* COMPARTIR (NOU) */
+        .ai-badge {
+            display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--accent);
+            padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.7rem;
+            font-weight: 800; text-transform: uppercase; border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
         .share-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--card-border); }
-        .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .share-buttons { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
         .share-btn {
             background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
-            color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer; text-decoration: none; font-size: 0.9rem;
+            color: white; padding: 10px 18px; border-radius: 12px; cursor: pointer; 
+            text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+            transition: all 0.3s;
         }
+        .share-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); transform: translateY(-2px); }
 
-        footer { text-align: center; color: #475569; padding: 2rem 0; font-size: 0.9rem; }
+        footer { text-align: center; color: #475569; padding: 4rem 0; font-size: 0.9rem; line-height: 1.5; }
 
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -89,53 +94,98 @@
 <div class="container">
     <header>
         <div class="logo">Sitges <span>Art</span></div>
-        <div class="subtitle">Patrimoni & Intel·ligència Artificial 2026</div>
+        <div class="subtitle">Art i intel·ligència artificial</div>
     </header>
 
     <div class="search-section">
         <div class="search-container">
-            <input type="text" id="user-input" placeholder="Pregunta sobre la història de Sitges...">
-            <div class="actions">
-                <button class="btn-action" id="mic-btn">🎤</button>
-                <button class="btn-action" id="send-btn">➔</button>
-            </div>
+            <input type="text" id="user-input" placeholder="Cerca obres, llocs o personatges...">
+            <button id="send-btn">➔</button>
         </div>
     </div>
 
     <div id="result-container"></div>
 
     <footer>
-        Creat per <strong>Pere Badia i Lorenz</strong> | pbadialorenz@gmail.com
+        Creat per <strong>Pere Badia i Lorenz</strong><br>
+        pbadialorenz@gmail.com
     </footer>
 </div>
 
 <script type="module">
-    // Aquí aniria la teva lògica de Firebase per cercar i mostrar
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee",
+        measurementId: "G-7G51JP9CFS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const input = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
     const resultContainer = document.getElementById('result-container');
 
-    sendBtn.onclick = () => {
-        const query = document.getElementById('user-input').value;
-        if(!query) return;
+    async function executarCerca() {
+        const query = input.value.toLowerCase().trim();
+        if (!query) return;
 
-        // Simulació de resposta per provar els botons
-        resultContainer.innerHTML = `
-            <div class="response-card" style="display:block">
-                <div style="color:var(--accent); font-weight:800; font-size:0.7rem; margin-bottom:1rem">RESULTAT DE CERCA</div>
-                <h2 style="margin-bottom:1rem">Resultat per: ${query}</h2>
-                <p style="line-height:1.8; color:#e2e8f0">Aquí apareixerà la informació de la base de dades...</p>
-                
-                <div class="share-section">
-                    <span style="color:var(--text-secondary); font-size:0.8rem">COMPARTEIX:</span>
-                    <div class="share-buttons">
-                        <a href="https://wa.me/?text=Mira això de Sitges Art!" target="_blank" class="share-btn">🟢 WhatsApp</a>
-                        <a href="#" class="share-btn">⚫ X</a>
-                        <button onclick="navigator.clipboard.writeText(window.location.href); alert('Copiat!')" class="share-btn">🔗 Link</button>
-                    </div>
-                </div>
-            </div>
-        `;
+        resultContainer.innerHTML = '<p style="text-align:center; margin-top:2rem; color:var(--text-secondary)">Explorant l\'art de Sitges...</p>';
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "obres"));
+            let trobat = false;
+            resultContainer.innerHTML = '';
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const nomMatch = data.nom?.toLowerCase().includes(query);
+                const keyMatch = data.search_key?.toLowerCase().includes(query);
+
+                if (nomMatch || keyMatch) {
+                    trobat = true;
+                    const card = document.createElement('div');
+                    card.className = 'response-card';
+                    card.innerHTML = `
+                        <div class="ai-badge">${data.tipus || 'HISTÒRIA'}</div>
+                        <h2 style="font-size:1.8rem; margin-bottom:1rem; color:white">${data.nom}</h2>
+                        <p style="font-size:1.15rem; line-height:1.9; color:#e2e8f0; white-space:pre-wrap">${data.resum}</p>
+                        
+                        <div class="share-section">
+                            <span class="share-title">Comparteix:</span>
+                            <div class="share-buttons">
+                                <a href="https://wa.me/?text=${encodeURIComponent(data.nom + ': ' + window.location.href)}" target="_blank" class="share-btn">🟢 WhatsApp</a>
+                                <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(data.nom)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn">⚫ X</a>
+                                <button onclick="window.copiarLink()" class="share-btn">🔗 Link</button>
+                            </div>
+                        </div>
+                    `;
+                    resultContainer.appendChild(card);
+                }
+            });
+
+            if (!trobat) {
+                resultContainer.innerHTML = '<p style="text-align:center; margin-top:2rem; color:var(--text-secondary)">No s\'han trobat resultats.</p>';
+            }
+        } catch (error) {
+            resultContainer.innerHTML = '<p style="text-align:center; margin-top:2rem; color:red">Error en connectar amb la base de dades.</p>';
+        }
+    }
+
+    window.copiarLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Enllaç copiat!");
     };
+
+    sendBtn.onclick = executarCerca;
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') executarCerca(); });
 </script>
 
 </body>
