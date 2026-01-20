@@ -139,6 +139,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // LES TEVES CREDENCIALS REALS
         const firebaseConfig = {
             apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
             authDomain: "sitgesart.firebaseapp.com",
@@ -153,25 +154,33 @@
         const db = getFirestore(app);
         let dadesGlobals = [];
 
+        // Funció per mostrar els resultats amb prioritat biogràfica
         function renderitzar(llista, textCerca) {
             const contenidor = document.getElementById('resultats');
             
-            // Si el cercador es buida, netegem la pantalla
             if (!textCerca || textCerca.length === 0) {
                 contenidor.innerHTML = "";
                 return;
             }
 
             if (!llista || llista.length === 0) {
-                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat per a la teva consulta.</p>";
+                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat.</p>";
                 return;
             }
 
-            // Priorització de Biografies: comparem el camp 'tipus'
+            // ORDENACIÓ: Biografies i noms exactes primer
             const llistaOrdenada = [...llista].sort((a, b) => {
-                const aEsBio = (a.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
-                const bEsBio = (b.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
-                return bEsBio - aEsBio;
+                const aNom = (a.nom || "").toLowerCase();
+                const bNom = (b.nom || "").toLowerCase();
+                const aTipus = (a.tipus || "").toLowerCase();
+                const bTipus = (b.tipus || "").toLowerCase();
+                const cerca = textCerca.toLowerCase();
+
+                // Puntuació: Biografia (2 punts), Nom exacte (1 punt)
+                const aPunts = (aTipus.includes("bio") ? 2 : 0) + (aNom === cerca ? 1 : 0);
+                const bPunts = (bTipus.includes("bio") ? 2 : 0) + (bNom === cerca ? 1 : 0);
+
+                return bPunts - aPunts;
             });
 
             contenidor.innerHTML = llistaOrdenada.map(obra => `
@@ -191,12 +200,12 @@
             `).join('');
         }
 
-        // Escolta passiva: només guarda les dades, no renderitza res en entrar
+        // Escolta de dades de la col·lecció 'obres'
         onSnapshot(collection(db, "obres"), (snapshot) => {
             dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         });
 
-        // Event de cerca
+        // Event de cerca en temps real
         document.getElementById('buscador').addEventListener('input', (e) => {
             const cerca = e.target.value.toLowerCase().trim();
             
