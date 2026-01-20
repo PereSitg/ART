@@ -31,102 +31,57 @@
             justify-content: center;
             align-items: flex-start;
             padding: 5vh 20px;
-            overflow-x: hidden;
         }
 
         .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 2.5rem; }
 
-        header { text-align: center; animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        header .logo {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 800;
-            background: linear-gradient(to bottom, #ffffff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        header .logo span {
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        header { text-align: center; animation: fadeInDown 1s ease; }
+        header .logo { font-size: clamp(3rem, 8vw, 4.5rem); font-weight: 800; background: linear-gradient(to bottom, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header .logo span { background: linear-gradient(to right, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* GRID DE RESULTATS */
-        #llista-obres {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
+        /* BARRA DE CERCA (RECUPERADA) */
+        .search-container {
             width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 0.75rem 1rem 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
+        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.15rem; }
+
+        .actions { display: flex; gap: 0.5rem; }
+        .btn-action {
+            background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
+            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        }
+        #send-btn { background: var(--primary); color: white; }
+
+        /* TARGETA DE RESPOSTA */
         .response-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             padding: 2.5rem;
             border-radius: 28px;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            margin-top: 2rem;
+            display: none; /* S'activa en cercar */
         }
 
-        .ai-badge {
-            align-self: flex-start;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            padding: 0.5rem 1.25rem;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .obra-titol { font-size: 1.8rem; font-weight: 700; color: white; }
-        .obra-resum { font-size: 1.1rem; line-height: 1.8; color: #e2e8e0; }
-
-        /* SECCIÓ COMPARTIR */
-        .share-section {
-            margin-top: 1rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--card-border);
-        }
-        .share-title {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-            display: block;
-        }
-        .share-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        
+        /* COMPARTIR (NOU) */
+        .share-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--card-border); }
+        .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .share-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 0.6rem 1rem;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .share-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent);
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+            color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer; text-decoration: none; font-size: 0.9rem;
         }
 
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        footer { text-align: center; color: #475569; padding: 2rem 0; font-size: 0.9rem; }
 
-        @media (max-width: 600px) { .response-card { padding: 1.5rem; } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -137,59 +92,50 @@
         <div class="subtitle">Patrimoni & Intel·ligència Artificial 2026</div>
     </header>
 
-    <div id="llista-obres">
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" id="user-input" placeholder="Pregunta sobre la història de Sitges...">
+            <div class="actions">
+                <button class="btn-action" id="mic-btn">🎤</button>
+                <button class="btn-action" id="send-btn">➔</button>
+            </div>
         </div>
+    </div>
+
+    <div id="result-container"></div>
+
+    <footer>
+        Creat per <strong>Pere Badia i Lorenz</strong> | pbadialorenz@gmail.com
+    </footer>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // Aquí aniria la teva lògica de Firebase per cercar i mostrar
+    const sendBtn = document.getElementById('send-btn');
+    const resultContainer = document.getElementById('result-container');
 
-    // LA TEVA CONFIGURACIÓ (Substitueix amb la teva)
-    const firebaseConfig = {
-        apiKey: "LA_TEVA_API_KEY",
-        projectId: "peresitg-art",
-        appId: "LA_TEVA_APP_ID"
-    };
+    sendBtn.onclick = () => {
+        const query = document.getElementById('user-input').value;
+        if(!query) return;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function carregarDades() {
-        const querySnapshot = await getDocs(collection(db, "obres"));
-        const container = document.getElementById('llista-obres');
-        container.innerHTML = '';
-
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const currentUrl = window.location.href;
-            
-            const card = document.createElement('div');
-            card.className = 'response-card';
-            card.innerHTML = `
-                <div class="ai-badge">${data.tipus || 'HISTÒRIA'}</div>
-                <h2 class="obra-titol">${data.nom}</h2>
-                <p class="obra-resum">${data.resum}</p>
+        // Simulació de resposta per provar els botons
+        resultContainer.innerHTML = `
+            <div class="response-card" style="display:block">
+                <div style="color:var(--accent); font-weight:800; font-size:0.7rem; margin-bottom:1rem">RESULTAT DE CERCA</div>
+                <h2 style="margin-bottom:1rem">Resultat per: ${query}</h2>
+                <p style="line-height:1.8; color:#e2e8f0">Aquí apareixerà la informació de la base de dades...</p>
+                
                 <div class="share-section">
-                    <span class="share-title">Compartir història</span>
+                    <span style="color:var(--text-secondary); font-size:0.8rem">COMPARTEIX:</span>
                     <div class="share-buttons">
-                        <a href="https://wa.me/?text=${encodeURIComponent(data.nom + ': ' + currentUrl)}" target="_blank" class="share-btn">🟢 WhatsApp</a>
-                        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(data.nom)}&url=${encodeURIComponent(currentUrl)}" target="_blank" class="share-btn">⚫ X</a>
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}" target="_blank" class="share-btn">🔵 Facebook</a>
-                        <button onclick="copiarLink()" class="share-btn">🔗 Copiar</button>
+                        <a href="https://wa.me/?text=Mira això de Sitges Art!" target="_blank" class="share-btn">🟢 WhatsApp</a>
+                        <a href="#" class="share-btn">⚫ X</a>
+                        <button onclick="navigator.clipboard.writeText(window.location.href); alert('Copiat!')" class="share-btn">🔗 Link</button>
                     </div>
                 </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    window.copiarLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Enllaç copiat!");
+            </div>
+        `;
     };
-
-    carregarDades();
 </script>
 
 </body>
