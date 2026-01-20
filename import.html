@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Importador Massiu - Sitges Art</title>
+    <style>
+        body { background: #020617; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
+        .status-box { background: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid #1e293b; display: inline-block; max-width: 600px; }
+        button { padding: 15px 30px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        #log { margin-top: 20px; text-align: left; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="status-box">
+    <h2>🚀 Importació Automàtica</h2>
+    <p>Aquest botó llegirà <b>biblioteca_sitges_premium.json</b> <br> i ho enviarà tot a la teva base de dades.</p>
+    <button onclick="comencarImportacio()">LANZAR IMPORTACIÓ</button>
+    <div id="log"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.comencarImportacio = async function() {
+        const log = document.getElementById('log');
+        log.innerHTML = "⏳ Connectant amb el fitxer JSON...<br>";
+
+        try {
+            const response = await fetch('biblioteca_sitges_premium.json');
+            if (!response.ok) throw new Error("No s'ha trobat el fitxer JSON a GitHub.");
+            const dades = await response.json();
+
+            log.innerHTML += `📦 S'han trobat ${dades.length} elements. Començant la pujada...<br><br>`;
+
+            for (const item of dades) {
+                await addDoc(collection(db, "obres"), item);
+                log.innerHTML += `✅ Importat: ${item.nom}<br>`;
+            }
+
+            log.innerHTML += "<br><b style='color:#10b981'>✨ PROSÉS FINALITZAT! Ja pots mirar la teva web principal.</b>";
+        } catch (error) {
+            log.innerHTML += `<br><b style='color:#ef4444'>❌ Error: ${error.message}</b>`;
+        }
+    }
+</script>
+</body>
+</html>
