@@ -2,162 +2,109 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art & Intel·ligència Artificial</title>
+    <title>Admin - Sitges Art & Història</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* EL TEU ESTIL CSS ADAPTAT */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f7f6;
-        }
-        header {
-            text-align: center;
-            padding: 40px 0;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        h1 { color: #2c3e50; margin: 0; }
-        .grid-obres {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .card:hover { transform: translateY(-5px); }
-        .tipus { 
-            font-size: 0.75rem; 
-            font-weight: bold; 
-            color: #3498db; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .font-link { color: #888; font-size: 0.85rem; text-decoration: none; }
-        
-        /* ESTIL DELS BOTONS DE COMPARTIR */
-        .share-container {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .share-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .share-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .share-icon:hover { background: #f0f0f0; border-color: #bbb; }
-        .share-icon img { width: 20px; height: 20px; }
+        .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 p-8">
 
-<header>
-    <h1>Sitges Art & IA 2026</h1>
-    <p>Patrimoni i memòria històrica de Sitges</p>
-</header>
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-blue-900">Gestor de Continguts SitgesArt</h1>
 
-<div id="llista-obres" class="grid-obres">
-    <p style="text-align: center; grid-column: 1/-1;">Carregant la història de Sitges...</p>
-</div>
+        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4">Afegir Nova Entrada (Manual o Criticartt)</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" id="nom" placeholder="Nom de l'obra o lloc (Ex: Can Falç)" class="border p-2 rounded">
+                <select id="tipus" class="border p-2 rounded">
+                    <option value="Modernisme">Modernisme</option>
+                    <option value="Història Local">Història Local (Criticartt)</option>
+                    <option value="Arquitectura">Arquitectura</option>
+                    <option value="Cinema">Cinema</option>
+                    <option value="Art Contemporani">Art Contemporani</option>
+                </select>
+                <textarea id="resum" placeholder="Resum curt per al cercador..." class="border p-2 rounded h-20"></textarea>
+                <textarea id="explicacio" placeholder="Història completa o anècdota..." class="border p-2 rounded h-32"></textarea>
+                <input type="text" id="url" placeholder="URL de la font (ex: criticartt.blogspot.com)" class="border p-2 rounded">
+                <button onclick="guardarDada()" class="bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Guardar a la Base de Dades</button>
+            </div>
+        </div>
 
-<script type="module">
-    // IMPORTACIÓ DE FIREBASE
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-semibold mb-4">Contingut a la Base de Dades</h2>
+            <div id="llista-contingut" class="space-y-4">
+                <p class="text-gray-500 italic">Carregant dades...</p>
+            </div>
+        </div>
+    </div>
 
-    // LA TEVA CONFIGURACIÓ DE FIREBASE (Assegura't que sigui la teva)
-    const firebaseConfig = {
-        apiKey: "LA_TEVA_API_KEY",
-        authDomain: "peresitg-art.firebaseapp.com",
-        projectId: "peresitg-art",
-        storageBucket: "peresitg-art.appspot.com",
-        messagingSenderId: "ID_SENDER",
-        appId: "ID_APP"
-    };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const container = document.getElementById('llista-obres');
+        const firebaseConfig = {
+            // ENGANXA AQUÍ LES TEVES CREDENCIALS DE FIREBASE
+            apiKey: "TEU_API_KEY",
+            authDomain: "TEU_PROJECTE.firebaseapp.com",
+            projectId: "TEU_PROJECTE_ID",
+            storageBucket: "TEU_PROJECTE.appspot.com",
+            messagingSenderId: "TEU_SENDER_ID",
+            appId: "TEU_APP_ID"
+        };
 
-    async function carregarObres() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "obres"));
-            container.innerHTML = ''; // Netegem el missatge de càrrega
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-            querySnapshot.forEach((doc) => {
-                const obra = doc.data();
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                // Construïm el contingut de la targeta
-                card.innerHTML = `
-                    <div>
-                        <span class="tipus">${obra.tipus || 'HISTÒRIA'}</span>
-                        <h2 style="margin: 10px 0;">${obra.nom}</h2>
-                        <p style="font-size: 0.95rem; color: #555;">${obra.resum}</p>
-                        <a href="${obra.url}" target="_blank" class="font-link">Font: ${obra.font}</a>
-                    </div>
-                    
-                    <div class="share-container">
-                        <div class="share-buttons">
-                            <a href="https://api.whatsapp.com/send?text=Mira aquesta història de Sitges: ${encodeURIComponent(obra.nom)} ${encodeURIComponent(window.location.href)}" target="_blank" class="share-icon">
-                                <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA">
-                            </a>
-                            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(obra.nom)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="share-icon">
-                                <img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" alt="X">
-                            </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-icon">
-                                <img src="https://cdn-icons-png.flaticon.com/512/5968/5968764.png" alt="FB">
-                            </a>
-                            <button onclick="copiarLink()" class="share-icon">
-                                <img src="https://cdn-icons-png.flaticon.com/512/1621/1621635.png" alt="Link">
-                            </button>
+        // FUNCIO PER GUARDAR
+        window.guardarDada = async () => {
+            const nom = document.getElementById('nom').value;
+            const tipus = document.getElementById('tipus').value;
+            const resum = document.getElementById('resum').value;
+            const explicacio = document.getElementById('explicacio').value;
+            const url = document.getElementById('url').value;
+
+            if(!nom || !explicacio) return alert("Falten camps!");
+
+            try {
+                await addDoc(collection(db, "obres"), {
+                    nom: nom,
+                    tipus: tipus,
+                    resum: resum,
+                    analisis_obres: [{ titol: "Història i Detalls", explicacio_artistica: explicacio }],
+                    url: url,
+                    data_creacio: new Date()
+                });
+                alert("Guardat correctament!");
+                document.querySelectorAll('input, textarea').forEach(el => el.value = "");
+            } catch (e) { console.error("Error: ", e); }
+        };
+
+        // LLEGIR EN TEMPS REAL
+        onSnapshot(collection(db, "obres"), (querySnapshot) => {
+            const llista = document.getElementById('llista-contingut');
+            llista.innerHTML = "";
+            querySnapshot.forEach((d) => {
+                const item = d.data();
+                llista.innerHTML += `
+                    <div class="card bg-gray-50 flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold uppercase text-blue-600">${item.tipus}</span>
+                            <h3 class="text-lg font-bold">${item.nom}</h3>
+                            <p class="text-sm text-gray-600">${item.resum || ''}</p>
                         </div>
+                        <button onclick="window.eliminarDada('${d.id}')" class="text-red-500 hover:underline text-sm">Eliminar</button>
                     </div>
                 `;
-                container.appendChild(card);
             });
-        } catch (error) {
-            console.error("Error carregant Firebase:", error);
-            container.innerHTML = "<p>Error en carregar les dades. Revisa la configuració de Firebase.</p>";
-        }
-    }
-
-    // Funció per copiar el link
-    window.copiarLink = function() {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            alert("Enllaç copiat al porta-retalls!");
         });
-    };
 
-    carregarObres();
-</script>
-
+        window.eliminarDada = async (id) => {
+            if(confirm("Segur que vols eliminar aquesta història?")) {
+                await deleteDoc(doc(db, "obres", id));
+            }
+        };
+    </script>
 </body>
 </html>
