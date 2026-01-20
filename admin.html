@@ -2,99 +2,56 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Sitges Art</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { background: #020617; color: white; font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px 20px; }
-        .admin-card { max-width: 600px; margin: auto; background: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { margin-bottom: 20px; font-size: 1.5rem; color: #3b82f6; text-align: center; }
-        label { display: block; margin-top: 15px; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
-        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #020617; color: white; font-size: 1rem; outline: none; }
-        input:focus { border-color: #3b82f6; }
-        button { width: 100%; padding: 15px; margin-top: 30px; background: #3b82f6; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        button:hover { background: #2563eb; transform: translateY(-2px); }
-        .status { margin-top: 15px; text-align: center; font-size: 0.9rem; font-weight: 500; }
+        body { background: #020617; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 40px; }
+        .card { background: #0f172a; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; border: 1px solid #1e293b; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #1e293b; background: #020617; color: white; }
+        button { width: 100%; padding: 15px; background: #3b82f6; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-
-<div class="admin-card">
-    <h1>Publicar a Sitges Art</h1>
-    
-    <label>Nom</label>
-    <input type="text" id="nom" placeholder="Ex: Miquel Utrillo">
-
-    <label>Tipus</label>
-    <input type="text" id="tipus" placeholder="Ex: Pintor / Arquitecte">
-
-    <label>Resum principal</label>
-    <textarea id="resum" rows="3" placeholder="Breu descripció..."></textarea>
-
-    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-top: 20px;">
-        <label style="margin-top: 0;">Obra destacada (Títol)</label>
-        <input type="text" id="titol_obra" placeholder="Ex: Construcció de Maricel">
-        <label>Anàlisi de l'obra</label>
-        <textarea id="desc_obra" rows="3" placeholder="Explicació artística..."></textarea>
-    </div>
-
-    <label>URL de referència</label>
-    <input type="text" id="url" placeholder="https://...">
-
-    <button onclick="enviarDada()">PUBLICAR A LA WEB</button>
-    <div id="status" class="status"></div>
+<div class="card">
+    <h2>Afegir a la base de dades</h2>
+    <input id="nom" placeholder="Nom (Ex: Santiago Rusiñol)">
+    <input id="tipus" placeholder="Tipus (Ex: Pintor)">
+    <textarea id="resum" placeholder="Resum general"></textarea>
+    <input id="titol_o" placeholder="Títol de l'obra">
+    <textarea id="desc_o" placeholder="Descripció de l'obra"></textarea>
+    <input id="url" placeholder="URL (Viquipèdia)">
+    <button onclick="enviar()">PUBLICAR ARA</button>
+    <p id="msg"></p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- AQUÍ HAS D'ENGANXAR LES TEVES CLAUS DE FIREBASE ---
     const firebaseConfig = {
-        apiKey: "LA_TEVA_API_KEY",
-        authDomain: "EL_TEU_PROJECTE.firebaseapp.com",
-        projectId: "EL_TEU_PROJECTE",
-        storageBucket: "EL_TEU_PROJECTE.appspot.com",
-        messagingSenderId: "EL_TEU_SENDER_ID",
-        appId: "LA_TEVA_APP_ID"
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    window.enviarDada = async function() {
-        const status = document.getElementById('status');
-        const btn = document.querySelector('button');
-        
-        try {
-            btn.innerText = "Publicant...";
-            btn.disabled = true;
-
-            const novaEntrada = {
-                nom: document.getElementById('nom').value,
-                tipus: document.getElementById('tipus').value,
-                resum: document.getElementById('resum').value,
-                analisis_obres: [{
-                    titol: document.getElementById('titol_obra').value,
-                    explicacio_artistica: document.getElementById('desc_obra').value
-                }],
-                url: document.getElementById('url').value,
-                data: new Date()
-            };
-
-            await addDoc(collection(db, "obres"), novaEntrada);
-            
-            status.innerHTML = "✅ Publicat amb èxit!";
-            status.style.color = "#10b981";
-            document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-            
-        } catch (e) {
-            status.innerHTML = "❌ Error: " + e.message;
-            status.style.color = "#ef4444";
-        } finally {
-            btn.innerText = "PUBLICAR A LA WEB";
-            btn.disabled = false;
-        }
+    window.enviar = async function() {
+        const doc = {
+            nom: document.getElementById('nom').value,
+            tipus: document.getElementById('tipus').value,
+            resum: document.getElementById('resum').value,
+            analisis_obres: [{
+                titol: document.getElementById('titol_o').value,
+                explicacio_artistica: document.getElementById('desc_o').value
+            }],
+            url: document.getElementById('url').value
+        };
+        await addDoc(collection(db, "obres"), doc);
+        document.getElementById('msg').innerText = "Publicat correctament!";
     }
 </script>
 </body>
