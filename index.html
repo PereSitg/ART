@@ -105,7 +105,6 @@
             color: var(--text-secondary);
         }
         .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-        .source-link a:hover { color: white; text-decoration: underline; }
 
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -126,7 +125,7 @@
         </section>
 
         <section id="resultats" class="results-section">
-            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu...</p>
+            <p id="loading-text" style="text-align: center; color: var(--text-secondary);">Carregant l'arxiu de Sitges...</p>
         </section>
 
         <footer style="text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 2rem;">
@@ -138,6 +137,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIGURACIÓ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAsS12345-ExampleKey", 
             authDomain: "sitgesart-81676.firebaseapp.com",
@@ -152,15 +152,11 @@
         
         let dadesGlobals = [];
 
-        onSnapshot(collection(db, "obres"), (snapshot) => {
-            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderitzar(dadesGlobals);
-        });
-
-        function renderitzar(llista) {
+        // Funció de renderitzat global
+        window.renderitzar = (llista) => {
             const contenidor = document.getElementById('resultats');
             if (llista.length === 0) {
-                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat que coincideixi.</p>";
+                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat resultats per a la teva pregunta.</p>";
                 return;
             }
 
@@ -169,9 +165,9 @@
                     <span class="ai-badge">${obra.tipus || 'CULTURA'}</span>
                     <div class="ai-content">
                         <h2>${obra.nom}</h2>
-                        <p>${obra.resum || ''}</p>
+                        <p>${obra.resum || 'Sense descripció.'}</p>
                     </div>
-                    ${obra.font || obra.url ? `
+                    ${(obra.font || obra.url) ? `
                         <div class="source-link">
                             ${obra.font ? `<span>FONT: <strong>${obra.font}</strong></span>` : ''}
                             ${obra.url ? `<br><a href="${obra.url}" target="_blank">Llegir crònica completa a Criticartt →</a>` : ''}
@@ -179,15 +175,33 @@
                     ` : ''}
                 </div>
             `).join('');
-        }
+        };
 
+        // Escolta de dades en temps real
+        onSnapshot(collection(db, "obres"), (snapshot) => {
+            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // Mostrem totes les dades al principi (opcional) o esperem a la cerca
+            renderitzar(dadesGlobals); 
+        });
+
+        // Lògica de cerca corregida
         document.getElementById('buscador').addEventListener('input', (e) => {
-            const cerca = e.target.value.toLowerCase();
-            const filtrades = dadesGlobals.filter(o => 
-                (o.nom && o.nom.toLowerCase().includes(cerca)) || 
-                (o.resum && o.resum.toLowerCase().includes(cerca)) ||
-                (o.font && o.font.toLowerCase().includes(cerca))
-            );
+            const cerca = e.target.value.toLowerCase().trim();
+            
+            // Si el buscador està buit, tornem a mostrar-ho tot
+            if (cerca === "") {
+                renderitzar(dadesGlobals);
+                return;
+            }
+
+            const filtrades = dadesGlobals.filter(o => {
+                const nom = (o.nom || "").toLowerCase();
+                const resum = (o.resum || "").toLowerCase();
+                const font = (o.font || "").toLowerCase();
+                
+                return nom.includes(cerca) || resum.includes(cerca) || font.includes(cerca);
+            });
+
             renderitzar(filtrades);
         });
     </script>
