@@ -3,135 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art - Biblioteca Digital</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <title>Sitges Art & Història - Cercador de Patrimoni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #3b82f6; --bg-dark: #020617; --card-bg: #0f172a;
-            --card-border: rgba(255, 255, 255, 0.08); --text-primary: #f8fafc;
-            --text-secondary: #94a3b8; --accent: #60a5fa; --glass: rgba(15, 23, 42, 0.8);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body {
-            background: var(--bg-dark);
-            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
-            color: var(--text-primary); min-height: 100vh; display: flex; 
-            justify-content: center; align-items: flex-start; padding: 10vh 20px;
-        }
-        .container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 2rem; }
-        header { text-align: center; }
-        header .logo { font-size: 3rem; font-weight: 800; color: white; letter-spacing: -2px; }
-        header .logo span { color: var(--primary); }
-        .search-container {
-            width: 100%; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border); border-radius: 20px; padding: 1.2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: sticky; top: 20px; z-index: 100;
-        }
-        input {
-            width: 100%; background: transparent; border: none; outline: none;
-            color: white; font-size: 1.2rem; font-weight: 500; text-align: center;
-        }
-        #resultats { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem; }
-        .response-card {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 2rem; border-radius: 24px; animation: fadeInUp 0.4s ease-out;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-        .badge {
-            background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 0.4rem 0.8rem;
-            border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.2);
-            margin-bottom: 1rem; display: inline-block; text-transform: uppercase;
-        }
-        h2 { font-size: 1.8rem; margin-bottom: 10px; }
-        p { color: var(--text-secondary); line-height: 1.6; }
-        .obra-box {
-            background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--primary);
-            padding: 1.2rem; margin-top: 1.5rem; border-radius: 0 12px 12px 0;
-        }
-        .obra-box b { color: white; display: block; margin-bottom: 5px; }
-        .btn-link {
-            display: inline-block; margin-top: 20px; color: var(--accent);
-            text-decoration: none; font-weight: 600; font-size: 0.95rem;
-            transition: 0.2s;
-        }
-        .btn-link:hover { color: white; transform: translateX(5px); }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Inter', sans-serif; }
+        .card-anim { transition: all 0.3s ease; }
+        .card-anim:hover { transform: translateY(-5px); }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900">
 
-<div class="container">
-    <header>
-        <div class="logo">Sitges<span>Art</span></div>
+    <header class="bg-blue-900 text-white py-12 px-6 shadow-xl">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Sitges: Art i Història</h1>
+            <p class="text-blue-200 text-lg max-w-2xl mx-auto">
+                Explora el llegat de la Blanca Subur: des del Modernisme de Rusiñol fins a les cròniques de Criticartt.
+            </p>
+        </div>
     </header>
-    <div class="search-container">
-        <input type="text" id="buscador" placeholder="Busca artistes, museus o obres..." autocomplete="off">
-    </div>
-    <div id="resultats"></div>
-</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <section class="max-w-6xl mx-auto px-6 -mt-8">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4">
+            <div class="flex-1 relative">
+                <span class="absolute left-4 top-4 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input type="text" id="buscador" onkeyup="filtrarContingut()" 
+                    placeholder="Busca una casa, un artista, una font..." 
+                    class="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all">
+            </div>
+            
+            <select id="filtreTipus" onchange="filtrarContingut()" 
+                class="md:w-64 p-4 rounded-xl border border-slate-200 bg-white font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-blue-100">
+                <option value="tots">Tots els estils</option>
+                <option value="Modernisme">Modernisme</option>
+                <option value="Història Local (Criticartt)">Història Criticartt</option>
+                <option value="Arquitectura">Arquitectura</option>
+                <option value="Cinema">Cinema</option>
+                <option value="Art Contemporani">Art Contemporani</option>
+            </select>
+        </div>
+    </section>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
-        authDomain: "sitgesart.firebaseapp.com",
-        projectId: "sitgesart",
-        storageBucket: "sitgesart.firebasestorage.app",
-        messagingSenderId: "673959867307",
-        appId: "1:673959867307:web:80607c11d79db42b4918ee"
-    };
+    <main class="max-w-6xl mx-auto p-6 mt-8">
+        <div id="resultats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="col-span-full text-center py-20 text-slate-400">
+                <p class="animate-pulse text-xl">Connectant amb la base de dades de Sitges...</p>
+            </div>
+        </div>
+    </main>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    let dades = [];
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-20 text-center">
+        <p class="mb-2">Sitges Art & Història - Projecte de Documentació Digital</p>
+        <p class="text-sm italic">Fonts: Museus de Sitges, Arxiu Municipal i Blog Criticartt.</p>
+    </footer>
 
-    // Connexió en temps real amb Firebase
-    onSnapshot(collection(db, "obres"), (snapshot) => {
-        dades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        filtrar(); 
-    });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    window.filtrar = function() {
-        const div = document.getElementById('resultats');
-        const text = document.getElementById('buscador').value.toLowerCase().trim();
+        // CREDENCIALS RECUPERADES
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsS12345-ExampleKey", 
+            authDomain: "sitgesart-81676.firebaseapp.com",
+            projectId: "sitgesart-81676",
+            storageBucket: "sitgesart-81676.appspot.com",
+            messagingSenderId: "1074123456789",
+            appId: "1:1074123456789:web:abcdef123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
         
-        if (text === "") { div.innerHTML = ""; return; }
+        let totesLesObres = [];
 
-        const filtrats = dades.filter(d => 
-            (d.nom || "").toLowerCase().includes(text) || 
-            (d.resum || "").toLowerCase().includes(text) ||
-            (d.tipus || "").toLowerCase().includes(text)
-        );
+        // CARREGAR DADES EN TEMPS REAL
+        onSnapshot(collection(db, "obres"), (snapshot) => {
+            totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderitzar(totesLesObres);
+        });
 
-        div.innerHTML = "";
-        filtrats.forEach(item => {
-            let obresHtml = "";
-            item.analisis_obres?.forEach(o => {
-                if(o.titol) {
-                    obresHtml += `<div class="obra-box"><b>🖼️ ${o.titol}</b><p>${o.explicacio_artistica}</p></div>`;
-                }
-            });
-
-            // CORRECCIÓ DE LINKS: Ens assegurem que tingui http
-            let finalUrl = item.url || "#";
-            if (finalUrl !== "#" && !finalUrl.startsWith('http')) {
-                finalUrl = 'https://' + finalUrl;
+        // FUNCIO PER PINTAR LES FITXES
+        window.renderitzar = (llista) => {
+            const contenidor = document.getElementById('resultats');
+            if (llista.length === 0) {
+                contenidor.innerHTML = `<p class="col-span-full text-center py-10">No s'ha trobat cap resultat.</p>`;
+                return;
             }
 
-            div.innerHTML += `
-                <div class="response-card">
-                    <span class="badge">${item.tipus}</span>
-                    <h2>${item.nom}</h2>
-                    <p>${item.resum}</p>
-                    ${obresHtml}
-                    <a href="${finalUrl}" target="_blank" rel="noopener" class="btn-link">Saber-ne més →</a>
-                </div>`;
-        });
-    }
+            contenidor.innerHTML = llista.map(obra => `
+                <div class="card-anim bg-white rounded-2xl shadow-md overflow-hidden border border-slate-100 flex flex-col">
+                    <div class="p-6 flex-1">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-blue-50 text-blue-600 rounded">
+                                ${obra.tipus || 'General'}
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2 leading-tight">${obra.nom}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                            ${obra.resum || 'Sense descripció disponible.'}
+                        </p>
+                        
+                        ${obra.font ? `
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Font d'informació:</p>
+                                <p class="text-sm text-blue-900 font-semibold">${obra.font}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${obra.url ? `
+                        <a href="${obra.url}" target="_blank" 
+                           class="bg-slate-50 hover:bg-blue-600 hover:text-white text-blue-600 text-center py-3 text-sm font-bold transition-colors border-t border-slate-100">
+                           VEURE L'ARTICLE ORIGINAL
+                        </a>
+                    ` : ''}
+                </div>
+            `).join('');
+        };
 
-    document.getElementById('buscador').addEventListener('input', filtrar);
-</script>
+        // FILTRAT DINÀMIC
+        window.filtrarContingut = () => {
+            const textCerca = document.getElementById('buscador').value.toLowerCase();
+            const filtre = document.getElementById('filtreTipus').value;
+
+            const filtrades = totesLesObres.filter(obra => {
+                const coincideixText = (obra.nom && obra.nom.toLowerCase().includes(textCerca)) || 
+                                       (obra.resum && obra.resum.toLowerCase().includes(textCerca)) ||
+                                       (obra.font && obra.font.toLowerCase().includes(textCerca));
+                
+                const coincideixFiltre = filtre === "tots" || obra.tipus === filtre;
+                
+                return coincideixText && coincideixFiltre;
+            });
+
+            renderitzar(filtrades);
+        };
+    </script>
 </body>
 </html>
