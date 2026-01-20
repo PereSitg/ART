@@ -104,8 +104,9 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-        .source-link a:hover { color: white; text-decoration: underline; }
+        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        footer { text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 4rem; line-height: 1.6; }
 
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -126,10 +127,10 @@
         </section>
 
         <section id="resultats" class="results-section">
-            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu de Sitges...</p>
+            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu...</p>
         </section>
 
-        <footer style="text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 4rem; line-height: 1.6;">
+        <footer>
             Sitges Art & Història 2026 • Pere Badia i Lorenz<br>
             <a href="mailto:pbadialorenz@gmail.com" style="color: #60a5fa; text-decoration: none;">pbadialorenz@gmail.com</a>
         </footer>
@@ -150,51 +151,53 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
         let dadesGlobals = [];
 
-        onSnapshot(collection(db, "obres"), (snapshot) => {
-            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderitzar(dadesGlobals);
-        });
-
+        // Funció de renderitzat ara fora de l'onSnapshot per seguretat
         function renderitzar(llista) {
             const contenidor = document.getElementById('resultats');
-            if (llista.length === 0) {
+            if (!llista || llista.length === 0) {
                 contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat.</p>";
                 return;
             }
 
             contenidor.innerHTML = llista.map(obra => `
                 <div class="response-card">
-                    <span class="ai-badge">${obra.tipus || 'PATRIMONI'}</span>
+                    <span class="ai-badge">${obra.tipus || 'ARXIU'}</span>
                     <div class="ai-content">
-                        <h2>${obra.nom || 'Sense títol'}</h2>
-                        <p>${obra.resum || 'Sense descripció disponible.'}</p>
+                        <h2>${obra.nom || 'Sense nom'}</h2>
+                        <p>${obra.resum || ''}</p>
                     </div>
                     ${(obra.font || obra.url) ? `
                         <div class="source-link">
                             ${obra.font ? `<span>FONT: <strong>${obra.font}</strong></span>` : ''}
-                            ${obra.url ? `<br><a href="${obra.url}" target="_blank">Llegir crònica completa →</a>` : ''}
+                            ${obra.url ? `<br><a href="${obra.url}" target="_blank">Veure article original →</a>` : ''}
                         </div>
                     ` : ''}
                 </div>
             `).join('');
         }
 
+        // Escolta de dades
+        onSnapshot(collection(db, "obres"), (snapshot) => {
+            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderitzar(dadesGlobals);
+        });
+
+        // Buscador millorat amb protecció contra nuls
         document.getElementById('buscador').addEventListener('input', (e) => {
             const cerca = e.target.value.toLowerCase().trim();
             
-            if (cerca === "") {
+            if (!cerca) {
                 renderitzar(dadesGlobals);
                 return;
             }
 
             const filtrades = dadesGlobals.filter(o => {
-                const nom = (o.nom || "").toLowerCase();
-                const resum = (o.resum || "").toLowerCase();
-                const font = (o.font || "").toLowerCase();
-                return nom.includes(cerca) || resum.includes(cerca) || font.includes(cerca);
+                const n = (o.nom || "").toLowerCase();
+                const r = (o.resum || "").toLowerCase();
+                const f = (o.font || "").toLowerCase();
+                return n.includes(cerca) || r.includes(cerca) || f.includes(cerca);
             });
 
             renderitzar(filtrades);
