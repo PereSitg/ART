@@ -43,32 +43,30 @@
             display: flex;
             gap: 10px;
             backdrop-filter: blur(10px);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
         }
 
         input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
-
-        #send-btn { 
-            background: var(--primary); color: white; border: none; 
-            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold;
-        }
 
         .response-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
             padding: 2.5rem; border-radius: 28px; margin-top: 1rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: fadeIn 0.4s ease-out;
         }
 
         .source-link {
             margin-top: 1.5rem; padding-top: 1rem;
             border-top: 1px solid var(--card-border);
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; justify-content: space-between;
             font-size: 0.9rem; color: var(--text-secondary);
         }
 
         .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-        .share-section { margin-top: 1.5rem; }
-        .share-buttons { display: flex; gap: 12px; margin-top: 10px; }
+        .share-buttons { display: flex; gap: 12px; margin-top: 1.5rem; }
         .share-btn {
             background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
             padding: 8px 15px; border-radius: 10px; color: white; text-decoration: none;
@@ -77,6 +75,8 @@
         .share-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
 
         footer { text-align: center; color: #475569; margin-top: 4rem; padding-bottom: 2rem; font-size: 0.9rem; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -88,8 +88,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="user-input" placeholder="Cerca obres o personatges de Sitges...">
-        <button id="send-btn">CERCAR</button>
+        <input type="text" id="user-input" placeholder="Comença a escriure per cercar...">
     </div>
 
     <div id="result-container"></div>
@@ -117,14 +116,17 @@
     const db = getFirestore(app);
 
     const input = document.getElementById('user-input');
-    const btn = document.getElementById('send-btn');
     const results = document.getElementById('result-container');
 
+    // Funció de cerca
     async function buscar() {
         const textBuscat = input.value.toLowerCase().trim();
-        if (!textBuscat) return;
-
-        results.innerHTML = "<p style='text-align:center'>Explorant la base de dades...</p>";
+        
+        // Si no hi ha text, netegem els resultats
+        if (textBuscat.length < 2) {
+            results.innerHTML = "";
+            return;
+        }
 
         try {
             const querySnapshot = await getDocs(collection(db, "obres"));
@@ -135,7 +137,7 @@
                 const data = doc.data();
                 const nom = data.nom || "";
                 const resum = data.resum || "";
-                const font = data.font || "Font desconeguda";
+                const font = data.font || "Retalls de Sitges";
                 const enllac = data.link || "#";
 
                 if (nom.toLowerCase().includes(textBuscat) || resum.toLowerCase().includes(textBuscat)) {
@@ -143,42 +145,44 @@
                     const card = document.createElement('div');
                     card.className = 'response-card';
                     card.innerHTML = `
-                        <h2 style="font-size:2rem; margin-bottom:1rem">${nom}</h2>
-                        <p style="line-height:1.8; color:#e2e8f0; font-size:1.1rem">${resum}</p>
+                        <h2 style="font-size:1.8rem; margin-bottom:1rem">${nom}</h2>
+                        <p style="line-height:1.7; color:#e2e8f0;">${resum}</p>
                         
                         <div class="source-link">
                             <span>Font: ${font}</span>
                             <a href="${enllac}" target="_blank">Llegir més ↗</a>
                         </div>
 
-                        <div class="share-section">
-                            <div class="share-buttons">
-                                <a href="https://wa.me/?text=${encodeURIComponent('Mira aquesta obra: ' + nom + ' ' + window.location.href)}" target="_blank" class="share-btn" style="color:#25D366">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.06 3.973l-1.127 4.113 4.215-1.105a7.859 7.859 0 0 0 3.784.965h.003c4.366 0 7.923-3.558 7.927-7.926a7.86 7.86 0 0 0-2.326-5.617zm-5.607 11.411h-.003a6.55 6.55 0 0 1-3.333-.913l-.239-.142-2.478.65.662-2.417-.156-.248a6.533 6.533 0 0 1-1.002-3.483c.002-3.61 2.949-6.557 6.56-6.557a6.548 6.548 0 0 1 4.639 1.921 6.549 6.549 0 0 1 1.921 4.643c-.003 3.611-2.95 6.558-6.56 6.558z"/></svg>
-                                    WhatsApp
-                                </a>
-                                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Enllaç copiat!')" class="share-btn">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.012 4.012 0 0 1-.128-1.287z"/></svg>
-                                    Copiar Link
-                                </button>
-                            </div>
+                        <div class="share-buttons">
+                            <a href="https://wa.me/?text=${encodeURIComponent(nom + ': ' + window.location.href)}" target="_blank" class="share-btn" style="color:#25D366">
+                                WhatsApp
+                            </a>
+                            <button onclick="copiar('${window.location.href}')" class="share-btn">
+                                Copiar Link
+                            </button>
                         </div>
                     `;
                     results.appendChild(card);
                 }
             });
 
-            if (!trobat) {
-                results.innerHTML = "<p style='text-align:center; color:gray; margin-top:2rem'>No s'ha trobat cap resultat.</p>";
+            if (!trobat && textBuscat.length > 2) {
+                results.innerHTML = "<p style='text-align:center; color:gray; margin-top:2rem'>Cap coincidència trobada...</p>";
             }
 
         } catch (error) {
-            results.innerHTML = "<p style='text-align:center; color:red'>Error al carregar les dades de Sitges Art.</p>";
+            console.error("Error Firebase:", error);
         }
     }
 
-    btn.onclick = buscar;
-    input.onkeypress = (e) => { if(e.key === 'Enter') buscar(); };
+    // Escolta cada vegada que l'usuari prem una tecla
+    input.addEventListener('input', buscar);
+
+    // Funció per copiar (global)
+    window.copiar = (text) => {
+        navigator.clipboard.writeText(text);
+        alert("Enllaç copiat!");
+    }
 </script>
 
 </body>
