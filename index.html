@@ -65,7 +65,6 @@
             display: inline-block; margin-bottom: 1rem;
         }
 
-        /* NOU ESTIL BLAU PER A LA FONT (Com el de la teva foto) */
         .font-badge {
             display: inline-block;
             margin-top: 1.5rem;
@@ -129,6 +128,17 @@
         const db = getFirestore(app);
         let dadesGlobals = [];
 
+        // FUNCIÓ DE NORMALITZACIÓ: Treu accents, passa a minúscules i ignora articles
+        function normalitzar(text) {
+            if (!text) return "";
+            return text.toString()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Treu accents
+                .replace(/\b(el|la|els|les|l'|d')\b/g, "") // Treu articles comuns
+                .trim();
+        }
+
         function renderitzar(llista, textCerca) {
             const contenidor = document.getElementById('resultats');
             if (!textCerca) { contenidor.innerHTML = ""; return; }
@@ -145,9 +155,7 @@
 
             contenidor.innerHTML = llistaOrdenada.map(obra => {
                 const esBio = (obra.tipus || "").toLowerCase().includes("bio");
-                
-                // Netegem el text de possibles etiquetes [Font: ...] que haguem posat abans manualment
-                let textNet = (obra.resum || '').split(' [Font:')[0];
+                let textNet = (obra.resum || obra.biografia || '').split(' [Font:')[0];
 
                 return `
                 <div class="response-card ${esBio ? 'bio-priority' : ''}">
@@ -156,9 +164,7 @@
                         <h2>${obra.nom}</h2>
                         <p>${textNet}</p>
                     </div>
-                    
                     ${obra.font ? `<div class="font-badge">${obra.font}</div>` : ''}
-
                     ${obra.url ? `<div class="source-link"><a href="${obra.url}" target="_blank">Llegir crònica completa →</a></div>` : ''}
                 </div>`;
             }).join('');
@@ -169,12 +175,26 @@
         });
 
         document.getElementById('buscador').addEventListener('input', (e) => {
-            const cerca = e.target.value.toLowerCase().trim();
-            const filtrades = dadesGlobals.filter(o => 
-                (o.nom || "").toLowerCase().includes(cerca) || 
-                (o.resum || "").toLowerCase().includes(cerca)
-            );
-            renderitzar(filtrades, cerca);
+            const cercaBruta = e.target.value;
+            const cercaNeta = normalitzar(cercaBruta); // Netejem el que escriu l'usuari
+            
+            if (cercaNeta === "") {
+                renderitzar([], "");
+                return;
+            }
+
+            const filtrades = dadesGlobals.filter(o => {
+                // Netejem el nom i el resum de cada fitxa per comparar-los amb la cerca neta
+                const nomNet = normalitzar(o.nom || "");
+                const resumNet = normalitzar(o.resum || o.biografia || "");
+                const searchKeyNet = normalitzar(o.search_key || "");
+
+                return nomNet.includes(cercaNeta) || 
+                       resumNet.includes(cercaNeta) || 
+                       searchKeyNet.includes(cercaNeta);
+            });
+            
+            renderitzar(filtrades, cercaBruta);
         });
     </script>
 </body>
