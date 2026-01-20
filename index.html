@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art</title>
+    <title>Sitges Art - Biblioteca Digital</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,36 +16,46 @@
             background: var(--bg-dark);
             background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
             color: var(--text-primary); min-height: 100vh; display: flex; 
-            justify-content: center; align-items: flex-start; padding-top: 15vh;
+            justify-content: center; align-items: flex-start; padding: 10vh 20px;
         }
-        .container { width: 90%; max-width: 900px; display: flex; flex-direction: column; gap: 2rem; }
-        header { text-align: center; margin-bottom: 1rem; }
-        header .logo { font-size: 3.5rem; font-weight: 800; color: white; letter-spacing: -2px; }
+        .container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 2rem; }
+        header { text-align: center; }
+        header .logo { font-size: 3rem; font-weight: 800; color: white; letter-spacing: -2px; }
         header .logo span { color: var(--primary); }
         .search-container {
             width: 100%; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border); border-radius: 20px; padding: 1.2rem 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--card-border); border-radius: 20px; padding: 1.2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: sticky; top: 20px; z-index: 100;
         }
         input {
             width: 100%; background: transparent; border: none; outline: none;
-            color: white; font-size: 1.25rem; font-weight: 500; text-align: center;
+            color: white; font-size: 1.2rem; font-weight: 500; text-align: center;
         }
-        #resultats { margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 5rem; }
+        #resultats { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem; }
         .response-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 2.5rem; border-radius: 28px; animation: fadeInUp 0.5s ease-out;
+            padding: 2rem; border-radius: 24px; animation: fadeInUp 0.4s ease-out;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .badge {
-            background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 0.4rem 1rem;
+            background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 0.4rem 0.8rem;
             border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.2);
-            margin-bottom: 1rem; display: inline-block;
+            margin-bottom: 1rem; display: inline-block; text-transform: uppercase;
         }
+        h2 { font-size: 1.8rem; margin-bottom: 10px; }
+        p { color: var(--text-secondary); line-height: 1.6; }
         .obra-box {
             background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--primary);
-            padding: 1rem; margin-top: 1.5rem; border-radius: 0 12px 12px 0;
+            padding: 1.2rem; margin-top: 1.5rem; border-radius: 0 12px 12px 0;
         }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .obra-box b { color: white; display: block; margin-bottom: 5px; }
+        .btn-link {
+            display: inline-block; margin-top: 20px; color: var(--accent);
+            text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .btn-link:hover { color: white; transform: translateX(5px); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -55,7 +65,7 @@
         <div class="logo">Sitges<span>Art</span></div>
     </header>
     <div class="search-container">
-        <input type="text" id="buscador" placeholder="Quin artista o museu busques?" autocomplete="off">
+        <input type="text" id="buscador" placeholder="Busca artistes, museus o obres..." autocomplete="off">
     </div>
     <div id="resultats"></div>
 </div>
@@ -77,6 +87,7 @@
     const db = getFirestore(app);
     let dades = [];
 
+    // Connexió en temps real amb Firebase
     onSnapshot(collection(db, "obres"), (snapshot) => {
         dades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         filtrar(); 
@@ -85,29 +96,41 @@
     window.filtrar = function() {
         const div = document.getElementById('resultats');
         const text = document.getElementById('buscador').value.toLowerCase().trim();
+        
         if (text === "") { div.innerHTML = ""; return; }
 
         const filtrats = dades.filter(d => 
             (d.nom || "").toLowerCase().includes(text) || 
-            (d.resum || "").toLowerCase().includes(text)
+            (d.resum || "").toLowerCase().includes(text) ||
+            (d.tipus || "").toLowerCase().includes(text)
         );
 
         div.innerHTML = "";
         filtrats.forEach(item => {
-            let obres = "";
+            let obresHtml = "";
             item.analisis_obres?.forEach(o => {
-                obres += `<div class="obra-box"><b>${o.titol}</b><p>${o.explicacio_artistica}</p></div>`;
+                if(o.titol) {
+                    obresHtml += `<div class="obra-box"><b>🖼️ ${o.titol}</b><p>${o.explicacio_artistica}</p></div>`;
+                }
             });
+
+            // CORRECCIÓ DE LINKS: Ens assegurem que tingui http
+            let finalUrl = item.url || "#";
+            if (finalUrl !== "#" && !finalUrl.startsWith('http')) {
+                finalUrl = 'https://' + finalUrl;
+            }
+
             div.innerHTML += `
                 <div class="response-card">
                     <span class="badge">${item.tipus}</span>
                     <h2>${item.nom}</h2>
                     <p>${item.resum}</p>
-                    ${obres}
-                    <br><a href="${item.url}" target="_blank" style="color:var(--accent); text-decoration:none;">Saber-ne més →</a>
+                    ${obresHtml}
+                    <a href="${finalUrl}" target="_blank" rel="noopener" class="btn-link">Saber-ne més →</a>
                 </div>`;
         });
     }
+
     document.getElementById('buscador').addEventListener('input', filtrar);
 </script>
 </body>
