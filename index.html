@@ -3,199 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art & Intel·ligència Artificial</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <title>Sitges Art & IA 2026</title>
     <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --bg-dark: #020617;
-            --card-bg: #0f172a;
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #60a5fa;
-            --glass: rgba(15, 23, 42, 0.8);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-
+        /* ESTIL GENERAL */
         body {
-            background: var(--bg-dark);
-            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%), radial-gradient(at 100% 0%, rgba(96, 165, 250, 0.1) 0, transparent 50%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex; justify-content: center; align-items: flex-start;
-            padding-top: 5vh; overflow-x: hidden;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #1c1e21;
         }
-
-        .container { width: 90%; max-width: 900px; display: flex; flex-direction: column; gap: 2.5rem; }
-
-        header { text-align: center; animation: fadeInDown 1s ease; }
-        header .logo { font-size: clamp(3rem, 8vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.5rem; background: linear-gradient(to bottom, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header .logo span { background: linear-gradient(to right, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header .subtitle { color: var(--text-secondary); font-size: 1.1rem; font-weight: 500; }
-
-        .search-container {
-            width: 100%; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border); border-radius: 20px;
-            padding: 0.75rem 1.5rem; display: flex; align-items: center;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.15rem; padding: 0.5rem 0; }
-
-        .results-section { width: 100%; margin-bottom: 5rem; display: flex; flex-direction: column; gap: 1.5rem; }
-        
-        .response-card {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 2.2rem; border-radius: 24px; animation: fadeInUp 0.6s ease;
-            position: relative;
+        .grid-obres {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
-
-        .bio-priority {
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-
-        .ai-badge {
-            background: rgba(59, 130, 246, 0.1); color: var(--accent);
-            padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.65rem; font-weight: 800;
-            text-transform: uppercase; border: 1px solid rgba(59, 130, 246, 0.2);
-            display: inline-block; margin-bottom: 1rem;
-        }
-
-        .font-badge {
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 0.5rem 1.5rem;
-            border: 1.5px solid #3b82f6;
-            border-radius: 50px;
-            background: #0f172a;
-            color: #60a5fa;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .tipus {
+            color: #007bff;
+            font-size: 0.8rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
-
-        .ai-content h2 { color: white; font-size: 1.6rem; margin-bottom: 1rem; }
-        .ai-content p { font-size: 1.15rem; line-height: 1.8; color: #e2e8f0; }
         
-        .source-link { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--card-border); font-size: 0.9rem; }
-        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
-
-        footer { text-align: center; color: #475569; padding-bottom: 4rem; font-size: 0.9rem; }
-
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* SECCIÓ COMPARTIR - Aquí és on hi ha les icones */
+        .share-section {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .share-title {
+            font-size: 0.85rem;
+            color: #65676b;
+            margin-bottom: 10px;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Icones rodones */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f2f5;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .share-btn:hover {
+            transform: scale(1.1);
+            background: #e4e6eb;
+        }
+        .share-btn img {
+            width: 22px;
+            height: 22px;
+            display: block; /* Garanteix que la imatge es vegi */
+        }
+        .copy-success {
+            font-size: 0.8rem;
+            color: green;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <div class="logo">Sitges<span>Art</span></div>
-            <div class="subtitle">Art i Intel·ligència Artificial</div>
-        </header>
+<header>
+    <h1>Sitges Art & IA 2026</h1>
+    <p>Història, Urbanisme i Personatges del nostre llegat</p>
+</header>
 
-        <div class="search-container">
-            <input type="text" id="buscador" placeholder="Escriu la teva pregunta..." autocomplete="off">
-        </div>
-
-        <section id="resultats" class="results-section"></section>
-
-        <footer>
-            Sitges Art & Història 2026 • Pere Badia i Lorenz<br>
-            <a href="mailto:pbadialorenz@gmail.com" style="color: #60a5fa; text-decoration: none;">pbadialorenz@gmail.com</a>
-        </footer>
+<div id="llista-obres" class="grid-obres">
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
-            authDomain: "sitgesart.firebaseapp.com",
-            projectId: "sitgesart",
-            storageBucket: "sitgesart.firebasestorage.app",
-            messagingSenderId: "673959867307",
-            appId: "1:673959867307:web:80607c11d79db42b4918ee"
-        };
+    // Reemplaça amb les teves credencials de Firebase
+    const firebaseConfig = {
+        apiKey: "LA_TEVA_API_KEY",
+        projectId: "peresitg-art",
+        appId: "LA_TEVA_APP_ID"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let dadesGlobals = [];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // FUNCIÓ DE NORMALITZACIÓ: Treu accents, passa a minúscules i ignora articles
-        function normalitzar(text) {
-            if (!text) return "";
-            return text.toString()
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "") // Treu accents
-                .replace(/\b(el|la|els|les|l'|d')\b/g, "") // Treu articles comuns
-                .trim();
-        }
+    async function mostrarDades() {
+        const querySnapshot = await getDocs(collection(db, "obres"));
+        const container = document.getElementById('llista-obres');
+        container.innerHTML = '';
 
-        function renderitzar(llista, textCerca) {
-            const contenidor = document.getElementById('resultats');
-            if (!textCerca) { contenidor.innerHTML = ""; return; }
-            if (llista.length === 0) { 
-                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hi ha resultats per a aquesta cerca.</p>"; 
-                return; 
-            }
-
-            const llistaOrdenada = [...llista].sort((a, b) => {
-                const aBio = (a.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
-                const bBio = (b.tipus || "").toLowerCase().includes("bio") ? 1 : 0;
-                return bBio - aBio;
-            });
-
-            contenidor.innerHTML = llistaOrdenada.map(obra => {
-                const esBio = (obra.tipus || "").toLowerCase().includes("bio");
-                let textNet = (obra.resum || obra.biografia || '').split(' [Font:')[0];
-
-                return `
-                <div class="response-card ${esBio ? 'bio-priority' : ''}">
-                    <span class="ai-badge">${obra.tipus || 'ARXIU'}</span>
-                    <div class="ai-content">
-                        <h2>${obra.nom}</h2>
-                        <p>${textNet}</p>
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const currentUrl = window.location.href;
+            
+            const cardHtml = `
+                <div class="card">
+                    <span class="tipus">${data.tipus || 'Retalls de Sitges'}</span>
+                    <h2 style="margin:0">${data.nom}</h2>
+                    <p>${data.resum}</p>
+                    
+                    <div class="share-section">
+                        <div class="share-title">Compartir</div>
+                        <div class="share-buttons">
+                            <a href="https://wa.me/?text=${encodeURIComponent(data.nom + ' ' + currentUrl)}" target="_blank" class="share-btn" title="WhatsApp">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA">
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(data.nom)}&url=${encodeURIComponent(currentUrl)}" target="_blank" class="share-btn" title="X">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023_original_glyph.svg" alt="X">
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}" target="_blank" class="share-btn" title="Facebook">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="FB">
+                            </a>
+                            <button onclick="copiar('${currentUrl}')" class="share-btn" title="Copiar enllaç">
+                                <img src="https://cdn-icons-png.flaticon.com/512/1621/1621635.png" alt="Link">
+                            </button>
+                        </div>
                     </div>
-                    ${obra.font ? `<div class="font-badge">${obra.font}</div>` : ''}
-                    ${obra.url ? `<div class="source-link"><a href="${obra.url}" target="_blank">Llegir crònica completa →</a></div>` : ''}
-                </div>`;
-            }).join('');
-        }
-
-        onSnapshot(collection(db, "obres"), (snapshot) => {
-            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                </div>
+            `;
+            container.innerHTML += cardHtml;
         });
+    }
 
-        document.getElementById('buscador').addEventListener('input', (e) => {
-            const cercaBruta = e.target.value;
-            const cercaNeta = normalitzar(cercaBruta); // Netejem el que escriu l'usuari
-            
-            if (cercaNeta === "") {
-                renderitzar([], "");
-                return;
-            }
+    window.copiar = (url) => {
+        navigator.clipboard.writeText(url);
+        alert("Enllaç copiat!");
+    };
 
-            const filtrades = dadesGlobals.filter(o => {
-                // Netejem el nom i el resum de cada fitxa per comparar-los amb la cerca neta
-                const nomNet = normalitzar(o.nom || "");
-                const resumNet = normalitzar(o.resum || o.biografia || "");
-                const searchKeyNet = normalitzar(o.search_key || "");
+    mostrarDades();
+</script>
 
-                return nomNet.includes(cercaNeta) || 
-                       resumNet.includes(cercaNeta) || 
-                       searchKeyNet.includes(cercaNeta);
-            });
-            
-            renderitzar(filtrades, cercaBruta);
-        });
-    </script>
 </body>
 </html>
