@@ -54,7 +54,6 @@
             background: var(--card-bg); border: 1px solid var(--card-border);
             padding: 2.5rem; border-radius: 28px; margin-top: 1.5rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            animation: fadeIn 0.4s ease-out;
         }
 
         .source-link {
@@ -77,14 +76,10 @@
         .share-btn {
             background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
             padding: 8px 15px; border-radius: 10px; color: white; text-decoration: none;
-            font-size: 0.85rem; display: flex; align-items: center; gap: 8px; transition: 0.3s;
-            cursor: pointer;
+            font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
         }
-        .share-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
 
         footer { text-align: center; color: #475569; margin-top: 4rem; padding-bottom: 2rem; font-size: 0.9rem; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -96,7 +91,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="user-input" placeholder="Escriu per cercar obres...">
+        <input type="text" id="user-input" placeholder="Comença a escriure per cercar...">
     </div>
 
     <div id="result-container"></div>
@@ -144,31 +139,26 @@
                 const nom = data.nom || "";
                 const resum = data.resum || "";
                 const font = data.font || "Retalls de Sitges";
-                const enllac = data.link || ""; // Agafa el link de Firebase
+                const enllac = data.link || "#";
 
                 if (nom.toLowerCase().includes(textBuscat) || resum.toLowerCase().includes(textBuscat)) {
                     trobat = true;
                     const card = document.createElement('div');
                     card.className = 'response-card';
-                    
-                    // Creem el botó de "Llegir més" només si hi ha enllaç
-                    const linkHTML = enllac ? `<a href="${enllac}" target="_blank" rel="noopener noreferrer">Llegir més ↗</a>` : '';
-
                     card.innerHTML = `
                         <h2 style="font-size:1.8rem; margin-bottom:1rem">${nom}</h2>
                         <p style="line-height:1.7; color:#e2e8f0;">${resum}</p>
                         
                         <div class="source-link">
                             <span>Font: ${font}</span>
-                            ${linkHTML}
+                            <a href="${enllac}" target="_blank" rel="noopener noreferrer">Llegir més ↗</a>
                         </div>
 
                         <div class="share-buttons">
-                            <a href="https://wa.me/?text=${encodeURIComponent('Mira això de Sitges Art: ' + nom + ' ' + enllac)}" 
-                               target="_blank" rel="noopener noreferrer" class="share-btn" style="color:#25D366">
+                            <a href="https://wa.me/?text=${encodeURIComponent(nom + ': ' + enllac)}" target="_blank" rel="noopener noreferrer" class="share-btn" style="color:#25D366">
                                 WhatsApp
                             </a>
-                            <button onclick="copiar('${enllac || window.location.href}')" class="share-btn">
+                            <button onclick="copiar('${enllac}')" class="share-btn" style="cursor:pointer; background:none; border:1px solid var(--card-border);">
                                 Copiar Link
                             </button>
                         </div>
@@ -176,22 +166,16 @@
                     results.appendChild(card);
                 }
             });
-
-            if (!trobat && textBuscat.length > 2) {
-                results.innerHTML = "<p style='text-align:center; color:gray; margin-top:2rem'>No s'ha trobat res...</p>";
-            }
-
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error Firebase:", error);
         }
     }
 
     input.addEventListener('input', buscar);
 
     window.copiar = (text) => {
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Enllaç copiat correctament!");
-        });
+        navigator.clipboard.writeText(text);
+        alert("Enllaç copiat!");
     }
 </script>
 
