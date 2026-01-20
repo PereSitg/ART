@@ -6,7 +6,6 @@
     <title>Sitges Art & Història - Explorer</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* EL TEU CSS INTACTE */
         :root {
             --primary: #3b82f6;
             --primary-glow: rgba(59, 130, 246, 0.5);
@@ -68,7 +67,8 @@
         }
         .search-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); transform: translateY(-2px); }
 
-        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.15rem; padding: 0.5rem 0; }
+        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.15rem; padding: 0.5rem 0; width: 100%; }
+        input::placeholder { color: #475569; }
         
         .results-section { width: 100%; margin-bottom: 5rem; display: flex; flex-direction: column; gap: 2rem; }
         
@@ -78,7 +78,7 @@
             padding: 2.5rem;
             border-radius: 28px;
             box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
-            width: 100%;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .ai-badge {
@@ -90,20 +90,25 @@
             font-weight: 800;
             text-transform: uppercase;
             border: 1px solid rgba(59, 130, 246, 0.2);
+            display: inline-block;
+            margin-bottom: 1rem;
         }
 
-        .ai-content { font-size: 1.1rem; line-height: 1.7; color: #e2e8f0; margin-top: 1.5rem; }
+        .ai-content h2 { color: white; font-size: 1.5rem; margin-bottom: 1rem; }
+        .ai-content p { font-size: 1.2rem; line-height: 1.9; color: #e2e8f0; }
         
         .source-link {
             margin-top: 1.5rem;
             padding-top: 1rem;
             border-top: 1px solid var(--card-border);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
         }
-        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .source-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        .source-link a:hover { color: white; text-decoration: underline; }
 
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -116,14 +121,15 @@
 
         <section class="search-section">
             <div class="search-container">
-                <input type="text" id="buscador" onkeyup="filtrarContingut()" placeholder="Pregunta sobre una casa, un artista o Criticartt...">
+                <input type="text" id="buscador" placeholder="Escriu la teva pregunta...">
             </div>
         </section>
 
         <section id="resultats" class="results-section">
-            </section>
+            <p style="text-align: center; color: var(--text-secondary);">Connectant amb l'arxiu...</p>
+        </section>
 
-        <footer>
+        <footer style="text-align: center; color: #475569; margin-top: 2rem; padding-bottom: 2rem;">
             Sitges Art & Història 2026 • Informació de l'Arxiu i Criticartt
         </footer>
     </div>
@@ -143,46 +149,47 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let totesLesObres = [];
+        
+        let dadesGlobals = [];
 
         onSnapshot(collection(db, "obres"), (snapshot) => {
-            totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderitzar(totesLesObres);
+            dadesGlobals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderitzar(dadesGlobals);
         });
 
-        window.renderitzar = (llista) => {
+        function renderitzar(llista) {
             const contenidor = document.getElementById('resultats');
-            if(llista.length === 0) {
-                contenidor.innerHTML = "<p style='text-align:center; color:#475569;'>No s'han trobat coincidències.</p>";
+            if (llista.length === 0) {
+                contenidor.innerHTML = "<p style='text-align:center; color:var(--text-secondary);'>No hem trobat cap resultat que coincideixi.</p>";
                 return;
             }
 
             contenidor.innerHTML = llista.map(obra => `
                 <div class="response-card">
-                    <div class="ai-header">
-                        <span class="ai-badge">${obra.tipus || 'CULTURA'}</span>
-                    </div>
+                    <span class="ai-badge">${obra.tipus || 'CULTURA'}</span>
                     <div class="ai-content">
-                        <h2 style="color:white; font-size:1.5rem; margin-bottom:0.5rem;">${obra.nom}</h2>
+                        <h2>${obra.nom}</h2>
                         <p>${obra.resum || ''}</p>
                     </div>
-                    <div class="source-link">
-                        ${obra.font ? `<span>FONT: <strong>${obra.font}</strong></span>` : ''}
-                        ${obra.url ? `<br><a href="${obra.url}" target="_blank">Llegir crònica completa →</a>` : ''}
-                    </div>
+                    ${obra.font || obra.url ? `
+                        <div class="source-link">
+                            ${obra.font ? `<span>FONT: <strong>${obra.font}</strong></span>` : ''}
+                            ${obra.url ? `<br><a href="${obra.url}" target="_blank">Llegir crònica completa a Criticartt →</a>` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             `).join('');
-        };
+        }
 
-        window.filtrarContingut = () => {
-            const text = document.getElementById('buscador').value.toLowerCase();
-            const filtrades = totesLesObres.filter(o => 
-                o.nom?.toLowerCase().includes(text) || 
-                o.resum?.toLowerCase().includes(text) ||
-                o.font?.toLowerCase().includes(text)
+        document.getElementById('buscador').addEventListener('input', (e) => {
+            const cerca = e.target.value.toLowerCase();
+            const filtrades = dadesGlobals.filter(o => 
+                (o.nom && o.nom.toLowerCase().includes(cerca)) || 
+                (o.resum && o.resum.toLowerCase().includes(cerca)) ||
+                (o.font && o.font.toLowerCase().includes(cerca))
             );
             renderitzar(filtrades);
-        };
+        });
     </script>
 </body>
 </html>
