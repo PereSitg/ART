@@ -3,138 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art</title>
+    <title>Sitges Art i Intel·ligència Artificial</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6; --bg-dark: #020617; --card-bg: #0f172a;
-            --card-border: rgba(255, 255, 255, 0.08); --text-primary: #f8fafc;
-            --text-secondary: #94a3b8; --accent: #60a5fa; --glass: rgba(15, 23, 42, 0.8);
+            --primary: #3b82f6;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #60a5fa;
+            --glass: rgba(15, 23, 42, 0.8);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
         body {
             background: var(--bg-dark);
             background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
-            color: var(--text-primary); min-height: 100vh; display: flex; 
-            justify-content: center; align-items: flex-start; padding-top: 15vh;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 5vh 20px;
         }
-        .container { width: 90%; max-width: 900px; display: flex; flex-direction: column; gap: 2rem; }
-        header { text-align: center; margin-bottom: 1rem; }
-        header .logo { font-size: 3.5rem; font-weight: 800; color: white; letter-spacing: -2px; }
-        header .logo span { color: var(--primary); }
+
+        .container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 2rem; }
+
+        header { text-align: center; }
+        header .logo { font-size: 3.5rem; font-weight: 800; color: white; }
+        header .logo span { color: var(--accent); }
+
         .search-container {
-            width: 100%; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border); border-radius: 20px; padding: 1.2rem 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
         }
-        input {
-            width: 100%; background: transparent; border: none; outline: none;
-            color: white; font-size: 1.25rem; font-weight: 500; text-align: center;
+
+        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
+
+        #send-btn { 
+            background: var(--primary); color: white; border: none; 
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold;
         }
-        #resultats { margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 5rem; }
+
         .response-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 2.5rem; border-radius: 28px; animation: fadeInUp 0.5s ease-out;
+            padding: 2rem; border-radius: 24px; margin-top: 1rem;
         }
-        .badge {
-            background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 0.4rem 1rem;
-            border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.2);
-            margin-bottom: 1rem; display: inline-block;
+
+        .share-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .share-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+            padding: 8px 15px; border-radius: 10px; color: white; text-decoration: none; font-size: 0.8rem;
+            display: flex; align-items: center; gap: 5px;
         }
-        .obra-box {
-            background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--primary);
-            padding: 1rem; margin-top: 1.5rem; border-radius: 0 12px 12px 0;
-        }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        footer { text-align: center; color: #475569; margin-top: 3rem; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="logo">Sitges<span>Art</span></div>
-        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Explora l'art i la història</p>
+        <div class="logo">Sitges <span>Art</span></div>
+        <p>Art i intel·ligència artificial</p>
     </header>
 
     <div class="search-container">
-        <input type="text" id="buscador" placeholder="Quin artista busques?" autocomplete="off">
+        <input type="text" id="user-input" placeholder="Escriu el nom d'una obra (ex: La Bufera)...">
+        <button id="send-btn">CERCAR</button>
     </div>
 
-    <div id="resultats"></div>
+    <div id="result-container"></div>
+
+    <footer>
+        Creat per Pere Badia i Lorenz | pbadialorenz@gmail.com
+    </footer>
 </div>
 
-<script>
-    let dades = [];
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Funció per normalitzar text (treure accents)
-    function normalitzar(text) {
-        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee"
+    };
 
-    async function inicialitzar() {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const input = document.getElementById('user-input');
+    const btn = document.getElementById('send-btn');
+    const results = document.getElementById('result-container');
+
+    async function buscar() {
+        const textBuscat = input.value.toLowerCase().trim();
+        if (!textBuscat) return;
+
+        results.innerHTML = "<p style='text-align:center'>Cercant a Sitges Art...</p>";
+
         try {
-            const res = await fetch('biblioteca_sitges_premium.json?t=' + Date.now());
-            dades = await res.json();
-            // NO cridem a renderitzar(dades) aquí per mantenir la pantalla neta
-        } catch (e) {
-            console.error("Error carregant dades.");
-        }
-    }
+            // Agafem TOTES les obres per filtrar-les manualment (evita errors d'índex de Firebase)
+            const querySnapshot = await getDocs(collection(db, "obres"));
+            results.innerHTML = "";
+            let trobat = false;
 
-    function renderitzar(llista) {
-        const div = document.getElementById('resultats');
-        const cercadorValue = document.getElementById('buscador').value.trim();
-        
-        // Si el buscador està buit, no pintis res
-        if (cercadorValue === "") {
-            div.innerHTML = "";
-            return;
-        }
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                // Comprovem si el text buscat està en el nom o en el resum
+                const enNom = data.nom && data.nom.toLowerCase().includes(textBuscat);
+                const enResum = data.resum && data.resum.toLowerCase().includes(textBuscat);
 
-        div.innerHTML = llista.length ? "" : "<p style='text-align:center; color:gray;'>No s'han trobat coincidències.</p>";
-        
-        llista.forEach(item => {
-            let obres = "";
-            if (item.analisis_obres) {
-                item.analisis_obres.forEach(o => {
-                    obres += `<div class="obra-box">
-                        <b style="color:var(--accent); display:block; margin-bottom:5px;">🖼️ ${o.titol}</b>
-                        <p style="font-size:0.9rem; color:var(--text-secondary); line-height:1.5;">${o.explicacio_artistica || ''}</p>
-                    </div>`;
-                });
+                if (enNom || enResum) {
+                    trobat = true;
+                    const card = document.createElement('div');
+                    card.className = 'response-card';
+                    card.innerHTML = `
+                        <h2 style="color:var(--accent); margin-bottom:10px">${data.nom}</h2>
+                        <p style="line-height:1.6">${data.resum}</p>
+                        <div class="share-buttons">
+                            <a href="https://wa.me/?text=${encodeURIComponent(data.nom + ': ' + window.location.href)}" target="_blank" class="share-btn">WhatsApp</a>
+                            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Copiat!')" class="share-btn">Copiar Link</button>
+                        </div>
+                    `;
+                    results.appendChild(card);
+                }
+            });
+
+            if (!trobat) {
+                results.innerHTML = "<p style='text-align:center; color:gray'>No hem trobat cap obra amb aquest nom.</p>";
             }
-            div.innerHTML += `
-                <div class="response-card">
-                    <span class="badge">${item.tipus || 'CULTURA'}</span>
-                    <h2 style="font-size:1.8rem; margin-bottom:1rem;">${item.nom}</h2>
-                    <p style="color:#e2e8f0; line-height:1.8; font-size:1.1rem;">${item.resum}</p>
-                    ${obres}
-                    <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--card-border);">
-                        <a href="${item.url}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">Saber-ne més →</a>
-                    </div>
-                </div>`;
-        });
+
+        } catch (error) {
+            console.error(error);
+            results.innerHTML = "<p style='text-align:center; color:red'>Error de connexió amb Firebase. Revisa si la col·lecció es diu 'obres'.</p>";
+        }
     }
 
-    const buscador = document.getElementById('buscador');
-    buscador.addEventListener('input', () => {
-        const text = normalitzar(buscador.value.trim());
-        
-        if (text === "") {
-            renderitzar([]); // Neteja la pantalla
-            return;
-        }
-
-        const filtrats = dades.filter(d => 
-            normalitzar(d.nom || "").includes(text) || 
-            normalitzar(d.resum || "").includes(text)
-        );
-        renderitzar(filtrats);
-    });
-
-    buscador.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
-
-    inicialitzar();
+    btn.onclick = buscar;
+    input.onkeypress = (e) => { if(e.key === 'Enter') buscar(); };
 </script>
+
 </body>
 </html>
