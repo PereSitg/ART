@@ -2,50 +2,65 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>SitgesArt - Rastrejador en Temps Real</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SitgesArt - Rastrejador Professional</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        .loading-bar { transition: width 0.3s ease; }
-        .log-line { font-family: monospace; font-size: 10px; border-left: 2px solid #e2e8f0; padding-left: 8px; margin-bottom: 2px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .hidden { display: none !important; }
+        .log-box::-webkit-scrollbar { width: 4px; }
+        .log-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 p-4 md:p-8">
+<body class="p-4 md:p-10 text-slate-800">
 
-    <div class="max-w-4xl mx-auto">
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex justify-between items-center border-b-2 border-orange-500">
-            <h1 class="text-xl font-black italic">SITGESART <span class="text-orange-500 text-sm">CRAWLER V2.0</span></h1>
+    <div class="max-w-5xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
+            <div>
+                <h1 class="text-2xl font-black tracking-tight text-slate-900">SitgesArt <span class="text-blue-600">Crawler</span></h1>
+                <p class="text-slate-500 text-sm font-medium">Sincronització amb Retalls de Sitges</p>
+            </div>
             <div id="auth-box">
-                <button onclick="loginGoogle()" class="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-xs">Login</button>
+                <button onclick="loginGoogle()" class="bg-white border border-slate-300 px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4">
+                    Identifica't
+                </button>
             </div>
         </div>
 
         <div id="content" class="hidden">
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 text-center mb-8">
-                <button onclick="executarCerca()" id="btn-cerca" class="bg-orange-500 text-white px-10 py-5 rounded-2xl font-black text-xl hover:bg-orange-600 shadow-xl shadow-orange-100 transition-all active:scale-95">
+            <div class="bg-white p-10 rounded-3xl shadow-xl shadow-blue-50 border border-slate-100 text-center mb-12">
+                <h2 class="text-xl font-bold mb-6 text-slate-700">Control de Sincronització</h2>
+                <button onclick="executarCerca()" id="btn-cerca" class="bg-orange-500 hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-lg shadow-orange-100 transition-all transform hover:scale-105 active:scale-95">
                     🚀 INICIAR ESCANEIG TOTAL
                 </button>
 
-                <div id="progress-container" class="mt-8 hidden">
-                    <div class="flex justify-between text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">
-                        <span id="progress-text">Treballant...</span>
+                <div id="progress-container" class="mt-10 hidden">
+                    <div class="flex justify-between text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
+                        <span id="progress-text">Preparant...</span>
                         <span id="progress-percent">0%</span>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-                        <div id="progress-bar" class="loading-bar bg-orange-500 h-full w-0"></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-4">
+                        <div id="progress-bar" class="bg-blue-600 h-full w-0 transition-all duration-500"></div>
                     </div>
-                    <div id="live-logs" class="mt-4 h-24 overflow-y-auto text-left bg-slate-50 p-3 rounded-lg border border-slate-100 text-slate-500">
-                        <p class="log-line text-blue-500">Llest per començar...</p>
+                    <div id="live-logs" class="log-box h-24 overflow-y-auto text-left bg-slate-50 p-4 rounded-xl border border-slate-100 text-[10px] text-slate-400 font-mono leading-relaxed">
                     </div>
                 </div>
             </div>
 
-            <div id="resultats" class="grid gap-4"></div>
+            <div id="resultats-info" class="mb-6 px-2 text-center"></div>
+            <div id="resultats" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+        
+        <div id="login-warning" class="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+            <p class="text-slate-400 font-medium">Inicia sessió per començar.</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -66,20 +81,26 @@
         window.logout = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
+            const authBox = document.getElementById('auth-box');
+            const content = document.getElementById('content');
+            const warning = document.getElementById('login-warning');
+
             if (user && user.email === "pbadialorenz@gmail.com") {
-                document.getElementById('auth-box').innerHTML = `<button onclick="logout()" class="text-red-500 font-bold text-[10px] uppercase tracking-tighter">Sortir: ${user.displayName}</button>`;
-                document.getElementById('content').classList.remove('hidden');
+                authBox.innerHTML = `<button onclick="logout()" class="text-red-500 text-[10px] font-black hover:underline uppercase tracking-widest">SORTIR: ${user.displayName}</button>`;
+                content.classList.remove('hidden');
+                warning.classList.add('hidden');
             } else {
                 if(user) signOut(auth);
-                document.getElementById('content').classList.add('hidden');
+                content.classList.add('hidden');
+                warning.classList.remove('hidden');
             }
         });
 
-        function addLog(msg, color = 'text-slate-500') {
+        function addLog(msg, type = 'info') {
             const logs = document.getElementById('live-logs');
-            const line = document.createElement('p');
-            line.className = `log-line ${color}`;
-            line.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            const line = document.createElement('div');
+            line.className = `mb-1 ${type === 'error' ? 'text-red-500 font-bold' : type === 'success' ? 'text-green-600' : ''}`;
+            line.innerText = `> ${msg}`;
             logs.prepend(line);
         }
 
@@ -92,6 +113,7 @@
         window.executarCerca = async () => {
             const resBox = document.getElementById('resultats');
             const progCont = document.getElementById('progress-container');
+            const infoCont = document.getElementById('resultats-info');
             const btn = document.getElementById('btn-cerca');
             
             btn.disabled = true;
@@ -100,56 +122,60 @@
             document.getElementById('live-logs').innerHTML = "";
 
             try {
-                addLog("Connectant amb Firebase...", "text-blue-600");
-                updateProgress(10, "Llegint la teva base de dades...");
+                updateProgress(20, "Connectant amb Firebase...");
+                addLog("Verificant base de dades...");
                 
+                // Posem un timeout manual per si Firebase no respon
                 const snap = await getDocs(collection(db, "obres"));
                 const guardats = snap.docs.map(d => d.data().link);
-                addLog(`S'han trobat ${guardats.length} obres ja existents a SitgesArt.`, "text-green-600");
+                addLog(`S'han trobat ${guardats.length} obres a la web.`, 'success');
 
-                updateProgress(30, "Connectant amb el Blog Retalls de Sitges...");
-                addLog("Demanant l'arxiu XML de Blogger (fins a 500 entrades)...");
-
+                updateProgress(50, "Cercant entrades al blog...");
                 const blogUrl = "https://retallsdesitges.blogspot.com/feeds/posts/default?alt=rss&max-results=500";
                 const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(blogUrl)}`);
                 const json = await response.json();
                 
-                updateProgress(60, "Processant continguts...");
                 const xml = new DOMParser().parseFromString(json.contents, "text/xml");
                 const items = xml.querySelectorAll("item");
                 
-                addLog(`Descarregades ${items.length} entrades. Iniciant comparació...`, "text-orange-600");
+                updateProgress(80, "Comparant dades...");
+                addLog(`Processant ${items.length} entrades del blog...`);
 
                 items.forEach((item, i) => {
                     const titol = item.querySelector("title").textContent;
                     const link = item.querySelector("link").textContent;
-                    const desc = item.querySelector("description").textContent.replace(/<[^>]*>/g, '').substring(0, 200).trim() + "...";
+                    const descRaw = item.querySelector("description").textContent;
+                    const desc = descRaw.replace(/<[^>]*>/g, '').substring(0, 180).trim() + "...";
                     const jaExisteix = guardats.includes(link);
 
-                    if(i % 50 === 0) addLog(`Analitzant entrada ${i}...`);
-
                     const card = document.createElement('div');
-                    card.className = `p-5 rounded-2xl border-2 flex justify-between items-center transition-all ${jaExisteix ? 'bg-slate-50 border-slate-100 opacity-50' : 'bg-white border-blue-50 shadow-sm'}`;
+                    card.className = `bg-white p-6 rounded-2xl border-2 flex flex-col justify-between transition-all ${jaExisteix ? 'opacity-40 border-slate-100' : 'border-white shadow-sm hover:border-blue-100'}`;
+                    
                     card.innerHTML = `
-                        <div class="max-w-[70%] text-left">
-                            <h3 class="font-bold text-slate-800 text-sm">${titol}</h3>
-                            <p class="text-[10px] text-slate-400 mt-1">${desc}</p>
-                        </div>
                         <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="font-bold text-slate-900 leading-tight">${titol}</h3>
+                                ${jaExisteix ? '<span class="text-[9px] font-black text-green-600 bg-green-50 px-2 py-1 rounded">EXISTEIX</span>' : ''}
+                            </div>
+                            <p class="text-xs text-slate-400 mb-6 leading-relaxed">${desc}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
                             ${jaExisteix 
-                                ? '<span class="text-green-500 font-bold text-[9px] uppercase tracking-widest">En llista</span>'
-                                : `<button onclick="importar(this, ${i})" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-[10px]">IMPORTAR</button>`}
+                                ? '<span class="text-[10px] font-bold text-slate-300">JA IMPORTAT</span>'
+                                : `<button onclick="importar(this, ${i})" class="bg-blue-600 text-white px-5 py-2 rounded-xl font-bold text-xs hover:bg-blue-700 transition shadow-md shadow-blue-50">IMPORTAR</button>`
+                            }
+                            <a href="${link}" target="_blank" class="text-[10px] text-slate-300 hover:underline">ORIGINAL</a>
                         </div>
                     `;
                     card.dataset.info = JSON.stringify({ nom: titol, link: link, resum: desc, font: "Retalls de Sitges", data_creacio: new Date() });
                     resBox.appendChild(card);
                 });
 
-                updateProgress(100, "Sincronització completada!");
-                addLog("Tot llast! Revisa la llista a sota.", "text-green-600 font-bold");
+                updateProgress(100, "Sincronització finalitzada.");
+                addLog("Tot a punt!", 'success');
 
             } catch (e) {
-                addLog("ERROR CRÍTIC: " + e.message, "text-red-600");
+                addLog(`Error: ${e.message}`, 'error');
                 updateProgress(0, "Error en la càrrega.");
             } finally {
                 btn.disabled = false;
@@ -157,17 +183,20 @@
         };
 
         window.importar = async (btn, i) => {
-            const card = btn.closest('div').parentElement;
+            const card = btn.closest('.bg-white');
             const data = JSON.parse(card.dataset.info);
             btn.innerText = "PUJANT...";
             btn.disabled = true;
+
             try {
                 await addDoc(collection(db, "obres"), data);
                 btn.innerText = "✅ FET";
-                btn.className = "bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-[10px]";
-                addLog(`Importat amb èxit: ${data.nom}`, "text-green-500");
+                btn.className = "bg-green-500 text-white px-5 py-2 rounded-xl font-bold text-xs";
+                card.style.opacity = "0.5";
+                addLog(`Importat: ${data.nom}`, 'success');
             } catch (err) {
-                alert("Error al pujar.");
+                alert("Error al pujar. Revisa permisos.");
+                btn.innerText = "ERROR";
                 btn.disabled = false;
             }
         };
