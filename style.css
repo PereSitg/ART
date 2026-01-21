@@ -1,0 +1,90 @@
+:root {
+    --primary: #3b82f6;
+    --bg-dark: #020617;
+    --card-bg: #0f172a;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent: #60a5fa;
+    --glass: rgba(15, 23, 42, 0.8);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+body {
+    background: var(--bg-dark);
+    background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 5vh 20px;
+}
+
+.container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 2rem; }
+
+header { text-align: center; }
+header .logo { 
+    font-size: 3.5rem; 
+    font-weight: 800; 
+    background: linear-gradient(to bottom, #ffffff, #94a3b8); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+header .logo span { 
+    background: linear-gradient(to right, #60a5fa, #3b82f6); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+
+.search-container {
+    background: var(--glass);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 12px 20px;
+    display: flex;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
+
+.response-card {
+    background: var(--card-bg); 
+    border: 1px solid var(--card-border);
+    padding: 2.5rem; 
+    border-radius: 28px; 
+    margin-top: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.source-link {
+    margin-top: 1.5rem; 
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    font-size: 0.9rem; 
+    color: var(--text-secondary);
+}
+
+.source-link a { 
+    color: var(--accent); 
+    text-decoration: none; 
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(96, 165, 250, 0.1);
+    transition: 0.3s;
+}
+.source-link a:hover { background: rgba(96, 165, 250, 0.2); }
+
+footer { text-align: center; color: #475569; margin-top: 4rem; padding-bottom: 2rem; font-size: 0.9rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
