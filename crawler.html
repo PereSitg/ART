@@ -7,54 +7,176 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        :root {
+            --primary: #3b82f6;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #60a5fa;
+            --glass: rgba(15, 23, 42, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background: var(--bg-dark);
+            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 5vh 20px;
+        }
+
+        .container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        header .logo { 
+            font-size: 3.5rem; 
+            font-weight: 800; 
+            background: linear-gradient(to bottom, #ffffff, #94a3b8); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        header .logo span { 
+            background: linear-gradient(to right, #3b82f6, #60a5fa); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .admin-panel {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .btn-main {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .log-console {
+            margin-top: 1.5rem;
+            background: #000;
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #60a5fa;
+            height: 120px;
+            overflow-y: auto;
+            text-align: left;
+            border: 1px solid var(--card-border);
+        }
+
+        .results-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 1.5rem; 
+            margin-top: 2rem; 
+        }
+
+        @media (max-width: 768px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .response-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border);
+            padding: 1.5rem; 
+            border-radius: 20px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .ja-importat { opacity: 0.3; filter: grayscale(1); }
+
+        .import-btn {
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .status-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            text-transform: uppercase;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hidden { display: none !important; }
-        .log-box::-webkit-scrollbar { width: 4px; }
-        .log-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
-<body class="p-4 md:p-10 text-slate-800">
+<body>
 
-    <div class="max-w-5xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
-            <div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-900 italic">SitgesArt <span class="text-blue-600">Crawler</span></h1>
-                <p class="text-slate-500 text-sm font-medium">Sincronització amb Retalls de Sitges</p>
-            </div>
-            <div id="auth-box">
-                <button onclick="loginGoogle()" class="bg-white border border-slate-300 px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4">
-                    Identifica't
-                </button>
-            </div>
-        </div>
+    <div class="container">
+        <header>
+            <div class="logo">SitgesArt <span>Crawler</span></div>
+            <p style="color: var(--text-secondary)">Sincronització amb Retalls de Sitges</p>
+            <div id="auth-box" class="mt-4"></div>
+        </header>
 
         <div id="content" class="hidden">
-            <div class="bg-white p-10 rounded-3xl shadow-xl shadow-blue-50 border border-slate-100 text-center mb-12">
-                <h2 class="text-xl font-bold mb-6 text-slate-700 font-black">Escaneig de l'històric</h2>
-                <button onclick="executarCerca()" id="btn-cerca" class="bg-orange-500 hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-lg shadow-orange-100 transition-all transform hover:scale-105 active:scale-95">
+            <div class="admin-panel">
+                <h2 style="font-weight: 800; margin-bottom: 1.5rem; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; tracking: 0.2em;">Escaneig de l'històric</h2>
+                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">
                     🚀 INICIAR CERCA DE 500 ENTRADES
                 </button>
 
-                <div id="status-area" class="mt-10 hidden border-t border-slate-50 pt-8">
+                <div id="status-area" class="mt-8 hidden border-t border-slate-800 pt-6">
                     <div class="flex items-center justify-center gap-3 mb-4">
-                        <div id="spinner" class="animate-spin h-4 w-4 border-3 border-blue-500 border-t-transparent rounded-full"></div>
-                        <span id="status-text" class="font-black text-slate-400 uppercase text-[10px] tracking-[0.2em]">Preparant motors...</span>
+                        <div id="spinner" class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                        <span id="status-text" class="font-black text-slate-500 uppercase text-[10px] tracking-[0.2em]">Preparant motors...</span>
                     </div>
-                    <div id="log-console" class="log-box max-w-2xl mx-auto bg-slate-50 p-4 rounded-xl text-left font-mono text-[9px] text-slate-400 h-24 overflow-y-auto leading-relaxed border border-slate-100">
+                    <div id="log-console" class="log-console">
                         > Sistema a punt.
                     </div>
                 </div>
             </div>
 
-            <div id="resultats-info" class="mb-6 px-2 text-center"></div>
-            <div id="resultats" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            <div id="resultats-info" class="mt-8 text-center text-sm font-bold text-slate-500"></div>
+            <div id="resultats" class="results-grid"></div>
         </div>
         
-        <div id="login-warning" class="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-inner">
-            <p class="text-slate-400 font-medium italic">Accés restringit a l'administrador de SitgesArt.</p>
+        <div id="login-warning" class="admin-panel">
+            <p class="text-slate-400 font-medium italic mb-6">Accés restringit a l'administrador de SitgesArt.</p>
+            <button onclick="loginGoogle()" class="btn-main" style="background: white; color: black;">
+                Identifica't amb Google
+            </button>
         </div>
+
+        <footer style="text-align: center; color: var(--text-secondary); margin: 4rem 0; font-size: 0.8rem;">
+            SitgesArt &copy; 2026 - Gestió de Continguts
+        </footer>
     </div>
 
     <script type="module">
@@ -85,7 +207,7 @@
             const warning = document.getElementById('login-warning');
 
             if (user && user.email === "pbadialorenz@gmail.com") {
-                authBox.innerHTML = `<button onclick="logout()" class="text-red-500 text-[10px] font-black hover:underline uppercase tracking-widest">SORTIR: ${user.displayName}</button>`;
+                authBox.innerHTML = `<button onclick="logout()" style="color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em;">SORTIR DE L'ADMIN</button>`;
                 content.classList.remove('hidden');
                 warning.classList.add('hidden');
             } else {
@@ -98,7 +220,7 @@
         function log(msg, color = "") {
             const console = document.getElementById('log-console');
             const line = document.createElement('div');
-            line.className = color;
+            line.style.color = color === "text-green-500 font-bold" ? "#10b981" : (color.includes("red") ? "#ef4444" : "");
             line.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
             console.prepend(line);
         }
@@ -115,7 +237,6 @@
             log("Iniciant connexió de dades...");
 
             try {
-                // 1. FIREBASE (amb límit de temps)
                 log("Pas 1: Verificant duplicats a Firebase...");
                 statusText.innerText = "Consultant base de dades...";
                 
@@ -125,10 +246,9 @@
                     guardats = snap.docs.map(d => d.data().link);
                     log(`Firebase connectat: ${guardats.length} obres detectades.`, "text-blue-500 font-bold");
                 } catch (e) {
-                    log("Avís: No s'ha pogut llegir Firebase. Es carregarà tot com a nou.", "text-orange-500");
+                    log("Avís: No s'ha pogut llegir Firebase.", "text-orange-500");
                 }
 
-                // 2. BLOG (Amb proxy alternatiu per evitar ERR_QUIC)
                 log("Pas 2: Recuperant entrades del blog...");
                 statusText.innerText = "Llegint blog (Protocol segur)...";
                 
@@ -155,22 +275,20 @@
                     const jaExisteix = guardats.includes(link);
 
                     const card = document.createElement('div');
-                    card.className = `bg-white p-8 rounded-2xl border-2 flex flex-col justify-between transition-all ${jaExisteix ? 'opacity-40 border-slate-100 scale-[0.98]' : 'border-white shadow-sm hover:shadow-xl hover:border-blue-100 hover:scale-[1.01]'}`;
+                    card.className = `response-card ${jaExisteix ? 'ja-importat' : ''}`;
                     
                     card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-bold text-lg leading-tight text-slate-900">${titol}</h3>
-                                ${jaExisteix ? '<span class="bg-green-100 text-green-700 text-[9px] font-black px-2 py-1 rounded tracking-tighter uppercase">Guardada</span>' : ''}
+                        <div style="flex-grow: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                ${jaExisteix ? '<span class="status-tag">Ja importada</span>' : '<span></span>'}
                             </div>
-                            <p class="text-sm text-slate-400 leading-relaxed mb-6 line-clamp-2">${desc}</p>
+                            <h3 style="font-size: 1rem; font-weight: 700; color: white; line-height: 1.3;">${titol}</h3>
                         </div>
-                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
+                        <div style="margin-top: 1rem; border-top: 1px solid var(--card-border); pt-3">
                             ${jaExisteix 
-                                ? '<span class="text-[10px] font-black text-slate-300 tracking-widest uppercase">Importat</span>'
-                                : `<button onclick="importar(this, ${i})" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-700 transition shadow-lg shadow-blue-50">IMPORTAR</button>`
+                                ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; margin-top: 10px;">DINS L\'ARXIU</div>' 
+                                : `<button onclick="importar(this, ${i})" class="import-btn">IMPORTAR ARA</button>`
                             }
-                            <a href="${link}" target="_blank" class="text-[10px] font-bold text-slate-300 hover:text-blue-500 transition uppercase">Blog ↗</a>
                         </div>
                     `;
                     card.dataset.info = JSON.stringify({ nom: titol, link: link, resum: desc, font: "Retalls de Sitges", data_creacio: new Date().toISOString() });
@@ -189,16 +307,16 @@
         };
 
         window.importar = async (btn, i) => {
-            const card = btn.closest('.bg-white');
+            const card = btn.closest('.response-card');
             const data = JSON.parse(card.dataset.info);
             btn.innerText = "ENVIANT...";
             btn.disabled = true;
 
             try {
                 await addDoc(collection(db, "obres"), data);
-                btn.innerText = "✅ FET";
-                btn.className = "bg-green-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs";
-                card.classList.add('opacity-40');
+                btn.innerText = "FET ✅";
+                btn.style.background = "#10b981";
+                card.classList.add('ja-importat');
                 log(`Importat: ${data.nom}`, "text-green-500");
             } catch (err) {
                 alert("Error: Revisa les Rules de Firebase.");
