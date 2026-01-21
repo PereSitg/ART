@@ -41,7 +41,7 @@
         .ja-importat { opacity: 0.3; filter: grayscale(1); }
         .import-btn { background: var(--accent); color: var(--bg-dark); padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; width: 100%; }
         .status-tag { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); color: #10b981; text-transform: uppercase; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -55,11 +55,11 @@
 
         <div id="main-content" class="hidden">
             <div class="admin-panel">
-                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🚀 BUSCAR ÚLTIMS ARTICLES</button>
+                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🚀 BUSCAR ARTICLES RECENTS</button>
                 <div id="pagination-controls" class="hidden">
                     <button onclick="executarCerca(true)" id="btn-mes" class="btn-secondary">⬇️ CARREGAR MÉS ANTICS</button>
                 </div>
-                <div class="log-console" id="log-console">> Sistema preparat.</div>
+                <div class="log-console" id="log-console">> Sistema preparat i a punt per netejar títols.</div>
             </div>
             <div id="results-grid" class="results-grid"></div>
         </div>
@@ -91,10 +91,25 @@
         let ultimaDataCercada = null;
         let guardatsGlobal = [];
 
+        // FUNCIÓ PER ARREGLAR LES MAJÚSCULES
+        function formatarTitol(text) {
+            if (!text) return "";
+            let str = text.toLowerCase().trim();
+            str = str.charAt(0).toUpperCase() + str.slice(1);
+            str = str.replace(/\. \s*([a-z])/g, (m, l) => ". " + l.toUpperCase());
+            const excepcions = ["Sitges", "Beli", "Vinyet", "Terramar", "Criticartt", "Art", "Sant", "Bartomeu", "Santa", "Tecla"];
+            excepcions.forEach(paraula => {
+                const regex = new RegExp("\\b" + paraula + "\\b", "gi");
+                str = str.replace(regex, paraula);
+            });
+            return str;
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === "pbadialorenz@gmail.com") {
                 document.getElementById('main-content').classList.remove('hidden');
                 document.getElementById('login-warning').classList.add('hidden');
+                document.getElementById('auth-box').innerHTML = `<button onclick="signOut(auth)" style="color: #64748b; font-size: 0.75rem;">SORTIR DE L'ADMIN</button>`;
             }
         });
 
@@ -115,13 +130,13 @@
             if (!esPaginacio) {
                 resBox.innerHTML = "";
                 ultimaDataCercada = null;
-                log("Llegint base de dades...");
+                log("Llegint base de dades per evitar duplicats...");
                 const snap = await getDocs(collection(db, "obres"));
                 guardatsGlobal = snap.docs.map(d => d.data().link);
             }
 
             try {
-                log(esPaginacio ? "Buscant articles anteriors..." : "Rastrejant articles recents...");
+                log(esPaginacio ? "Buscant articles anteriors..." : "Rastrejant articles de Criticartt...");
                 
                 let blogUrl = `https://criticartt.blogspot.com/feeds/posts/default?alt=rss&max-results=50`;
                 if (ultimaDataCercada) {
@@ -134,20 +149,21 @@
                 const items = xml.querySelectorAll("item");
 
                 if (items.length === 0) {
-                    log("No s'han trobat més articles.");
+                    log("Final del blog: no hi ha més articles.");
                     return;
                 }
 
-                log(`Trobats ${items.length} articles nous en aquesta pàgina.`);
+                log(`Trobats ${items.length} articles.`);
 
                 items.forEach((item) => {
-                    const titol = item.querySelector("title").textContent;
+                    const titolBrut = item.querySelector("title").textContent;
+                    const titol = formatarTitol(titolBrut); // NETEJA DE MAJÚSCULES
+                    
                     const link = item.querySelector("link").textContent;
                     const dataPub = item.querySelector("pubDate")?.textContent;
                     
                     if (dataPub) {
                         const d = new Date(dataPub);
-                        // Restem un segon a l'última data trobada per a la següent cerca
                         ultimaDataCercada = d.toISOString();
                     }
 
@@ -160,9 +176,10 @@
                                 ${jaExisteix ? '<span class="status-tag">Ja importada</span>' : '<span></span>'}
                             </div>
                             <h3 style="font-size: 1rem; font-weight: 700; color: white; line-height: 1.3;">${titol}</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.7rem; margin-top: 5px;">${link}</p>
                         </div>
                         <div style="margin-top: 1rem; border-top: 1px solid var(--card-border); pt-3">
-                            ${jaExisteix ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; margin-top: 10px;">A L\'ARXIU</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">IMPORTAR</button>`}
+                            ${jaExisteix ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; margin-top: 10px;">ELEMENT ARXIBAT</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">IMPORTAR A LA WEB</button>`}
                         </div>
                     `;
                     resBox.appendChild(card);
@@ -179,15 +196,19 @@
 
         window.importar = async (btn, titolB64, link) => {
             const titol = decodeURIComponent(atob(titolB64));
-            btn.innerText = "⏳...";
+            btn.innerText = "⏳ DESANT...";
             btn.disabled = true;
             try {
                 await addDoc(collection(db, "obres"), {
-                    nom: titol, link: link, font: "Criticartt", autor: "Beli", data_creacio: new Date().toISOString()
+                    nom: titol, 
+                    link: link, 
+                    font: "Criticartt", 
+                    autor: "Beli", 
+                    data_creacio: new Date().toISOString()
                 });
                 btn.innerText = "FET ✅";
                 btn.style.background = "#10b981";
-                log(`Importat: ${titol}`);
+                log(`Correcte: ${titol}`);
             } catch (e) {
                 alert("Error: " + e.message);
                 btn.disabled = false;
