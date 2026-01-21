@@ -17,7 +17,7 @@
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-extrabold text-blue-900">Admin <span class="text-blue-500">SitgesArt</span></h1>
-            <a href="index.html" class="bg-white px-4 py-2 rounded-lg shadow-sm text-sm font-bold text-blue-600 hover:bg-blue-50 transition">Anar a la Web ↗</a>
+            <a href="index.html" class="bg-white px-4 py-2 rounded-lg shadow-sm text-sm font-bold text-blue-600 hover:bg-blue-50 transition border border-blue-100">Anar a la Web ↗</a>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -29,13 +29,13 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nom de l'obra o lloc</label>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nom de l'obra</label>
                             <input type="text" id="nom" class="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none border-slate-200">
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipus / Categoria</label>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipus</label>
                                 <select id="tipus" class="w-full border p-2.5 rounded-lg outline-none border-slate-200">
                                     <option value="Modernisme">Modernisme</option>
                                     <option value="Història Local">Història Local</option>
@@ -45,13 +45,13 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Font (Ex: Viquipèdia)</label>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Font (Viquipèdia...)</label>
                                 <input type="text" id="font" class="w-full border p-2.5 rounded-lg outline-none border-slate-200">
                             </div>
                         </div>
 
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Resum (Surt al cercador)</label>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Resum</label>
                             <textarea id="resum" class="w-full border p-2.5 rounded-lg h-24 outline-none border-slate-200"></textarea>
                         </div>
 
@@ -64,7 +64,7 @@
                             <button onclick="guardarDada()" id="btn-save" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition">
                                 Guardar Fitxa
                             </button>
-                            <button onclick="cancelarEdicio()" id="btn-cancel" class="hidden bg-slate-100 text-slate-500 px-5 py-3 rounded-xl font-bold hover:bg-slate-200 transition">
+                            <button onclick="cancelarEdicio()" id="btn-cancel" class="hidden bg-slate-100 text-slate-500 px-5 py-3 rounded-xl font-bold hover:bg-slate-200 transition border border-slate-200">
                                 Cancel·lar
                             </button>
                         </div>
@@ -76,11 +76,11 @@
                 <div class="bg-white p-4 rounded-t-2xl border border-slate-200 border-b-0 shadow-sm">
                     <div class="relative">
                         <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">🔍</span>
-                        <input type="text" id="admin-search" oninput="filtrarLlista()" placeholder="Buscar fitxa per nom o resum..." class="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 border border-transparent focus:border-transparent transition">
+                        <input type="text" id="admin-search" placeholder="Cercar en temps real..." class="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 border border-slate-100 transition">
                     </div>
                 </div>
                 <div id="llista-contingut" class="space-y-3 bg-white p-4 border border-slate-200 rounded-b-2xl min-h-[400px]">
-                    <p class="text-center py-10 text-slate-400 italic font-light">Carregant dades de Firebase...</p>
+                    <p class="text-center py-10 text-slate-400 italic">Carregant dades...</p>
                 </div>
             </div>
 
@@ -98,28 +98,31 @@
             projectId: "sitgesart",
             storageBucket: "sitgesart.firebasestorage.app",
             messagingSenderId: "673959867307",
-            appId: "1:673959867307:web:80607c11d79db42b4918ee",
-            measurementId: "G-7G51JP9CFS"
+            appId: "1:673959867307:web:80607c11d79db42b4918ee"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let totesLesObres = [];
 
-        // 1. ESCULTAR CANVIS EN TEMPS REAL
+        // 1. CARREGAR DADES I POSAR-LES A L'ESCOLTA
         const q = query(collection(db, "obres"), orderBy("data_creacio", "desc"));
         onSnapshot(q, (snapshot) => {
+            console.log("Dades rebudes de Firebase!");
             totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderitzarLlista(totesLesObres);
+        }, (error) => {
+            console.error("Error Firebase:", error);
+            document.getElementById('llista-contingut').innerHTML = "<p class='text-red-500'>Error de connexió: " + error.message + "</p>";
         });
 
-        // 2. FUNCIÓ PER PINTAR LA LLISTA
+        // 2. FUNCIÓ PER DIBUIXAR LA LLISTA
         function renderitzarLlista(obres) {
             const llista = document.getElementById('llista-contingut');
             llista.innerHTML = "";
             
             if (obres.length === 0) {
-                llista.innerHTML = "<p class='text-center py-10 text-slate-400'>No s'ha trobat res.</p>";
+                llista.innerHTML = "<p class='text-center py-10 text-slate-400 font-light'>No s'ha trobat cap fitxa a la BBDD.</p>";
                 return;
             }
 
@@ -141,25 +144,22 @@
             });
         }
 
-        // 3. BUSCADOR INTERN (FILTRE EN TEMPS REAL)
-        window.filtrarLlista = () => {
-            const text = document.getElementById('admin-search').value.toLowerCase().trim();
+        // 3. BUSCADOR QUE FUNCIONA SI O SI
+        const searchInput = document.getElementById('admin-search');
+        searchInput.addEventListener('input', () => {
+            const text = searchInput.value.toLowerCase().trim();
             const filtrades = totesLesObres.filter(o => 
                 (o.nom && o.nom.toLowerCase().includes(text)) || 
                 (o.resum && o.resum.toLowerCase().includes(text))
             );
             renderitzarLlista(filtrades);
-        };
+        });
 
         // 4. GUARDAR / ACTUALITZAR
         window.guardarDada = async () => {
             const id = document.getElementById('edit-id').value;
-            const nom = document.getElementById('nom').value;
-            
-            if(!nom) return alert("Posa un nom a la fitxa!");
-
             const dada = {
-                nom: nom,
+                nom: document.getElementById('nom').value,
                 tipus: document.getElementById('tipus').value,
                 font: document.getElementById('font').value,
                 resum: document.getElementById('resum').value,
@@ -167,17 +167,21 @@
                 data_creacio: new Date()
             };
 
+            if(!dada.nom) return alert("Posa un nom!");
+
             try {
                 if(id) {
                     await updateDoc(doc(db, "obres", id), dada);
+                    alert("Actualitzat!");
                 } else {
                     await addDoc(collection(db, "obres"), dada);
+                    alert("Creat!");
                 }
                 cancelarEdicio();
             } catch (e) { alert("Error al guardar."); }
         };
 
-        // 5. EDITAR I BORRAR
+        // 5. EDICIÓ I ELIMINACIÓ
         window.prepararEdicio = (id) => {
             const obra = totesLesObres.find(o => o.id === id);
             if(!obra) return;
@@ -204,7 +208,7 @@
         };
 
         window.eliminarDada = async (id) => {
-            if(confirm("Vols esborrar aquesta fitxa per sempre?")) {
+            if(confirm("Vols esborrar aquesta fitxa?")) {
                 await deleteDoc(doc(db, "obres", id));
             }
         };
