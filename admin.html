@@ -2,108 +2,190 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Sitges Art & Història</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Expert - Sitges Art</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; background: white; transition: all 0.2s; }
+        .card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .sticky-form { position: sticky; top: 20px; }
     </style>
 </head>
-<body class="bg-gray-50 p-8">
+<body class="bg-slate-100 p-4 md:p-8">
 
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-blue-900">Gestor de Continguts SitgesArt</h1>
-
-        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h2 class="text-xl font-semibold mb-4">Afegir Nova Entrada (Manual o Criticartt)</h2>
-            <div class="grid grid-cols-1 gap-4">
-                <input type="text" id="nom" placeholder="Nom de l'obra o lloc (Ex: Can Falç)" class="border p-2 rounded">
-                <select id="tipus" class="border p-2 rounded">
-                    <option value="Modernisme">Modernisme</option>
-                    <option value="Història Local">Història Local (Criticartt)</option>
-                    <option value="Arquitectura">Arquitectura</option>
-                    <option value="Cinema">Cinema</option>
-                    <option value="Art Contemporani">Art Contemporani</option>
-                </select>
-                <textarea id="resum" placeholder="Resum curt per al cercador..." class="border p-2 rounded h-20"></textarea>
-                <textarea id="explicacio" placeholder="Història completa o anècdota..." class="border p-2 rounded h-32"></textarea>
-                <input type="text" id="url" placeholder="URL de la font (ex: criticartt.blogspot.com)" class="border p-2 rounded">
-                <button onclick="guardarDada()" class="bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Guardar a la Base de Dades</button>
-            </div>
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-extrabold text-blue-900">Admin <span class="text-blue-500">SitgesArt</span></h1>
+            <a href="index.html" class="bg-white px-4 py-2 rounded-lg shadow-sm text-sm font-bold text-blue-600 hover:bg-blue-50">Anar a la Web ↗</a>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Contingut a la Base de Dades</h2>
-            <div id="llista-contingut" class="space-y-4">
-                <p class="text-gray-500 italic">Carregant dades...</p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <div class="sticky-form">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100">
+                    <h2 id="form-title" class="text-xl font-bold mb-4 text-slate-800">Afegir Nova Entrada</h2>
+                    <input type="hidden" id="edit-id"> <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase">Nom de l'obra</label>
+                            <input type="text" id="nom" class="w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Tipus</label>
+                                <select id="tipus" class="w-full border p-2 rounded-lg outline-none">
+                                    <option value="Modernisme">Modernisme</option>
+                                    <option value="Història Local">Història Local</option>
+                                    <option value="Arquitectura">Arquitectura</option>
+                                    <option value="Cinema">Cinema</option>
+                                    <option value="Art Contemporani">Art Contemporani</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Font (Ex: Viquipèdia)</label>
+                                <input type="text" id="font" class="w-full border p-2 rounded-lg outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase">Resum (Cercador)</label>
+                            <textarea id="resum" class="w-full border p-2 rounded-lg h-20 outline-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase">URL de l'enllaç</label>
+                            <input type="text" id="link" class="w-full border p-2 rounded-lg outline-none" placeholder="https://...">
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="guardarDada()" id="btn-save" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 shadow-md">
+                                Guardar fitxa
+                            </button>
+                            <button onclick="cancelarEdicio()" id="btn-cancel" class="hidden bg-slate-200 text-slate-600 px-4 py-3 rounded-lg font-bold">
+                                Cancel·lar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="bg-white p-4 rounded-t-2xl border-b border-slate-100 shadow-sm">
+                    <input type="text" id="admin-search" oninput="filtrarLlista()" placeholder="🔍 Buscar fitxa per nom..." class="w-full p-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div id="llista-contingut" class="space-y-3 mt-4">
+                    <p class="text-center py-10 text-slate-400">Carregant base de dades...</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } 
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            // ENGANXA AQUÍ LES TEVES CREDENCIALS DE FIREBASE
-            apiKey: "TEU_API_KEY",
-            authDomain: "TEU_PROJECTE.firebaseapp.com",
-            projectId: "TEU_PROJECTE_ID",
-            storageBucket: "TEU_PROJECTE.appspot.com",
-            messagingSenderId: "TEU_SENDER_ID",
-            appId: "TEU_APP_ID"
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee",
+            measurementId: "G-7G51JP9CFS"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let totesLesObres = [];
 
-        // FUNCIO PER GUARDAR
-        window.guardarDada = async () => {
-            const nom = document.getElementById('nom').value;
-            const tipus = document.getElementById('tipus').value;
-            const resum = document.getElementById('resum').value;
-            const explicacio = document.getElementById('explicacio').value;
-            const url = document.getElementById('url').value;
-
-            if(!nom || !explicacio) return alert("Falten camps!");
-
-            try {
-                await addDoc(collection(db, "obres"), {
-                    nom: nom,
-                    tipus: tipus,
-                    resum: resum,
-                    analisis_obres: [{ titol: "Història i Detalls", explicacio_artistica: explicacio }],
-                    url: url,
-                    data_creacio: new Date()
-                });
-                alert("Guardat correctament!");
-                document.querySelectorAll('input, textarea').forEach(el => el.value = "");
-            } catch (e) { console.error("Error: ", e); }
-        };
-
-        // LLEGIR EN TEMPS REAL
-        onSnapshot(collection(db, "obres"), (querySnapshot) => {
-            const llista = document.getElementById('llista-contingut');
-            llista.innerHTML = "";
-            querySnapshot.forEach((d) => {
-                const item = d.data();
-                llista.innerHTML += `
-                    <div class="card bg-gray-50 flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-bold uppercase text-blue-600">${item.tipus}</span>
-                            <h3 class="text-lg font-bold">${item.nom}</h3>
-                            <p class="text-sm text-gray-600">${item.resum || ''}</p>
-                        </div>
-                        <button onclick="window.eliminarDada('${d.id}')" class="text-red-500 hover:underline text-sm">Eliminar</button>
-                    </div>
-                `;
-            });
+        // LLEGIR DADES
+        const q = query(collection(db, "obres"), orderBy("data_creacio", "desc"));
+        onSnapshot(q, (snapshot) => {
+            totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderitzarLlista(totesLesObres);
         });
 
+        function renderitzarLlista(obres) {
+            const llista = document.getElementById('llista-contingut');
+            llista.innerHTML = "";
+            obres.forEach(obra => {
+                const div = document.createElement('div');
+                div.className = "card flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <span class="text-[10px] font-bold text-blue-500 uppercase">${obra.tipus || 'General'}</span>
+                        <h3 class="font-bold text-slate-800">${obra.nom}</h3>
+                        <p class="text-xs text-slate-400 truncate w-48">${obra.resum || ''}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prepararEdicio('${obra.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg text-xs font-bold">EDITAR</button>
+                        <button onclick="eliminarDada('${obra.id}')" class="text-red-400 hover:bg-red-50 p-2 rounded-lg text-xs font-bold">BORRAR</button>
+                    </div>
+                `;
+                llista.appendChild(div);
+            });
+        }
+
+        // BUSCADOR INTERN
+        window.filtrarLlista = () => {
+            const text = document.getElementById('admin-search').value.toLowerCase();
+            const filtrades = totesLesObres.filter(o => o.nom.toLowerCase().includes(text));
+            renderitzarLlista(filtrades);
+        };
+
+        // GUARDAR (CREAR O EDITAR)
+        window.guardarDada = async () => {
+            const id = document.getElementById('edit-id').value;
+            const dada = {
+                nom: document.getElementById('nom').value,
+                tipus: document.getElementById('tipus').value,
+                font: document.getElementById('font').value,
+                resum: document.getElementById('resum').value,
+                link: document.getElementById('link').value,
+                data_creacio: new Date()
+            };
+
+            if(!dada.nom) return alert("Posa un nom!");
+
+            try {
+                if(id) {
+                    await updateDoc(doc(db, "obres", id), dada);
+                    alert("Actualitzat!");
+                } else {
+                    await addDoc(collection(db, "obres"), dada);
+                    alert("Creat!");
+                }
+                cancelarEdicio();
+            } catch (e) { alert("Error!"); }
+        };
+
+        // CARREGAR DADES AL FORMULARI PER EDITAR
+        window.prepararEdicio = (id) => {
+            const obra = totesLesObres.find(o => o.id === id);
+            document.getElementById('edit-id').value = obra.id;
+            document.getElementById('nom').value = obra.nom;
+            document.getElementById('tipus').value = obra.tipus || "Modernisme";
+            document.getElementById('font').value = obra.font || "";
+            document.getElementById('resum').value = obra.resum || "";
+            document.getElementById('link').value = obra.link || obra.url || "";
+            
+            document.getElementById('form-title').innerText = "Editant: " + obra.nom;
+            document.getElementById('btn-save').innerText = "Guardar Canvis";
+            document.getElementById('btn-cancel').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelarEdicio = () => {
+            document.getElementById('edit-id').value = "";
+            document.querySelectorAll('input, textarea').forEach(i => i.value = "");
+            document.getElementById('form-title').innerText = "Afegir Nova Entrada";
+            document.getElementById('btn-save').innerText = "Guardar fitxa";
+            document.getElementById('btn-cancel').classList.add('hidden');
+        };
+
         window.eliminarDada = async (id) => {
-            if(confirm("Segur que vols eliminar aquesta història?")) {
-                await deleteDoc(doc(db, "obres", id));
-            }
+            if(confirm("Segur?")) await deleteDoc(doc(db, "obres", id));
         };
     </script>
 </body>
