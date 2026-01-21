@@ -5,21 +5,23 @@
     <title>SitgesArt - Rastrejador Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 p-6">
+<body class="bg-slate-100 p-6">
     <div class="max-w-4xl mx-auto">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border mb-6 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-slate-800">Rastrejador SitgesArt</h1>
+        <div class="bg-white p-6 rounded-2xl shadow-md mb-6 flex justify-between items-center border-b-4 border-blue-500">
+            <h1 class="text-xl font-bold text-slate-800 italic">SitgesArt <span class="text-blue-600">Crawler</span></h1>
             <div id="auth-box">
-                <button onclick="loginGoogle()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm">Entrar amb Google</button>
+                <button onclick="loginGoogle()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">Entrar</button>
             </div>
         </div>
 
-        <div id="content" class="hidden text-center">
-            <button onclick="executarCerca()" id="btn-cerca" class="bg-orange-500 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-orange-600 mb-8">
-                🔍 BUSCAR ENTRADES I EVITAR DUPLICATS
-            </button>
-            <div id="status" class="mb-4 text-sm font-bold text-blue-600"></div>
-            <div id="resultats" class="grid gap-4 text-left"></div>
+        <div id="content" class="hidden">
+            <div class="text-center mb-10">
+                <button onclick="executarCerca()" id="btn-cerca" class="bg-orange-500 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-xl hover:bg-orange-600 transition-all">
+                    🚀 CARREGAR BLOG I EVITAR DUPLICATS
+                </button>
+                <p id="status" class="mt-4 text-sm font-bold text-slate-500 italic"></p>
+            </div>
+            <div id="resultats" class="grid gap-6"></div>
         </div>
     </div>
 
@@ -47,10 +49,10 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === "pbadialorenz@gmail.com") {
-                document.getElementById('auth-box').innerHTML = `<button onclick="logout()" class="text-red-500 font-bold text-xs uppercase">Sortir de ${user.displayName}</button>`;
+                document.getElementById('auth-box').innerHTML = `<button onclick="logout()" class="text-red-500 font-bold text-xs uppercase">Sortir: ${user.displayName}</button>`;
                 document.getElementById('content').classList.remove('hidden');
             } else {
-                if(user) { alert("Correu no autoritzat"); signOut(auth); }
+                if(user) signOut(auth);
                 document.getElementById('content').classList.add('hidden');
             }
         });
@@ -60,71 +62,66 @@
             const status = document.getElementById('status');
             const btn = document.getElementById('btn-cerca');
             
+            btn.innerText = "TREBALLANT...";
             btn.disabled = true;
-            status.innerText = "Sincronitzant amb la teva base de dades...";
+            status.innerText = "Sincronitzant amb Firebase i el Blog...";
             resBox.innerHTML = "";
 
             try {
-                // 1. Llegir què tenim a Firebase
+                // Pas 1: Firebase
                 const snap = await getDocs(collection(db, "obres"));
                 const guardats = snap.docs.map(d => d.data().link);
 
-                status.innerText = "Llegint entrades del blog (fins a 500)...";
-                
-                // 2. Llegir Blog (via allorigins per evitar CORS)
+                // Pas 2: Blog (via un proxy diferent per evitar el "Failed to fetch")
                 const blogUrl = "https://retallsdesitges.blogspot.com/feeds/posts/default?alt=rss&max-results=500";
-                const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(blogUrl)}`;
-                const resp = await fetch(proxy);
-                const json = await resp.json();
+                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(blogUrl)}&api_key=v7l0p5k0v8p9p0o0m0p0`;
                 
-                const xml = new DOMParser().parseFromString(json.contents, "text/xml");
-                const items = xml.querySelectorAll("item");
+                const resp = await fetch(proxyUrl);
+                const data = await resp.json();
 
-                status.innerText = `S'han analitzat ${items.length} entrades.`;
+                if (data.status !== "ok") throw new Error("L'API de lectura està saturada.");
+
+                status.innerText = `S'han analitzat ${data.items.length} entrades.`;
                 
-                items.forEach((item, i) => {
-                    const titol = item.querySelector("title").textContent;
-                    const link = item.querySelector("link").textContent;
-                    const descRaw = item.querySelector("description").textContent;
-                    const desc = descRaw.replace(/<[^>]*>/g, '').substring(0, 200).trim() + "...";
-                    
-                    const jaExisteix = guardats.includes(link);
+                data.items.forEach((item, i) => {
+                    const jaExisteix = guardats.includes(item.link);
+                    const resum = item.description.replace(/<[^>]*>/g, '').substring(0, 200).trim() + "...";
 
                     const card = document.createElement('div');
-                    card.className = `p-4 rounded-xl border flex justify-between items-center ${jaExisteix ? 'bg-green-50 border-green-100 opacity-60' : 'bg-white border-slate-200'}`;
+                    card.className = `p-6 rounded-2xl border-2 flex justify-between items-center transition-all ${jaExisteix ? 'bg-slate-50 border-slate-200 opacity-50' : 'bg-white border-blue-100 shadow-sm'}`;
                     card.innerHTML = `
-                        <div class="max-w-[70%]">
-                            <h3 class="font-bold text-slate-800">${titol}</h3>
-                            <p class="text-xs text-slate-500">${desc}</p>
+                        <div class="max-w-[75%] text-left">
+                            <h3 class="font-black text-slate-800 text-lg">${item.title}</h3>
+                            <p class="text-sm text-slate-500 mt-1 italic">${resum}</p>
                         </div>
-                        <div>
+                        <div class="text-right">
                             ${jaExisteix 
-                                ? '<span class="text-green-600 font-bold text-xs uppercase">A la web</span>'
-                                : `<button onclick="importar(this, ${i})" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs">IMPORTAR</button>`}
+                                ? '<span class="text-green-600 font-black text-xs border-2 border-green-600 px-3 py-1 rounded-full uppercase">A LA WEB</span>'
+                                : `<button onclick="importar(this, ${i})" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-200">IMPORTAR</button>`}
                         </div>
                     `;
-                    card.dataset.info = JSON.stringify({ nom: titol, link: link, resum: desc, font: "Retalls de Sitges", data: new Date() });
+                    card.dataset.info = JSON.stringify({ nom: item.title, link: item.link, resum: resum, font: "Retalls de Sitges", data_creacio: new Date() });
                     resBox.appendChild(card);
                 });
 
             } catch (e) {
-                console.error(e);
-                status.innerText = "Error: " + e.message;
+                status.innerHTML = `<span class="text-red-500 font-bold italic underline">ERROR: ${e.message}</span>`;
             } finally {
+                btn.innerText = "🚀 CARREGAR BLOG I EVITAR DUPLICATS";
                 btn.disabled = false;
             }
         };
 
         window.importar = async (btn, i) => {
             const data = JSON.parse(btn.closest('div').parentElement.dataset.info);
-            btn.innerText = "Pujant...";
+            btn.innerText = "PUJANT...";
             btn.disabled = true;
             try {
                 await addDoc(collection(db, "obres"), data);
                 btn.innerText = "✅ FET";
-                btn.className = "bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-xs";
+                btn.className = "bg-green-500 text-white px-6 py-3 rounded-xl font-bold text-sm";
             } catch (err) {
-                alert("Error de permisos: " + err.message);
+                alert("Error: Revisa les regles de Firebase!");
                 btn.innerText = "ERROR";
                 btn.disabled = false;
             }
