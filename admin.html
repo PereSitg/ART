@@ -3,100 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sitges Art</title>
+    <title>Admin Sitges Art - Temps Real</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .card { transition: all 0.2s ease; border: 1px solid #e2e8f0; }
-        .card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1); }
-        .sticky-form { position: sticky; top: 2rem; }
-        input, textarea, select { transition: all 0.2s; }
-        input:focus, textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .card { transition: all 0.2s; border: 1px solid #e2e8f0; background: white; }
+        .sticky-form { position: sticky; top: 1rem; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-8">
+<body class="bg-slate-50 p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Gestor Sitges<span class="text-blue-600">Art</span></h1>
-                <p class="text-slate-500 text-sm">Panell d'administració i edició de continguts</p>
-            </div>
-            <a href="index.html" class="bg-white border border-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm">
-                Anar al cercador públic ↗
-            </a>
-        </div>
+        <h1 class="text-2xl font-extrabold mb-8 text-slate-800">Admin Sitges<span class="text-blue-600">Art</span></h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             <div class="sticky-form">
-                <div class="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
-                    <h2 id="form-title" class="text-xl font-extrabold mb-6 text-slate-800 flex items-center gap-2">
-                        <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
-                        Afegir Nova Entrada
-                    </h2>
+                <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+                    <h2 id="form-title" class="text-lg font-bold mb-4">Nova Entrada</h2>
+                    <input type="hidden" id="edit-id">
                     
-                    <input type="hidden" id="edit-id"> 
-                    
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nom de l'obra</label>
-                            <input type="text" id="nom" placeholder="Ex: El Greco i el Cau Ferrat" class="w-full border border-slate-200 p-3 rounded-xl outline-none">
-                        </div>
-
+                    <div class="space-y-4">
+                        <input type="text" id="nom" placeholder="Nom de l'obra" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Categoria</label>
-                                <select id="tipus" class="w-full border border-slate-200 p-3 rounded-xl outline-none bg-white">
-                                    <option value="Modernisme">Modernisme</option>
-                                    <option value="Història Local">Història Local</option>
-                                    <option value="Arquitectura">Arquitectura</option>
-                                    <option value="Cinema">Cinema</option>
-                                    <option value="Art Contemporani">Art Contemporani</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Font</label>
-                                <input type="text" id="font" placeholder="Ex: Viquipèdia" class="w-full border border-slate-200 p-3 rounded-xl outline-none">
-                            </div>
+                            <select id="tipus" class="border p-3 rounded-xl outline-none bg-white">
+                                <option value="Modernisme">Modernisme</option>
+                                <option value="Història Local">Història Local</option>
+                                <option value="Arquitectura">Arquitectura</option>
+                            </select>
+                            <input type="text" id="font" placeholder="Font (Ex: Viquipèdia)" class="border p-3 rounded-xl outline-none">
                         </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Resum descriptiu</label>
-                            <textarea id="resum" placeholder="Escriu un resum atractiu..." class="w-full border border-slate-200 p-3 rounded-xl h-28 outline-none"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enllaç (URL)</label>
-                            <input type="text" id="link" placeholder="https://ca.wikipedia.org/..." class="w-full border border-slate-200 p-3 rounded-xl outline-none">
-                        </div>
-
-                        <div class="flex gap-3 pt-4">
-                            <button onclick="guardarDada()" id="btn-save" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">
-                                Guardar fitxa
-                            </button>
-                            <button onclick="cancelarEdicio()" id="btn-cancel" class="hidden bg-slate-100 text-slate-500 px-6 py-4 rounded-2xl font-bold hover:bg-slate-200 transition border border-slate-200">
-                                Cancel·lar
-                            </button>
+                        <textarea id="resum" placeholder="Resum per al cercador..." class="w-full border p-3 rounded-xl h-24 outline-none"></textarea>
+                        <input type="text" id="link" placeholder="URL (https://...)" class="w-full border p-3 rounded-xl outline-none">
+                        
+                        <div class="flex gap-2">
+                            <button onclick="guardarDada()" id="btn-save" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Guardar</button>
+                            <button onclick="cancelarEdicio()" id="btn-cancel" class="hidden bg-slate-100 text-slate-500 px-4 py-3 rounded-xl font-bold">X</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-4 flex items-center text-slate-400 text-lg">🔍</span>
-                        <input type="text" id="admin-search" placeholder="Cerca ràpida en la base de dades..." class="w-full pl-12 pr-4 py-3.5 bg-slate-50 rounded-xl outline-none focus:bg-white border border-transparent focus:border-blue-200 transition">
-                    </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                    <input type="text" id="admin-search" placeholder="🔍 Buscar en temps real..." class="w-full p-3 bg-slate-50 rounded-xl outline-none border focus:border-blue-300">
                 </div>
-
-                <div id="llista-contingut" class="space-y-3 min-h-[500px]">
-                    <p class="text-center py-20 text-slate-400 animate-pulse">Connectant amb Firebase...</p>
+                
+                <div id="llista-contingut" class="space-y-3">
+                    <p class="text-center py-10 text-slate-400">Carregant dades...</p>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -118,100 +75,72 @@
         const db = getFirestore(app);
         let totesLesObres = [];
 
-        // 1. CARREGA EN TEMPS REAL
-        const q = query(collection(db, "obres"), orderBy("data_creacio", "desc"));
-        onSnapshot(q, (snapshot) => {
-            totesLesObres = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderitzarLlista(totesLesObres);
+        // 1. ESCOLTAR FIREBASE (Temps real de base de dades)
+        onSnapshot(collection(db, "obres"), (snapshot) => {
+            console.log("Dades fresques de Firebase!");
+            totesLesObres = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderitzar(totesLesObres);
         });
 
-        // 2. DIBUIXAR FITXES
-        function renderitzarLlista(obres) {
-            const llista = document.getElementById('llista-contingut');
-            llista.innerHTML = "";
-            
-            if (obres.length === 0) {
-                llista.innerHTML = "<div class='bg-white p-10 rounded-2xl border border-dashed border-slate-300 text-center text-slate-400'>No s'ha trobat cap fitxa</div>";
-                return;
-            }
-
-            obres.forEach(obra => {
+        // 2. PINTAR LA LLISTA
+        function renderitzar(llistaFiltrada) {
+            const container = document.getElementById('llista-contingut');
+            container.innerHTML = "";
+            llistaFiltrada.forEach(obra => {
                 const div = document.createElement('div');
-                div.className = "card bg-white p-5 rounded-2xl flex justify-between items-center gap-4 shadow-sm";
+                div.className = "card p-4 rounded-2xl flex justify-between items-center";
                 div.innerHTML = `
-                    <div class="overflow-hidden">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-bold uppercase rounded-md tracking-wider">${obra.tipus || 'General'}</span>
-                            <span class="text-slate-300 text-[10px]">•</span>
-                            <span class="text-slate-400 text-[10px] font-medium">${obra.font || 'Sense font'}</span>
-                        </div>
-                        <h3 class="font-bold text-slate-800 truncate">${obra.nom}</h3>
-                        <p class="text-xs text-slate-500 truncate mt-0.5">${obra.resum || ''}</p>
+                    <div class="truncate">
+                        <p class="text-[10px] font-bold text-blue-500 uppercase">${obra.tipus || ''}</p>
+                        <h3 class="font-bold text-slate-800">${obra.nom}</h3>
+                        <p class="text-xs text-slate-400 truncate">${obra.resum || ''}</p>
                     </div>
-                    <div class="flex gap-2 flex-shrink-0">
-                        <button onclick="prepararEdicio('${obra.id}')" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-xl transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        </button>
-                        <button onclick="eliminarDada('${obra.id}')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-xl transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
+                    <div class="flex gap-2">
+                        <button onclick="prepararEdicio('${obra.id}')" class="p-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">EDITAR</button>
+                        <button onclick="eliminarDada('${obra.id}')" class="p-2 bg-red-50 text-red-400 rounded-lg text-xs font-bold">BORRAR</button>
                     </div>
                 `;
-                llista.appendChild(div);
+                container.appendChild(div);
             });
         }
 
-        // 3. BUSCADOR EN TEMPS REAL
-        document.getElementById('admin-search').addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase().trim();
+        // 3. BUSCADOR EN TEMPS REAL (Escolta cada tecla)
+        document.getElementById('admin-search').addEventListener('keyup', (e) => {
+            const valor = e.target.value.toLowerCase();
             const filtrades = totesLesObres.filter(o => 
-                (o.nom && o.nom.toLowerCase().includes(text)) || 
-                (o.resum && o.resum.toLowerCase().includes(text))
+                o.nom.toLowerCase().includes(valor) || 
+                (o.resum && o.resum.toLowerCase().includes(valor))
             );
-            renderitzarLlista(filtrades);
+            renderitzar(filtrades);
         });
 
-        // 4. GUARDAR / EDITAR
+        // --- FUNCIONS GLOBALS ---
         window.guardarDada = async () => {
             const id = document.getElementById('edit-id').value;
-            const nom = document.getElementById('nom').value.trim();
-            
-            if(!nom) return alert("El nom és obligatori");
-
             const dada = {
-                nom: nom,
+                nom: document.getElementById('nom').value,
                 tipus: document.getElementById('tipus').value,
-                font: document.getElementById('font').value.trim() || "Retalls de Sitges",
-                resum: document.getElementById('resum').value.trim(),
-                link: document.getElementById('link').value.trim(),
+                font: document.getElementById('font').value,
+                resum: document.getElementById('resum').value,
+                link: document.getElementById('link').value,
                 data_creacio: new Date()
             };
-
+            if(!dada.nom) return alert("Posa el nom!");
             try {
-                if(id) {
-                    await updateDoc(doc(db, "obres", id), dada);
-                } else {
-                    await addDoc(collection(db, "obres"), dada);
-                }
+                if(id) { await updateDoc(doc(db, "obres", id), dada); alert("Actualitzat!"); }
+                else { await addDoc(collection(db, "obres"), dada); alert("Creat!"); }
                 cancelarEdicio();
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) { alert("Error!"); }
         };
 
-        // 5. PREPARAR EDICIÓ
         window.prepararEdicio = (id) => {
-            const obra = totesLesObres.find(o => o.id === id);
-            if(!obra) return;
-
-            document.getElementById('edit-id').value = obra.id;
-            document.getElementById('nom').value = obra.nom || "";
-            document.getElementById('tipus').value = obra.tipus || "Modernisme";
-            document.getElementById('font').value = obra.font || "";
-            document.getElementById('resum').value = obra.resum || "";
-            document.getElementById('link').value = obra.link || obra.url || "";
-            
-            document.getElementById('form-title').innerHTML = "<span class='w-2 h-6 bg-orange-500 rounded-full'></span> Editant fitxa";
-            document.getElementById('btn-save').innerText = "Actualitzar fitxa";
-            document.getElementById('btn-save').classList.replace('bg-blue-600', 'bg-orange-500');
+            const o = totesLesObres.find(obra => obra.id === id);
+            document.getElementById('edit-id').value = o.id;
+            document.getElementById('nom').value = o.nom;
+            document.getElementById('resum').value = o.resum || "";
+            document.getElementById('font').value = o.font || "";
+            document.getElementById('link').value = o.link || o.url || "";
+            document.getElementById('form-title').innerText = "Editant: " + o.nom;
             document.getElementById('btn-cancel').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -219,16 +148,12 @@
         window.cancelarEdicio = () => {
             document.getElementById('edit-id').value = "";
             document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-            document.getElementById('form-title').innerHTML = "<span class='w-2 h-6 bg-blue-600 rounded-full'></span> Afegir Nova Entrada";
-            document.getElementById('btn-save').innerText = "Guardar fitxa";
-            document.getElementById('btn-save').classList.replace('bg-orange-500', 'bg-blue-600');
+            document.getElementById('form-title').innerText = "Nova Entrada";
             document.getElementById('btn-cancel').classList.add('hidden');
         };
 
         window.eliminarDada = async (id) => {
-            if(confirm("Segur que vols esborrar aquesta fitxa?")) {
-                await deleteDoc(doc(db, "obres", id));
-            }
+            if(confirm("Segur?")) await deleteDoc(doc(db, "obres", id));
         };
     </script>
 </body>
