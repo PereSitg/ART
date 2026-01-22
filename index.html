@@ -7,8 +7,13 @@
 
     <meta property="og:title" content="Sitges Art">
     <meta property="og:description" content="Un viatge per l'art, la cultura i la memòria de Sitges.">
-    <meta property="og:image" content="sitgesart.jpg">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peresitg.github.io/ART/">
+    
+    <meta property="og:image" content="https://peresitg.github.io/ART/sitgesArt.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
     <meta name="description" content="Un viatge per l'art, la cultura i la memòria de Sitges.">
     
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -163,7 +168,6 @@
     const db = getFirestore(app);
     let obresCache = [];
 
-    // Funció per netejar text (accents, etc)
     function normalitzar(text) {
         return text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
     }
@@ -185,19 +189,13 @@
             return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
         });
 
-        // SISTEMA DE PRIORITATS (Lògica d'ordenació)
         filtrats.sort((a, b) => {
             const nomA = normalitzar(a.nom);
             const nomB = normalitzar(b.nom);
-
-            // 1. Prioritat màxima: El títol és EXACTAMENT el que busquem (Bernat de Fonollar)
             if (nomA === termeNet && nomB !== termeNet) return -1;
             if (nomB === termeNet && nomA !== termeNet) return 1;
-
-            // 2. Prioritat alta: El títol començà per la paraula cercada
             if (nomA.startsWith(termeNet) && !nomB.startsWith(termeNet)) return -1;
             if (nomB.startsWith(termeNet) && !nomA.startsWith(termeNet)) return 1;
-
             return 0;
         });
 
@@ -217,7 +215,6 @@
         });
     }
 
-    // Event listener per a la cerca
     document.getElementById('user-input').addEventListener('input', (e) => {
         mostrarResultats(e.target.value);
     });
