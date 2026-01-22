@@ -9,7 +9,12 @@
     --glass: rgba(15, 23, 42, 0.8);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+}
 
 body {
     background: var(--bg-dark);
@@ -21,7 +26,14 @@ body {
     padding: 5vh 20px;
 }
 
-.container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 2rem; }
+/* Hem ampliat el container a 1200px per al Grid */
+.container { 
+    width: 100%; 
+    max-width: 1200px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2rem; 
+}
 
 header { text-align: center; }
 header .logo { 
@@ -49,18 +61,36 @@ header .logo span {
     top: 20px;
     z-index: 100;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    max-width: 600px; /* La barra de cerca es manté centrada i no tan ampla */
+    margin: 0 auto 2rem auto;
 }
 
 input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
 
+/* NOU: Contenidor Grid per als resultats */
+#result-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
 .response-card {
     background: var(--card-bg); 
     border: 1px solid var(--card-border);
-    padding: 2.5rem; 
+    padding: 2rem; 
     border-radius: 28px; 
-    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     animation: fadeIn 0.4s ease-out;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.response-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
 }
 
 .source-link {
@@ -70,7 +100,7 @@ input { flex: 1; background: transparent; border: none; outline: none; color: wh
     display: flex; 
     align-items: center; 
     justify-content: space-between;
-    font-size: 0.9rem; 
+    font-size: 0.85rem; 
     color: var(--text-secondary);
 }
 
@@ -88,3 +118,11 @@ input { flex: 1; background: transparent; border: none; outline: none; color: wh
 footer { text-align: center; color: #475569; margin-top: 4rem; padding-bottom: 2rem; font-size: 0.9rem; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Ajust per a mòbils */
+@media (max-width: 768px) {
+    #result-container {
+        grid-template-columns: 1fr;
+    }
+    header .logo { font-size: 2.5rem; }
+}
