@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art | El Repte dels 100</title>
+    <title>Sitges Art</title>
     
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
-    
+
     <style>
-        /* Un parell d'ajustos ràpids per si el teu style.css encara no els té */
+        /* Estils base per assegurar que tot es vegi bé */
+        :root {
+            --accent: #3b82f6;
+            --text-secondary: #94a3b8;
+            --card-border: #1e293b;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #020617;
@@ -22,118 +28,75 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         .logo {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
             letter-spacing: -1px;
         }
 
         .logo span {
-            color: #3b82f6;
+            color: var(--accent);
         }
 
         .search-container {
             position: sticky;
             top: 20px;
             z-index: 100;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         #user-input {
             width: 100%;
-            padding: 18px 25px;
-            font-size: 1.1rem;
+            padding: 20px 30px;
+            font-size: 1.2rem;
             background: #0f172a;
             border: 2px solid #1e293b;
-            border-radius: 20px;
+            border-radius: 25px;
             color: white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
 
         #user-input:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: var(--accent);
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
         }
 
+        /* Contenidor per a les targetes (response-card) que genera el JS */
         #result-container {
-            display: grid;
-            grid-template-cols: 1fr;
-            gap: 20px;
-        }
-
-        /* Estil per a cada fitxa de personatge que el JS crearà */
-        .result-item {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            padding: 25px;
-            border-radius: 20px;
-            transition: transform 0.2s ease;
-        }
-
-        .result-item:hover {
-            transform: translateY(-5px);
-            border-color: #334155;
-        }
-
-        .result-item h3 {
-            margin: 0 0 10px 0;
-            color: #3b82f6;
-            font-size: 1.4rem;
-        }
-
-        .result-item p {
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .meta {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
+            flex-direction: column;
+            gap: 25px;
         }
 
-        .meta a {
-            background: #1e293b;
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .meta a:hover {
-            background: #3b82f6;
+        .response-card {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            border-radius: 25px;
+            transition: transform 0.2s ease;
         }
 
         footer {
             text-align: center;
-            margin-top: 80px;
+            margin-top: 100px;
             padding: 40px;
             border-top: 1px solid #1e293b;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 0.9rem;
-        }
-
-        .no-results {
-            text-align: center;
-            color: #64748b;
-            padding: 40px;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -142,11 +105,10 @@
 <div class="container">
     <header>
         <div class="logo">Sitges <span>Art</span></div>
-        <p style="color: #64748b; margin-top: 10px;">El Repte dels 100 Personatges</p>
     </header>
 
     <div class="search-container">
-        <input type="text" id="user-input" placeholder="Cerca per nom o descripció (ex: sama)..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Comença a escriure per cercar..." autocomplete="off">
     </div>
 
     <div id="result-container"></div>
