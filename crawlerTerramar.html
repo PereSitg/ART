@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crawler Terramar | Sitges Art</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #3b82f6;
+            --bg: #020617;
+            --card-bg: #0f172a;
+            --text: #f8fafc;
+            --border: #1e293b;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 800px; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 span { color: var(--accent); }
+        
+        #console { 
+            background: #000; color: #4ade80; font-family: monospace; 
+            padding: 15px; border-radius: 12px; height: 100px; overflow-y: auto;
+            margin-bottom: 20px; font-size: 0.8rem; border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .btn-main {
+            background: var(--accent); color: white; border: none; padding: 15px 30px; 
+            font-size: 1rem; font-weight: 600; border-radius: 12px; cursor: pointer;
+            width: 100%; transition: 0.3s;
+        }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+
+        .entry { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; margin-top: 25px; border-radius: 20px; animation: fadeIn 0.4s ease-out; }
+        label { display: block; color: var(--accent); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; margin-top: 15px; }
+        input, textarea { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+            background: #020617; color: white; font-size: 0.95rem; box-sizing: border-box;
+        }
+        .copy-btn { 
+            background: #10b981; color: white; border: none; padding: 12px; 
+            width: 100%; cursor: pointer; border-radius: 10px; font-weight: bold; margin-top: 20px;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Terramar <span>Crawler</span></h1>
+            <p style="color: #94a3b8;">Extracció sense duplicats: Vinyet Panyella</p>
+        </header>
+
+        <div id="console">> Sistema de filtratge actiu...</div>
+        <button class="btn-main" onclick="llegirTerramar()">CERCAR NOVES ENTRADES</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Set per guardar els links i evitar duplicats en la sessió
+        const linksProcessats = new Set();
+
+        const log = (m) => {
+            const c = document.getElementById('console');
+            c.innerHTML += `<div>> ${m}</div>`;
+            c.scrollTop = c.scrollHeight;
+        };
+
+        async function llegirTerramar() {
+            const res = document.getElementById('results');
+            log("Accedint al blog de Vinyet Panyella...");
+            
+            const rss = "https://quaderndeterramar.wordpress.com/feed/";
+            const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rss)}&ts=${Date.now()}`;
+
+            try {
+                const response = await fetch(proxy);
+                const data = await response.json();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(data.contents, "text/xml");
+                const items = xml.querySelectorAll("item");
+
+                let nous = 0;
+                let duplicats = 0;
+
+                items.forEach(item => {
+                    const l = item.querySelector("link").textContent;
+
+                    // COMPROVACIÓ DE DUPLICATS
+                    if (linksProcessats.has(l)) {
+                        duplicats++;
+                        return; // Salta aquesta entrada
+                    }
+
+                    linksProcessats.add(l);
+                    nous++;
+
+                    const t = item.querySelector("title").textContent;
+                    let d = item.querySelector("description").textContent;
+                    d = d.replace(/<[^>]*>?/gm, '').trim().substring(0, 250) + "...";
+
+                    const div = document.createElement('div');
+                    div.className = 'entry';
+                    div.innerHTML = `
+                        <label>nom</label>
+                        <input type="text" value="${t}">
+                        <label>resum</label>
+                        <textarea rows="3">${d}</textarea>
+                        <label>font</label>
+                        <input type="text" value="Vinyet Panyella">
+                        <label>link</label>
+                        <input type="text" value="${l}">
+                        <button class="copy-btn" onclick="copiarFitxa(this)">COPIAR PER A FIREBASE</button>
+                    `;
+                    res.prepend(div); // Posa les més noves a dalt de tot
+                });
+
+                log(`Procés acabat: ${nous} entrades noves afegides.`);
+                if (duplicats > 0) log(`${duplicats} entrades ja estaven a la llista (duplicats filtrats).`);
+
+            } catch (e) {
+                log("Error de connexió. Reintenta-ho en uns segons.");
+            }
+        }
+
+        function copiarFitxa(btn) {
+            const i = btn.parentElement.querySelectorAll('input, textarea');
+            const txt = `Nom: ${i[0].value}\nResum: ${i[1].value}\nFont: ${i[2].value}\nLink: ${i[3].value}`;
+            navigator.clipboard.writeText(txt).then(() => {
+                const original = btn.innerText;
+                btn.innerText = "¡COPIAT!";
+                setTimeout(() => { btn.innerText = original; }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
