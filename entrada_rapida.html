@@ -76,22 +76,22 @@
         const provider = new GoogleAuthProvider();
 
         // BASE DE DADES INTERNA PER ANAR RÀPID
-      const dadesPersonatges = {
-            "Josep Artigas": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Artigas_i_Ojeda", resum: "Un dels cartellistes i dissenyadors gràfics catalans més internacionals; va viure i treballar a Sitges molts anys." },
-            "Cini Boeri": { font: "Viquipèdia", url: "https://it.wikipedia.org/wiki/Cini_Boeri", resum: "Arquitecta i dissenyadora italiana de gran prestigi que va deixar la seva empremta a Sitges amb la Casa Bunker." },
-            "Coderch": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Antoni_Coderch_i_de_Sentmenat", resum: "Josep Antoni Coderch, l'arquitecte més important de la postguerra, autor d'edificis magistrals a la costa sitgetana." },
-            "Pepito Pascual": { font: "Web", url: "https://www.l'eco.cat", resum: "Músic multiinstrumentista i ànima lliure de la cultura sitgetana, col·laborador de Pascal Comelade i molts altres." },
-            "Jordi Pañella": { font: "Web", url: "https://www.visitsitges.com", resum: "Figura clau de la cultura popular, molt vinculat a la conservació de les tradicions i a la història del Carnaval." },
-            "Isidre Pañella": { font: "Web", url: "https://ca.wikipedia.org/wiki/Isidre_Pañella_i_Virella", resum: "Mestre pirotècnic de referència, responsable durant dècades de l'espectacular Castell de Foc de la Festa Major." },
-            "Agustí Albors": { font: "Web", url: "https://www.sitges.cat", resum: "Activista cultural i prohom de la vila, sempre implicat en les institucions i la preservació del patrimoni." },
-            "Miguel Condé": { font: "Viquipèdia", url: "https://en.wikipedia.org/wiki/Miguel_Condé", resum: "Pintor i gravador mexicà de reconeixement mundial que té el seu taller i residència a Sitges des de fa dècades." },
-            "Horacio Elena": { font: "Web", url: "https://www.horacioelena.es", resum: "Il·lustrador de llibres infantils i artista resident a Sitges, amb una obra plena de tendresa i color." },
-            "Bruno de Fabriziis": { font: "Web", url: "https://www.brunoart.com", resum: "Artista polifacètic i escultor resident a Sitges, conegut per les seves formes orgàniques i el treball amb el ferro." },
-            "Thomas Spieker": { font: "Web", url: "https://www.l'eco.cat", resum: "Periodista alemany arrelat a Sitges, gran ambaixador de la vila i cronista de la vida internacional a la costa." },
-            "Nati de Castellar": { font: "Web", url: "https://www.sitgesheritages.com", resum: "Ballarina i figura mítica de l'espectacle a Sitges, recordada per la seva elegància i passió per la dansa." },
-            "Manuel Llopis de Casades": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Llegat_Llopis", resum: "L'últim propietari de la Casa Llopis (Museu Romàntic), qui va llegar el seu patrimoni i el celler de Malvasia a la Generalitat." },
-            "Ramon de Dalmases": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ramon_de_Dalmases_i_de_Olabarría", resum: "Marquès de Mura, bibliòfil i personatge de la societat sitgetana que va viure al Palau de Maricel." },
-            "Antonio Baños": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Antonio_Baños_i_Boncompain", resum: "Periodista i escriptor resident a Sitges, conegut per la seva anàlisi política i social i la seva estima per la vila." }
+     const dadesPersonatges = {
+            "Ada Parellada": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ada_Parellada_i_Garrell", resum: "Reconeguda cuinera de la nissaga dels Parellada, amb forts vincles familiars i gastronòmics a Sitges." },
+            "Carme Parellada": { font: "Web", url: "https://www.l'eco.cat", resum: "Historiadora i activista cultural, una de les veus més autoritzades per parlar de la genealogia sitgetana." },
+            "Suso Plaza": { font: "Web", url: "https://www.susoplaza.com", resum: "Pintor contemporani resident a Sitges, la seva obra destaca per l'ús del color i una visió molt personal del paisatge." },
+            "Blanca de la Riva": { font: "Web", url: "https://www.blancadelariva.com", resum: "Artista visual i pintora amb taller a Sitges, coneguda per les seves composicions abstractes i expressives." },
+            "Genís Hernández": { font: "Web", url: "https://www.genishernandez.com", resum: "Artista polifacètic que treballa la imatge i la plàstica, vinculat a les noves generacions de creadors sitgetans." },
+            "Anna Monzó": { font: "Web", url: "https://www.annamonzo.com", resum: "Joieria artística contemporània amb segell sitgetà, que fusiona disseny i artesania d'alt nivell." },
+            "Josep Manuel Soler": { font: "Web", url: "https://www.l'eco.cat", resum: "Periodista i ex-director de L'Eco de Sitges, figura clau per entendre la crònica local de les darreres dècades." },
+            "Gumersind Riera": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Gumersind_Riera_i_Sans", resum: "Poeta d'origen menorquí establert a Sitges, molt actiu en els certàmens literaris i la vida cultural de la vila." },
+            "Celia Suñol": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Celia_Suñol_i_Pla", resum: "Escriptora que va reflectir en la seva literatura la vida de la burgesia i els canvis socials del seu temps." },
+            "Josep Davenport": { font: "Web", url: "https://www.l'eco.cat", resum: "Personatge històric lligat a les famílies 'americanes' que van transformar el perfil arquitectònic de Sitges." },
+            "Antoni Mesa": { font: "Web", url: "https://www.l'eco.cat", resum: "Investigador i cronista de la història local, especialitzat en la recuperació de la memòria oral i documental." },
+            "Miquel de Sitges": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Miquel_de_Sitges", resum: "Escriptor i religiós caputxí que va portar el nom de la vila a la seva producció intel·lectual i literària." },
+            "Josep Galofre": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Galofre_i_Coma", resum: "Pintor romàntic que, tot i la seva carrera internacional, va mantenir vincles amb els artistes que s'instal·laven a Sitges." },
+            "Salvador Samà": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Salvador_Samà_i_Torrents", resum: "Marquès de Marianao i polític, impulsor de projectes arquitectònics i urbanístics de gran rellevància." },
+            "Bartomeu Robert": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Bartomeu_Robert_i_Yarzábal", resum: "Conegut com el Doctor Robert, metge i polític fill de sitgetans, símbol del catalanisme i la ciència del segle XIX." }
         };
 
         // Identificació
