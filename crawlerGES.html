@@ -3,168 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crawler G.E.S. - Control d'Extracció</title>
+    <title>Crawler G.E.S. | Sitges Art</title>
+    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg: #020617;
-            --card: #0f172a;
             --accent: #3b82f6;
+            --bg: #020617;
+            --card-bg: #0f172a;
             --text: #f8fafc;
+            --border: #1e293b;
             --text-dim: #94a3b8;
             --console-bg: #000000;
         }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            padding: 40px 20px; 
-            max-width: 900px;
-            margin: 0 auto;
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        h1 { text-align: center; color: var(--accent); margin-bottom: 5px; }
-        .controls { text-align: center; margin-bottom: 30px; }
-        
-        /* Finestra de Consola */
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 { text-align: center; font-weight: 800; font-size: 2rem; margin-bottom: 5px; }
+        h1 span { color: var(--accent); }
+        .intro { text-align: center; color: var(--text-dim); margin-bottom: 30px; font-size: 0.9rem; }
+
+        /* Consola de seguiment */
         #console {
             background: var(--console-bg);
-            color: #10b981;
-            font-family: monospace;
+            color: #4ade80;
+            font-family: 'Courier New', monospace;
             padding: 15px;
-            border-radius: 8px;
-            height: 150px;
+            border-radius: 12px;
+            height: 120px;
             overflow-y: auto;
             margin-bottom: 30px;
-            border: 1px solid #1e293b;
-            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
             line-height: 1.4;
         }
 
-        .start-btn {
-            background: #10b981;
+        .controls { text-align: center; margin-bottom: 40px; }
+
+        /* Botó estilitzat com a la web principal */
+        .btn-main {
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 14px 28px;
             font-size: 1rem;
-            font-weight: bold;
-            border-radius: 12px;
+            font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
             transition: 0.3s;
         }
-        .start-btn:hover { background: #059669; transform: scale(1.05); }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
 
         .entry { 
-            background: var(--card); 
-            border: 1px solid #1e293b; 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
             padding: 25px; 
             margin-bottom: 25px; 
             border-radius: 16px;
+            animation: fadeIn 0.3s ease-in;
         }
-        label { font-weight: bold; color: var(--accent); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px; }
+
+        label { font-weight: 600; color: var(--accent); display: block; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        
         input, textarea { 
-            width: 100%; padding: 12px; border: 1px solid #1e293b; border-radius: 8px; 
-            background: #020617; color: white; margin-bottom: 15px;
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+            background: #020617; color: white; margin-bottom: 20px;
+            font-family: inherit; font-size: 0.95rem; box-sizing: border-box;
         }
+
         .copy-btn { 
-            background: var(--accent); color: white; border: none; padding: 12px; 
-            width: 100%; cursor: pointer; border-radius: 8px; font-weight: bold;
+            background: rgba(59, 130, 246, 0.1); 
+            color: var(--accent); 
+            border: 1px solid var(--accent); 
+            padding: 12px; 
+            width: 100%; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .copy-btn:hover { background: var(--accent); color: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Crawler G.E.S.</h1>
-    <p style="text-align: center; color: var(--text-dim); margin-bottom: 20px;">Control d'extracció de dades del G.E.S.</p>
+    <div class="container">
+        <h1>Sitges <span>Art</span> Crawler</h1>
+        <p class="intro">Extractor de dades del Grup d'Estudis Sitgetans</p>
 
-    <div class="controls">
-        <button class="start-btn" onclick="iniciarExtraccio()">INICIAR RECERCA DE DADES</button>
+        <div id="console">> Sistema llest. Esperant ordre...</div>
+
+        <div class="controls">
+            <button class="btn-main" onclick="iniciarExtraccio()">CERCAR DADES DEL G.E.S.</button>
+        </div>
+
+        <div id="results"></div>
     </div>
 
-    <div id="console">> Esperant ordre d'inici...</div>
-
-    <div id="results"></div>
-
     <script>
-        const log = (missatge) => {
-            const consola = document.getElementById('console');
-            const p = document.createElement('div');
-            p.textContent = `> ${new Date().toLocaleTimeString()}: ${missatge}`;
-            consola.appendChild(p);
-            consola.scrollTop = consola.scrollHeight;
+        const log = (msg) => {
+            const c = document.getElementById('console');
+            const d = document.createElement('div');
+            d.textContent = `> ${new Date().toLocaleTimeString()}: ${msg}`;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
         };
 
         async function iniciarExtraccio() {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = "";
-            log("Iniciant connexió amb la web ges-sitges.org...");
+            const res = document.getElementById('results');
+            res.innerHTML = "";
+            log("Connectant amb ges-sitges.org...");
             
-            const RSS_URL = `https://www.ges-sitges.org/feed/`;
-            const PROXY = `https://api.allorigins.win/get?url=${encodeURIComponent(RSS_URL)}&timestamp=${new Date().getTime()}`;
+            // Canvi de proxy a un de més lliure
+            const target = "https://www.ges-sitges.org/feed/";
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(target);
 
             try {
-                log("Demanant dades al proxy (AllOrigins)...");
-                const response = await fetch(PROXY);
+                log("Demanant flux de dades (RSS)...");
+                const response = await fetch(proxyUrl);
                 
-                if (!response.ok) throw new Error("Error en la resposta del servidor.");
+                if (!response.ok) throw new Error("Servidor ocupat. Reintenta-ho en uns segons.");
                 
-                const data = await response.json();
-                log("Dades rebudes. Analitzant format XML...");
+                const text = await response.text();
+                log("Dades rebudes. Processant contingut...");
                 
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-                const items = xmlDoc.querySelectorAll("item");
+                const xml = new DOMParser().parseFromString(text, "text/xml");
+                const items = xml.querySelectorAll("item");
 
                 if (items.length === 0) {
-                    log("ALERTA: No s'ha trobat cap element <item> al XML.");
-                    resultsDiv.innerHTML = "<p style='text-align:center'>No s'han trobat dades. El servidor del GES podria estar bloquejant l'accés extern temporalment.</p>";
+                    log("No s'han trobat entrades. El format del G.E.S. ha canviat.");
                     return;
                 }
 
-                log(`Èxit! S'han trobat ${items.length} entrades.`);
+                log(`Trobades ${items.length} entrades.`);
                 
-                let html = "";
-                items.forEach((item, index) => {
-                    const titol = item.querySelector("title")?.textContent || "Sense títol";
-                    const link = item.querySelector("link")?.textContent || "";
-                    let resumRaw = item.querySelector("description")?.textContent || "";
-                    let resumNetejat = resumRaw.replace(/<[^>]*>?/gm, '').trim().substring(0, 250) + "...";
+                items.forEach(item => {
+                    const t = item.querySelector("title")?.textContent || "";
+                    const l = item.querySelector("link")?.textContent || "";
+                    let d = item.querySelector("description")?.textContent || "";
+                    d = d.replace(/<[^>]*>?/gm, '').trim().substring(0, 220) + "...";
 
-                    html += `
-                        <div class="entry">
-                            <label>nom</label>
-                            <input type="text" value="${titol}">
-                            <label>resum</label>
-                            <textarea rows="4">${resumNetejat}</textarea>
-                            <label>font</label>
-                            <input type="text" value="G.E.S.">
-                            <label>link</label>
-                            <input type="text" value="${link}">
-                            <button class="copy-btn" onclick="copyRow(this)">COPIAR PER A FIREBASE</button>
-                        </div>
+                    const div = document.createElement('div');
+                    div.className = 'entry';
+                    div.innerHTML = `
+                        <label>nom</label>
+                        <input type="text" value="${t}">
+                        <label>resum</label>
+                        <textarea rows="3">${d}</textarea>
+                        <label>font</label>
+                        <input type="text" value="G.E.S.">
+                        <label>link</label>
+                        <input type="text" value="${l}">
+                        <button class="copy-btn" onclick="copyRow(this)">COPIAR PER A FIREBASE</button>
                     `;
+                    res.appendChild(div);
                 });
-                
-                resultsDiv.innerHTML = html;
-                log("Procés finalitzat. Pots editar i copiar les dades.");
+                log("Llistat preparat.");
 
-            } catch (error) {
-                log(`ERROR: ${error.message}`);
-                console.error(error);
+            } catch (e) {
+                log("ERROR: " + e.message);
+                log("Consell: Prova de carregar la pàgina de nou.");
             }
         }
 
         function copyRow(btn) {
             const entry = btn.parentElement;
-            const inputs = entry.querySelectorAll('input, textarea');
-            const textToCopy = `Nom: ${inputs[0].value}\nResum: ${inputs[1].value}\nFont: ${inputs[2].value}\nLink: ${inputs[3].value}`;
+            const i = entry.querySelectorAll('input, textarea');
+            const txt = `Nom: ${i[0].value}\nResum: ${i[1].value}\nFont: ${i[2].value}\nLink: ${i[3].value}`;
             
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                log(`Copiada l'entrada: ${inputs[0].value.substring(0, 30)}...`);
-                btn.innerText = "¡COPIAT!";
+            navigator.clipboard.writeText(txt).then(() => {
+                log("Copiada entrada: " + i[0].value.substring(0,20) + "...");
+                const old = btn.innerText;
+                btn.innerText = "¡COPIAT AMB ÈXIT!";
                 btn.style.background = "#10b981";
+                btn.style.color = "white";
                 setTimeout(() => {
-                    btn.innerText = "COPIAR PER A FIREBASE";
-                    btn.style.background = "#3b82f6";
-                }, 2000);
+                    btn.innerText = old;
+                    btn.style.background = "";
+                    btn.style.color = "";
+                }, 1500);
             });
         }
     </script>
