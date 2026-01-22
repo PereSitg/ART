@@ -26,11 +26,13 @@
             line-height: 1.5;
         }
 
+        .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 20px; }
+
         .btn-main {
-            background: var(--accent); color: white; border: none; padding: 15px 30px; 
-            font-size: 1rem; font-weight: 600; border-radius: 12px; cursor: pointer;
-            width: 100%; transition: 0.3s;
+            background: var(--accent); color: white; border: none; padding: 15px; 
+            font-size: 1rem; font-weight: 600; border-radius: 12px; cursor: pointer; transition: 0.3s;
         }
+        .btn-sec { background: #1e293b; color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; }
         .btn-main:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
 
         .entry { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; margin-top: 25px; border-radius: 20px; animation: fadeIn 0.4s ease-out; }
@@ -51,18 +53,22 @@
     <div class="container">
         <header>
             <h1>Terramar <span>Crawler</span></h1>
-            <p style="color: #94a3b8;">Extracció sense duplicats: Vinyet Panyella</p>
+            <p style="color: #94a3b8;">Vinyet Panyella - Sense duplicats</p>
         </header>
 
-        <div id="console">> Sistema de filtratge actiu...</div>
-        <button class="btn-main" onclick="llegirTerramar()">CERCAR NOVES ENTRADES</button>
+        <div id="console">> Sistema llest. Fes clic per cercar entrades.</div>
+        
+        <div class="controls">
+            <button class="btn-main" onclick="llegirTerramar()">CERCAR NOVES ENTRADES</button>
+            <button class="btn-sec" onclick="netejarPantalla()">NETEJAR</button>
+        </div>
 
         <div id="results"></div>
     </div>
 
     <script>
-        // Set per guardar els links i evitar duplicats en la sessió
-        const linksProcessats = new Set();
+        // Set per guardar els links i evitar duplicats reals
+        let linksProcessats = new Set();
 
         const log = (m) => {
             const c = document.getElementById('console');
@@ -70,10 +76,17 @@
             c.scrollTop = c.scrollHeight;
         };
 
+        function netejarPantalla() {
+            document.getElementById('results').innerHTML = "";
+            linksProcessats.clear();
+            log("Pantalla i memòria de duplicats netejada.");
+        }
+
         async function llegirTerramar() {
             const res = document.getElementById('results');
-            log("Accedint al blog de Vinyet Panyella...");
+            log("Connectant amb el blog de la Vinyet...");
             
+            // WordPress RSS feed amb TS per saltar la caché
             const rss = "https://quaderndeterramar.wordpress.com/feed/";
             const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(rss)}&ts=${Date.now()}`;
 
@@ -85,15 +98,15 @@
                 const items = xml.querySelectorAll("item");
 
                 let nous = 0;
-                let duplicats = 0;
+                let ignorats = 0;
 
                 items.forEach(item => {
                     const l = item.querySelector("link").textContent;
 
-                    // COMPROVACIÓ DE DUPLICATS
+                    // Si el link ja està a la pantalla, l'ignorem
                     if (linksProcessats.has(l)) {
-                        duplicats++;
-                        return; // Salta aquesta entrada
+                        ignorats++;
+                        return;
                     }
 
                     linksProcessats.add(l);
@@ -116,14 +129,17 @@
                         <input type="text" value="${l}">
                         <button class="copy-btn" onclick="copiarFitxa(this)">COPIAR PER A FIREBASE</button>
                     `;
-                    res.prepend(div); // Posa les més noves a dalt de tot
+                    res.prepend(div); 
                 });
 
-                log(`Procés acabat: ${nous} entrades noves afegides.`);
-                if (duplicats > 0) log(`${duplicats} entrades ja estaven a la llista (duplicats filtrats).`);
+                if(nous > 0) {
+                    log(`Èxit: S'han afegit ${nous} entrades noves.`);
+                } else {
+                    log("No hi ha entrades més noves de les que ja es veuen.");
+                }
 
             } catch (e) {
-                log("Error de connexió. Reintenta-ho en uns segons.");
+                log("Error: No es pot connectar al proxy. Reintenta-ho.");
             }
         }
 
