@@ -47,7 +47,22 @@
             padding: 40px 0;
         }
 
-        .logo { font-size: 2.5rem; font-weight: 800; }
+        /* AJUST DEL LOGO AMB IMATGE */
+        .logo { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Espai entre la imatge i el text */
+        }
+
+        .logo-img {
+            height: 3.5rem; /* Ajustat perquè quadri amb la lletra */
+            width: auto;
+            border-radius: 10px;
+        }
+
         .logo span { color: var(--accent); }
 
         .subtitle {
@@ -136,7 +151,10 @@
 
 <div class="container">
     <header>
-        <div class="logo">Sitges <span>Art</span></div>
+        <div class="logo">
+            <img src="imatge.png" alt="Logo Sitges Art" class="logo-img">
+            <div>Sitges <span>Art</span></div>
+        </div>
         <p class="subtitle">Un viatge per l'art, la cultura i la memòria de Sitges.</p>
     </header>
 
