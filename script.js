@@ -21,7 +21,7 @@ const db = getFirestore(app);
 const input = document.getElementById('user-input');
 const results = document.getElementById('result-container');
 
-// --- NORMALITZACIÓ DE TEXT (Sense accents i minúscules) ---
+// --- NORMALITZACIÓ DE TEXT ---
 const netejarText = (text) => {
     if (!text) return "";
     return text.toString()
@@ -31,7 +31,7 @@ const netejarText = (text) => {
         .replace(/[\u0300-\u036f]/g, "");
 };
 
-// --- FUNCIÓ PER PINTAR LES TARGETES (NETES) ---
+// --- FUNCIÓ PER PINTAR LES TARGETES ---
 function crearCard(data) {
     const nomOriginal = data.nom || "";
     const resumOriginal = data.resum || "";
@@ -41,22 +41,27 @@ function crearCard(data) {
     const card = document.createElement('div');
     card.className = 'response-card';
     
-    // Generem contingut net sense estils "inline" pesats
     card.innerHTML = `
         <h2>${nomOriginal}</h2>
         <p>${resumOriginal}</p>
         <div class="source-link">
             <span>Font: ${font}</span>
-            ${linkFinal ? `<a href="${linkFinal}" target="_blank" class="btn-link">Saber-ne més ↗</a>` : ''}
+            ${linkFinal ? `<a href="${linkFinal}" target="_blank" class="btn-link">Més informació ↗</a>` : ''}
         </div>
     `;
     return card;
 }
 
-// --- FUNCIÓ DE CERCA I CÀRREGA INICIAL ---
+// --- FUNCIÓ DE CERCA ---
 async function buscar() {
     const textBuscat = netejarText(input.value);
     
+    // SI EL CERCADOR ESTÀ BUIT O TÉ MENYS DE 2 LLETRES, NETEJEM LA PANTALLA
+    if (textBuscat.length < 2) {
+        results.innerHTML = "";
+        return;
+    }
+
     try {
         const querySnapshot = await getDocs(collection(db, "obres"));
         results.innerHTML = "";
@@ -67,13 +72,13 @@ async function buscar() {
             const nomPerComparar = netejarText(data.nom);
             const resumPerComparar = netejarText(data.resum);
 
-            if (textBuscat === "" || nomPerComparar.includes(textBuscat) || resumPerComparar.includes(textBuscat)) {
+            if (nomPerComparar.includes(textBuscat) || resumPerComparar.includes(textBuscat)) {
                 results.appendChild(crearCard(data));
                 trobats++;
             }
         });
 
-        // Missatge simple si no hi ha resultats
+        // Missatge si no hi ha resultats després de buscar
         if (trobats === 0) {
             results.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">
@@ -86,6 +91,7 @@ async function buscar() {
     }
 }
 
-// Escoltadors d'esdeveniments
+// Escoltador: Només busca quan l'usuari escriu
 input.addEventListener('input', buscar);
-window.addEventListener('DOMContentLoaded', buscar);
+
+// HEM ELIMINAT EL DOMContentLoaded PERQUÈ LA PANTALLA SURTI NETA
