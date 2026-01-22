@@ -6,45 +6,60 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        body { background: #020617; color: white; font-family: sans-serif; }
-        .input-field { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; width: 100%; color: white; margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 0.9rem; }
+        body { background: #020617; color: white; font-family: sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .input-field { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 100%; color: white; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 0.85rem; font-weight: 600; }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="flex items-center justify-center min-height-screen p-6">
+<body>
 
-    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-xl">
-        <h1 class="text-2xl font-bold mb-6 text-blue-400">Dades de la Fitxa</h1>
+    <div id="login-card" class="bg-slate-900 border border-slate-800 p-10 rounded-3xl shadow-2xl text-center">
+        <h1 class="text-2xl font-bold mb-6">🔒 Accés Protegit</h1>
+        <button onclick="login()" class="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-slate-200 transition-all">
+            Identifica't com Admin
+        </button>
+    </div>
 
-        <label>Selecciona un personatge pendent:</label>
-        <select id="selector" class="input-field border-blue-500 bg-slate-800" onchange="carregarDades()">
-            <option value="">-- Tria un nom per auto-omplir --</option>
-            </select>
+    <div id="form-card" class="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-2xl hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-black text-blue-400">SITGES ART EXPRESS ⚡</h1>
+            <span id="user-email" class="text-xs text-slate-500"></span>
+        </div>
 
-        <hr class="border-slate-800 my-6">
+        <label>1. Tria un personatge de la llista:</label>
+        <select id="selector" class="input-field border-blue-500/50 bg-slate-800 cursor-pointer" onchange="carregarDades()">
+            <option value="">-- Selecciona per auto-completar --</option>
+        </select>
 
-        <label>Nom de l'obra / Personatge</label>
-        <input type="text" id="nom" class="input-field">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label>Nom</label>
+                <input type="text" id="nom" class="input-field">
+            </div>
+            <div>
+                <label>Font</label>
+                <input type="text" id="font" class="input-field">
+            </div>
+        </div>
 
-        <label>Font (Ex: Viquipèdia)</label>
-        <input type="text" id="font" class="input-field">
+        <label>URL (Viquipèdia / Web)</label>
+        <input type="text" id="url" class="input-field text-blue-300 text-sm">
 
-        <label>Resum descriptiu...</label>
-        <textarea id="resum" class="input-field h-32"></textarea>
+        <label>Resum per a la web</label>
+        <textarea id="resum" class="input-field h-32 text-sm leading-relaxed"></textarea>
 
-        <label>URL de l'enllaç</label>
-        <input type="text" id="url" class="input-field">
-
-        <button onclick="guardarAFirebase()" id="btn-save" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all">
-            GUARDAR A LA BBDD
+        <button onclick="guardarAFirebase()" id="btn-save" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all">
+            GUARDAR ARA MATEIX
         </button>
         
-        <p id="status" class="mt-4 text-center text-sm"></p>
+        <p id="status" class="mt-4 text-center font-bold"></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
@@ -57,77 +72,94 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-        // DADES PREPARADES (Pots anar afegint més aquí)
+        // BASE DE DADES INTERNA PER ANAR RÀPID
         const dadesPersonatges = {
-            "Joan Maragall": {
-                font: "Viquipèdia",
-                resum: "Poeta cabdal de la literatura catalana i figura central del Modernisme. Molt vinculat a les Festes Modernistes de Sitges convidades per Rusiñol.",
-                url: "https://ca.wikipedia.org/wiki/Joan_Maragall_i_Gorina"
-            },
-            "Josep Maria de Sagarra": {
-                font: "Viquipèdia",
-                resum: "Escriptor, poeta i dramaturg. Va immortalitzar l'esperit i el paisatge de Sitges en diverses de les seves obres i memòries.",
-                url: "https://ca.wikipedia.org/wiki/Josep_Maria_de_Sagarra_i_de_Castellarnau"
-            },
-            "Facundo Bacardí": {
-                font: "Viquipèdia",
-                resum: "Empresari sitgetà que va emigrar a Cuba on va fundar la destil·leria Bacardí, transformant la indústria del rom a nivell mundial.",
-                url: "https://ca.wikipedia.org/wiki/Facundo_Bacardí_i_Massó"
-            },
-            "Vinyet Panyella": {
-                font: "Viquipèdia",
-                resum: "Escriptora i investigadora cultural. Ha estat directora dels Museus de Sitges i és una de les veus més expertes en el Modernisme sitgetà.",
-                url: "https://ca.wikipedia.org/wiki/Vinyet_Panyella_i_Balcells"
-            }
+            "Felip Masó": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Felip_Masó_i_de_Falguera", resum: "Pintor sitgetà de l'Escola Luminista, famós per les seves escenes de platja i costumisme local." },
+            "Emili Grau Sala": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Emili_Grau_i_Sala", resum: "Pintor de projecció internacional associat a l'Escola de París, conegut pel seu estil elegant i colorista." },
+            "Joan Llaverias": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Joan_Llaverias_i_Labró", resum: "Dibuixant i pintor modernista, membre fundador del Cercle Artístic de Sant Lluc i gran aquarel·lista." },
+            "Pere Pruna": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Pere_Pruna_i_Ocerans", resum: "Pintor vinculat al Noucentisme, deixeble de Picasso, amb una obra centrada en la delicadesa de la figura femenina." },
+            "Joan Maragall": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Joan_Maragall_i_Gorina", resum: "Poeta cabdal del Modernisme català, gran amic de Rusiñol i participant actiu de les Festes Modernistes." },
+            "J.V. Foix": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/J._V._Foix", resum: "Poeta i assagista d'avantguarda, figura clau de la cultura catalana i col·laborador de 'L'Amic de les Arts'." },
+            "Marta Pessarrodona": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Marta_Pessarrodona_i_Artigues", resum: "Poeta i crítica literària, resident a Sitges i Premi d'Honor de les Lletres Catalanes (2019)." },
+            "Francesc Gumà i Ferran": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Francesc_Gumà_i_Ferran", resum: "Empresari i polític que va impulsar l'arribada del ferrocarril a Sitges, canviant per sempre l'economia de la vila." },
+            "Gaietà Buïgas": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Gaietà_Buïgas_i_Monravà", resum: "Arquitecte modernista conegut pel Monument a Colom a Barcelona i diverses cases senyorials a Sitges." },
+            "Enric Morera": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Enric_Morera_i_Viura", resum: "Compositor de sardanes i música coral, estretament lligat al moviment modernista de Sitges." },
+            "Jordi Milán": { font: "Web", url: "https://ca.wikipedia.org/wiki/Jordi_Milán", resum: "Director teatral i fundador de la companyia La Cubana, nascuda a Sitges i referent de l'humor català." },
+            "Àngel Sala": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Àngel_Sala_i_Vila", resum: "Escriptor i crític de cinema, director del Festival Internacional de Cinema Fantàstic de Catalunya (Sitges)." },
+            "Trinitat Catasús": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Trinitat_Catasús_i_Catasús", resum: "Enginyer i poeta noucentista sitgetà, conegut pel seu rigor formal i amor a la terra." },
+            "Santi Millán": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Santi_Millán", resum: "Actor i presentador de televisió que va iniciar la seva carrera a Sitges amb la companyia La Cubana." },
+            "Lluís Jou": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Lluís_Jou_i_Senabre", resum: "Eminent gravador i tipògraf que va escollir Sitges per instal·lar el seu taller de bibliofília." }
         };
 
-        // Omplir el selector automàticament
-        const selector = document.getElementById('selector');
-        for (let nom in dadesPersonatges) {
-            let opt = document.createElement('option');
-            opt.value = nom;
-            opt.innerHTML = nom;
-            selector.appendChild(opt);
+        // Identificació
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === "pbadialorenz@gmail.com") {
+                document.getElementById('login-card').classList.add('hidden');
+                document.getElementById('form-card').classList.remove('hidden');
+                document.getElementById('user-email').innerText = user.email;
+                carregarLlista();
+            }
+        });
+
+        window.login = () => signInWithPopup(auth, provider);
+
+        function carregarLlista() {
+            const selector = document.getElementById('selector');
+            for (let nom in dadesPersonatges) {
+                let opt = document.createElement('option');
+                opt.value = nom;
+                opt.innerText = nom;
+                selector.appendChild(opt);
+            }
         }
 
         window.carregarDades = () => {
-            const seleccionat = document.getElementById('selector').value;
-            if (dadesPersonatges[seleccionat]) {
-                document.getElementById('nom').value = seleccionat;
-                document.getElementById('font').value = dadesPersonatges[seleccionat].font;
-                document.getElementById('resum').value = dadesPersonatges[seleccionat].resum;
-                document.getElementById('url').value = dadesPersonatges[seleccionat].url;
+            const sel = document.getElementById('selector').value;
+            if (dadesPersonatges[sel]) {
+                document.getElementById('nom').value = sel;
+                document.getElementById('font').value = dadesPersonatges[sel].font;
+                document.getElementById('url').value = dadesPersonatges[sel].url;
+                document.getElementById('resum').value = dadesPersonatges[sel].resum;
             }
         };
 
         window.guardarAFirebase = async () => {
-            const btn = document.getElementById('btn-save');
             const status = document.getElementById('status');
+            const btn = document.getElementById('btn-save');
             
-            const dades = {
+            const docData = {
                 nom: document.getElementById('nom').value,
                 font: document.getElementById('font').value,
-                resum: document.getElementById('resum').value,
                 link: document.getElementById('url').value,
-                data: new Date().toISOString()
+                resum: document.getElementById('resum').value,
+                data_entrada: new Date().toISOString()
             };
 
-            if (!dades.nom) return alert("Falta el nom!");
-
-            btn.disabled = true;
-            status.innerText = "⏳ Guardant...";
+            if (!docData.nom) return alert("Tria un personatge primer!");
 
             try {
-                await addDoc(collection(db, "obres"), dades);
-                status.className = "mt-4 text-center text-sm text-green-400";
-                status.innerText = "✅ Guardat amb èxit!";
-                // Netejar camps
-                document.getElementById('nom').value = "";
-                document.getElementById('resum').value = "";
-                document.getElementById('url').value = "";
+                btn.disabled = true;
+                status.innerText = "⏳ Guardant a Firebase...";
+                await addDoc(collection(db, "obres"), docData);
+                status.innerText = "✅ Guardat correctament!";
+                status.className = "mt-4 text-center font-bold text-green-400";
+                
+                // Neteja per al següent
+                setTimeout(() => {
+                    status.innerText = "";
+                    document.getElementById('nom').value = "";
+                    document.getElementById('resum').value = "";
+                    document.getElementById('url').value = "";
+                    document.getElementById('selector').value = "";
+                }, 2000);
+
             } catch (e) {
-                status.innerText = "❌ Error en guardar";
+                status.innerText = "❌ Error: " + e.message;
+                status.className = "mt-4 text-center font-bold text-red-400";
+                console.error(e);
             } finally {
                 btn.disabled = false;
             }
