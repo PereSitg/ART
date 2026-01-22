@@ -76,22 +76,22 @@
         const provider = new GoogleAuthProvider();
 
         // BASE DE DADES INTERNA PER ANAR RÀPID
-        const dadesPersonatges = {
-            "Iris Lázaro": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Iris_Lázaro_i_García", resum: "Pintora realista resident a Sitges, coneguda per la seva minuciositat i la seva interpretació poètica dels paisatges." },
-            "Josep Maria Llopis de Cellers": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Maria_Llopis_de_Cellers", resum: "Dibuixant i arquitecte sitgetà, autor d'importants treballs gràfics sobre la vila i la seva història." },
-            "Carlos Vázquez": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Carlos_Vázquez_Úbeda", resum: "Pintor i il·lustrador que va tenir una forta vinculació amb el Modernisme i el grup de pintors de Sitges." },
-            "Josep Planes i Peñalver": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Planes_i_Peñalver", resum: "Escultor d'obra reconeguda que va contribuir a la riquesa del patrimoni artístic sitgetà del segle XX." },
-            "Cándida Pérez": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Càndida_Pérez_i_Martínez", resum: "Compositora sitgetana de cuplets molt famosa als anys 20, autora del conegut 'El relicario'." },
-            "Salvador Soler i Forment": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Salvador_Soler_i_Forment", resum: "Periodista i poeta sitgetà, gran defensor de la cultura local i cronista de la vida social de la vila." },
-            "Miquel de Sitges": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Miquel_de_Sitges", resum: "Religiós caputxí i escriptor, una figura intel·lectual destacada dins de l'orde i amb orígens a la vila." },
-            "Gumersind Riera": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Gumersind_Riera_i_Sans", resum: "Poeta d'origen menorquí establert a Sitges, molt actiu en els certàmens literaris locals." },
-            "Rafael Casanova": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Rafael_Casanova_i_Augé", resum: "Escriptor i activista cultural sitgetà, autor de diversos estudis sobre el folklore i la història de la vila." },
-            "Josep Galofre": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Galofre_i_Coma", resum: "Pintor històric català del segle XIX amb relació amb els cercles artístics que freqüentaven Sitges." },
-            "Jaume Figueras": { font: "Web", url: "https://ca.wikipedia.org/wiki/Jaume_Figueras", resum: "Crític de cinema i gran divulgador cultural, molt vinculat al Festival de Sitges des dels seus inicis." },
-            "Antoni Mesa": { font: "Web", url: "https://www.l'eco.cat", resum: "Historiador i col·laborador de L'Eco de Sitges, expert en la genealogia i les famílies de la vila." },
-            "Janio Marti": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Janio_Marti", resum: "Músic i director d'orquestra sitgetà, una institució en el món de les festes majors i el ball d'envelat." },
-            "Gabriel Pallarès": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Gabriel_Pallarès_i_Roig", resum: "Compositor i músic sitgetà, autor de nombroses peces per a cobla i sardanes molt estimades." },
-            "Franciscu de Sitges": { font: "Llegendes", url: "https://ca.wikipedia.org/wiki/Cultura_de_Sitges", resum: "Personatge popular i llegendari de la vila, part de l'imaginari col·lectiu i la tradició oral sitgetana." }
+       const dadesPersonatges = {
+            "Manuel Vidal-Quadras": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Manuel_Vidal-Quadras_i_Ramon", resum: "Bancer i col·leccionista d'art vinculat a la burgesia barcelonina amb fortes arrels i llegat a Sitges." },
+            "Josep Canals": { font: "Web", url: "https://www.canalsgaleriaart.cat", resum: "Gallerista i promotor d'art que ha treballat intensament per la difusió dels artistes de la vila i del Penedès." },
+            "Albert Catasús": { font: "Web", url: "https://ca.wikipedia.org/wiki/Albert_Catasús", resum: "Historiador de l'art especialitzat en el Modernisme i el Noucentisme a Sitges, col·laborador de museus." },
+            "Manel Torrens": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Manel_Torrens_i_Gironella", resum: "Compositor de sardanes i músic molt actiu en la vida cultural sitgetana i en la seva Festa Major." },
+            "Xavier Montsalvatge": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Xavier_Montsalvatge_i_Bassols", resum: "Un dels compositors catalans més influents del segle XX, amb estades i vincles artístics a la nostra vila." },
+            "Anna Ricci": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Anna_Ricci", resum: "Mezzosoprano catalana d'un gust exquisit que va triar Sitges com un dels seus refugis de creació i vida." },
+            "Ovidi Montllor": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ovidi_Montllor_i_Mengual", resum: "Actor i cantautor de la Nova Cançó que va viure una etapa significativa a Sitges, integrat en la seva cultura." },
+            "Pawel Rouba": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Pawel_Rouba", resum: "Mestre de mim i pantomima polonès resident a Sitges, que va formar generacions d'actors des de la vila." },
+            "Lindsay Kemp": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Lindsay_Kemp", resum: "Coreògraf i mim britànic de fama mundial, estretament vinculat al Festival de Teatre de Sitges." },
+            "Ricard Salvat": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ricard_Salvat_i_Ferré", resum: "Director teatral i escriptor, una de les figures més importants de l'escena catalana i del Festival sitgetà." },
+            "Mercè Comes": { font: "Web", url: "https://ca.wikipedia.org/wiki/Mercè_Comes", resum: "Actriu còmica nascuda o vinculada professionalment a Sitges a través de la companyia La Cubana." },
+            "José Mojica": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/José_Mojica", resum: "Tenor i actor mexicà que va viure a Sitges abans de fer-se frare, deixant una forta empremta popular." },
+            "Ignasi Mas i Morell": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ignasi_Mas_i_Morell", resum: "Arquitecte modernista i noucentista, autor d'edificis tan emblemàtics com l'antic escorxador de Sitges." },
+            "Bonaventura Pollés": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Bonaventura_Pollés_i_Vivó", resum: "Arquitecte actiu a finals del XIX i principis del XX, autor de diversos xalets i cases de reforma a la vila." },
+            "Jaume Sunyer": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Jaume_Sunyer_i_Juncosa", resum: "Arquitecte sitgetà autor de nombroses obres d'estil modernista que defineixen el perfil urbà local." }
         };
 
         // Identificació
