@@ -3,119 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crawler G.E.S. - Extractor de dades</title>
+    <title>Crawler G.E.S. - Control d'Extracció</title>
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
+            --bg: #020617;
+            --card: #0f172a;
             --accent: #3b82f6;
             --text: #f8fafc;
             --text-dim: #94a3b8;
+            --console-bg: #000000;
         }
         body { 
-            font-family: sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg); 
             color: var(--text); 
             padding: 40px 20px; 
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
-        h1 { text-align: center; color: var(--accent); margin-bottom: 10px; }
-        .intro { text-align: center; color: var(--text-dim); margin-bottom: 40px; }
+        h1 { text-align: center; color: var(--accent); margin-bottom: 5px; }
+        .controls { text-align: center; margin-bottom: 30px; }
         
-        .entry { 
-            background: var(--card); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        /* Finestra de Consola */
+        #console {
+            background: var(--console-bg);
+            color: #10b981;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            height: 150px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+            border: 1px solid #1e293b;
+            font-size: 0.85rem;
+            line-height: 1.4;
         }
-        .field { margin-bottom: 15px; }
-        label { font-weight: bold; color: var(--accent); display: block; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; }
-        input, textarea { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid #334155; 
-            border-radius: 6px; 
-            background: #0f172a; 
-            color: white; 
-            font-size: 0.95rem;
-        }
-        .copy-btn { 
-            background: var(--accent); 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            width: 100%;
-            cursor: pointer; 
-            border-radius: 8px; 
+
+        .start-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
             font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
             transition: 0.3s;
         }
-        .copy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        #results { margin-top: 20px; }
-        .loading { text-align: center; color: var(--text-dim); }
+        .start-btn:hover { background: #059669; transform: scale(1.05); }
+
+        .entry { 
+            background: var(--card); 
+            border: 1px solid #1e293b; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 16px;
+        }
+        label { font-weight: bold; color: var(--accent); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px; }
+        input, textarea { 
+            width: 100%; padding: 12px; border: 1px solid #1e293b; border-radius: 8px; 
+            background: #020617; color: white; margin-bottom: 15px;
+        }
+        .copy-btn { 
+            background: var(--accent); color: white; border: none; padding: 12px; 
+            width: 100%; cursor: pointer; border-radius: 8px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <h1>Crawler G.E.S.</h1>
-    <p class="intro">Extracció automàtica de la web ges-sitges.org per a SitgesArt</p>
+    <p style="text-align: center; color: var(--text-dim); margin-bottom: 20px;">Control d'extracció de dades del G.E.S.</p>
 
-    <div id="results" class="loading">Connectant amb la web del G.E.S...</div>
+    <div class="controls">
+        <button class="start-btn" onclick="iniciarExtraccio()">INICIAR RECERCA DE DADES</button>
+    </div>
+
+    <div id="console">> Esperant ordre d'inici...</div>
+
+    <div id="results"></div>
 
     <script>
-        // RSS del G.E.S. per obtenir les darreres entrades
-        const RSS_URL = `https://www.ges-sitges.org/feed/`;
+        const log = (missatge) => {
+            const consola = document.getElementById('console');
+            const p = document.createElement('div');
+            p.textContent = `> ${new Date().toLocaleTimeString()}: ${missatge}`;
+            consola.appendChild(p);
+            consola.scrollTop = consola.scrollHeight;
+        };
 
-        async function fetchGES() {
+        async function iniciarExtraccio() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "";
+            log("Iniciant connexió amb la web ges-sitges.org...");
+            
+            const RSS_URL = `https://www.ges-sitges.org/feed/`;
+            const PROXY = `https://api.allorigins.win/get?url=${encodeURIComponent(RSS_URL)}&timestamp=${new Date().getTime()}`;
+
             try {
-                // Utilitzem un proxy per evitar el bloqueig de CORS del navegador
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(RSS_URL)}`);
+                log("Demanant dades al proxy (AllOrigins)...");
+                const response = await fetch(PROXY);
+                
+                if (!response.ok) throw new Error("Error en la resposta del servidor.");
+                
                 const data = await response.json();
+                log("Dades rebudes. Analitzant format XML...");
+                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(data.contents, "text/xml");
                 const items = xmlDoc.querySelectorAll("item");
 
+                if (items.length === 0) {
+                    log("ALERTA: No s'ha trobat cap element <item> al XML.");
+                    resultsDiv.innerHTML = "<p style='text-align:center'>No s'han trobat dades. El servidor del GES podria estar bloquejant l'accés extern temporalment.</p>";
+                    return;
+                }
+
+                log(`Èxit! S'han trobat ${items.length} entrades.`);
+                
                 let html = "";
-                items.forEach(item => {
-                    const titol = item.querySelector("title").textContent;
-                    const link = item.querySelector("link").textContent;
-                    
-                    // Neteja del resum (treiem etiquetes HTML i limitem caràcters)
-                    let resumRaw = item.querySelector("description").textContent;
-                    let resumNetejat = resumRaw.replace(/<[^>]*>?/gm, '').trim();
-                    if (resumNetejat.length > 250) {
-                        resumNetejat = resumNetejat.substring(0, 250) + "...";
-                    }
+                items.forEach((item, index) => {
+                    const titol = item.querySelector("title")?.textContent || "Sense títol";
+                    const link = item.querySelector("link")?.textContent || "";
+                    let resumRaw = item.querySelector("description")?.textContent || "";
+                    let resumNetejat = resumRaw.replace(/<[^>]*>?/gm, '').trim().substring(0, 250) + "...";
 
                     html += `
                         <div class="entry">
-                            <div class="field">
-                                <label>nom</label>
-                                <input type="text" value="${titol}">
-                            </div>
-                            <div class="field">
-                                <label>resum</label>
-                                <textarea rows="4">${resumNetejat}</textarea>
-                            </div>
-                            <div class="field">
-                                <label>font</label>
-                                <input type="text" value="G.E.S.">
-                            </div>
-                            <div class="field">
-                                <label>link</label>
-                                <input type="text" value="${link}">
-                            </div>
-                            <button class="copy-btn" onclick="copyRow(this)">Copiar dades per Firebase</button>
+                            <label>nom</label>
+                            <input type="text" value="${titol}">
+                            <label>resum</label>
+                            <textarea rows="4">${resumNetejat}</textarea>
+                            <label>font</label>
+                            <input type="text" value="G.E.S.">
+                            <label>link</label>
+                            <input type="text" value="${link}">
+                            <button class="copy-btn" onclick="copyRow(this)">COPIAR PER A FIREBASE</button>
                         </div>
                     `;
                 });
-                document.getElementById('results').innerHTML = html || "No s'han trobat entrades noves.";
-                document.getElementById('results').classList.remove('loading');
+                
+                resultsDiv.innerHTML = html;
+                log("Procés finalitzat. Pots editar i copiar les dades.");
+
             } catch (error) {
-                document.getElementById('results').innerHTML = "Error de connexió. Torna a carregar la pàgina.";
+                log(`ERROR: ${error.message}`);
                 console.error(error);
             }
         }
@@ -123,22 +155,18 @@
         function copyRow(btn) {
             const entry = btn.parentElement;
             const inputs = entry.querySelectorAll('input, textarea');
-            
-            // Creem un objecte o text per copiar fàcilment
             const textToCopy = `Nom: ${inputs[0].value}\nResum: ${inputs[1].value}\nFont: ${inputs[2].value}\nLink: ${inputs[3].value}`;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = "¡Dades copiades!";
+                log(`Copiada l'entrada: ${inputs[0].value.substring(0, 30)}...`);
+                btn.innerText = "¡COPIAT!";
                 btn.style.background = "#10b981";
                 setTimeout(() => {
-                    btn.innerText = originalText;
+                    btn.innerText = "COPIAR PER A FIREBASE";
                     btn.style.background = "#3b82f6";
                 }, 2000);
             });
         }
-
-        fetchGES();
     </script>
 </body>
 </html>
