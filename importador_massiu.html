@@ -2,40 +2,81 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>SitgesArt - Importador de 341 Notícies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SitgesArt - Importador Oficial Massiu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: white; }
-        .progress-bar { transition: width 0.3s ease; }
+        :root {
+            --primary: #1e40af;
+            --bg: #020617;
+            --card: #0f172a;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, rgba(30, 64, 175, 0.15) 0, transparent 50%);
+            min-height: 100vh;
+        }
+        .progress-bar {
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
     </style>
 </head>
-<body class="p-10">
-    <div class="max-w-2xl mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl">
-        <h1 class="text-3xl font-extrabold text-blue-500 mb-2">Importador Oficial</h1>
-        <p class="text-slate-400 mb-8">Pujant 341 notícies de l'Ajuntament de Sitges a Firebase.</p>
+<body class="flex items-center justify-center p-6">
 
-        <div class="mb-6">
-            <label class="block text-sm font-bold mb-2">Selecciona el fitxer JSON:</label>
-            <input type="file" id="jsonInput" accept=".json" class="w-full bg-black p-4 rounded-xl border border-slate-700">
+    <div class="w-full max-w-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 p-8 rounded-[2rem] shadow-2xl">
+        <header class="text-center mb-8">
+            <div class="inline-block bg-blue-500/10 text-blue-500 text-xs font-black px-3 py-1 rounded-full mb-3 uppercase tracking-widest">
+                Database Manager
+            </div>
+            <h1 class="text-3xl font-extrabold text-white">Importador <span class="text-blue-500">Massiu</span></h1>
+            <p class="text-slate-400 mt-2">Sincronització de l'històric de Cultura Sitges</p>
+        </header>
+
+        <div class="space-y-6">
+            <div class="bg-black/40 p-6 rounded-2xl border border-slate-800">
+                <label class="block text-sm font-bold text-slate-300 mb-3">Selecciona el fitxer JSON (341 notícies):</label>
+                <input type="file" id="jsonInput" accept=".json" 
+                       class="block w-full text-sm text-slate-400
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0
+                              file:text-sm file:font-bold
+                              file:bg-blue-600 file:text-white
+                              hover:file:bg-blue-500 cursor:pointer">
+            </div>
+
+            <button onclick="iniciarImportacio()" id="btnPujar" 
+                    class="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]">
+                INICIAR PUJADA A FIREBASE
+            </button>
+
+            <div id="status-box" class="hidden space-y-4 pt-4">
+                <div class="flex justify-between items-end">
+                    <div class="space-y-1">
+                        <span id="txtProgres" class="text-blue-400 font-bold block text-sm">Preparant...</span>
+                        <span id="txtComptador" class="text-xs text-slate-500">Esperant dades...</span>
+                    </div>
+                    <span id="percentatge" class="text-2xl font-black text-white">0%</span>
+                </div>
+                
+                <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                    <div id="barra" class="progress-bar bg-blue-500 h-full w-0"></div>
+                </div>
+
+                <div id="log" class="bg-black p-4 rounded-xl border border-slate-800 h-48 overflow-y-auto font-mono text-[10px] leading-relaxed">
+                    <div class="text-slate-500">> Sistema a l'espera de fitxer...</div>
+                </div>
+            </div>
         </div>
 
-        <button onclick="iniciarImportacio()" id="btnPujar" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg transition-all">
-            INICIAR PUJADA MASSIVA
-        </button>
-
-        <div id="status-box" class="hidden mt-8">
-            <div class="flex justify-between mb-2 text-sm">
-                <span id="txtProgres">Processant...</span>
-                <span id="percentatge">0%</span>
-            </div>
-            <div class="w-full bg-slate-800 rounded-full h-4 overflow-hidden">
-                <div id="barra" class="progress-bar bg-blue-500 h-full w-0"></div>
-            </div>
-            <div id="log" class="mt-4 text-xs font-mono text-slate-500 h-32 overflow-y-auto bg-black p-4 rounded-lg">
-                > Esperant fitxer...
-            </div>
-        </div>
+        <footer class="mt-8 text-center text-slate-600 text-[10px] uppercase tracking-widest">
+            SitgesArt Engine &copy; 2026 - Font: Ajuntament de Sitges
+        </footer>
     </div>
 
     <script type="module">
@@ -56,66 +97,85 @@
 
         window.iniciarImportacio = async () => {
             const input = document.getElementById('jsonInput');
-            if (!input.files[0]) return alert("Selecciona el fitxer JSON primer!");
+            if (!input.files[0]) return alert("Si us plau, selecciona el fitxer JSON que has descarregat abans.");
 
             const btn = document.getElementById('btnPujar');
             const statusBox = document.getElementById('status-box');
             const log = document.getElementById('log');
             const barra = document.getElementById('barra');
-            const txtProgres = document.getElementById('txtProgres');
             const percent = document.getElementById('percentatge');
+            const txtProgres = document.getElementById('txtProgres');
+            const txtComptador = document.getElementById('txtComptador');
 
             btn.disabled = true;
+            btn.innerText = "IMPORTANT...";
+            btn.classList.add('opacity-50');
             statusBox.classList.remove('hidden');
 
-            // 1. Carregar dades existents per evitar duplicats
-            log.innerHTML += "<div>> Sincronitzant amb Firebase per evitar duplicats...</div>";
-            const snap = await getDocs(collection(db, "obres"));
-            const guardats = new Set(snap.docs.map(d => d.data().nom.toLowerCase().trim()));
+            log.innerHTML = "<div>[INFO] Connectant amb Firebase...</div>";
 
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const dades = JSON.parse(e.target.result);
-                const total = dades.length;
-                let nous = 0;
-                let processats = 0;
+            try {
+                // 1. Obtenir duplicats per no repetir feina
+                const snap = await getDocs(collection(db, "obres"));
+                const guardats = new Set(snap.docs.map(d => d.data().nom?.toLowerCase().trim()));
+                log.innerHTML += `<div>[INFO] S'han detectat ${guardats.size} obres ja existents a la base de dades.</div>`;
 
-                for (const item of dades) {
-                    processats++;
-                    const nomNet = item.nom.toLowerCase().trim();
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const dades = JSON.parse(e.target.result);
+                    const total = dades.length;
+                    let nous = 0;
+                    let saltats = 0;
 
-                    if (!guardats.has(nomNet)) {
-                        try {
-                            // Assegurem que el model sigui el correcte
-                            await addDoc(collection(db, "obres"), {
-                                nom: item.nom,
-                                resum: item.resum || "",
-                                link: item.link || "",
-                                font: "Ajuntament de Sitges",
-                                origen: "Cultura Sitges",
-                                data_importacio: new Date().toISOString()
-                            });
-                            nous++;
-                            log.innerHTML += `<div class="text-blue-400">> Importat: ${item.nom.substring(0,40)}...</div>`;
-                        } catch (err) {
-                            log.innerHTML += `<div class="text-red-500">> Error en: ${item.nom}</div>`;
+                    for (let i = 0; i < total; i++) {
+                        const item = dades[i];
+                        const nomNet = item.nom?.toLowerCase().trim();
+
+                        if (!guardats.has(nomNet)) {
+                            try {
+                                // Pausa de 200ms per evitar el bloqueig de quota de Firebase (Rate Limit)
+                                await new Promise(r => setTimeout(r, 200));
+
+                                await addDoc(collection(db, "obres"), {
+                                    nom: item.nom.replace(/[\u2018\u2019]/g, "'"), // Correcció de cometes typogràfiques que fan fallar Drupal
+                                    resum: item.resum || "",
+                                    link: item.link || "",
+                                    font: "Ajuntament de Sitges",
+                                    origen: "Cultura Sitges",
+                                    data_importacio: new Date().toISOString()
+                                });
+                                nous++;
+                                log.innerHTML += `<div class="text-blue-400">> PUJAT: ${item.nom.substring(0,40)}...</div>`;
+                            } catch (err) {
+                                log.innerHTML += `<div class="text-red-500">> ERROR en: ${item.nom.substring(0,20)}</div>`;
+                            }
+                        } else {
+                            saltats++;
+                            log.innerHTML += `<div class="text-slate-600">> SALTAT: Ja existeix.</div>`;
                         }
-                    } else {
-                        log.innerHTML += `<div class="text-slate-600">> Saltat (ja existeix): ${item.nom.substring(0,30)}...</div>`;
+
+                        // Actualització visual de la barra
+                        const p = Math.round(((i + 1) / total) * 100);
+                        barra.style.width = p + "%";
+                        percent.innerText = p + "%";
+                        txtProgres.innerText = `Processant notícia ${i + 1} de ${total}`;
+                        txtComptador.innerText = `${nous} noves, ${saltats} duplicades`;
+                        log.scrollTop = log.scrollHeight;
                     }
 
-                    // Actualitzar barra
-                    const p = Math.round((processats / total) * 100);
-                    barra.style.width = p + "%";
-                    percent.innerText = p + "%";
-                    txtProgres.innerText = `Processant ${processats} de ${total}...`;
-                    log.scrollTop = log.scrollHeight;
-                }
+                    log.innerHTML += `<div class="text-green-500 font-bold text-sm mt-4">✅ PROCÉS COMPLETAT AMB ÈXIT.</div>`;
+                    log.innerHTML += `<div class="text-white text-xs">Total noves: ${nous} | Total duplicades: ${saltats}</div>`;
+                    btn.innerText = "PUJADA FINALITZADA";
+                    btn.classList.remove('bg-blue-600');
+                    btn.classList.add('bg-green-600');
+                };
+                reader.readAsText(input.files[0]);
 
-                log.innerHTML += `<div class="text-green-500 font-bold mt-2">✅ FINALITZAT! S'han afegit ${nous} notícies noves.</div>`;
-                btn.innerText = "IMPORTACIÓ COMPLETADA";
-            };
-            reader.readAsText(input.files[0]);
+            } catch (error) {
+                log.innerHTML += `<div class="text-red-500">❌ Error crític: ${error.message}</div>`;
+                btn.disabled = false;
+                btn.innerText = "REINTENTAR";
+            }
         };
     </script>
 </body>
