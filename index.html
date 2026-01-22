@@ -1,152 +1,111 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitges Art</title>
-    
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+<style>
+    :root {
+        --accent: #3b82f6;
+        --bg: #020617;
+        --card-bg: #0f172a;
+        --text: #f8fafc;
+        --text-dim: #94a3b8;
+    }
 
-    <style>
-        /* Estils base */
-        :root {
-            --accent: #3b82f6;
-            --text-secondary: #94a3b8;
-            --card-border: #1e293b;
-            --card-bg: #0f172a;
-        }
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 0;
+    }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020617;
-            color: #f8fafc;
-            margin: 0;
-            padding: 0;
-        }
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
 
-        .container {
-            /* Hem ampliat el max-width per aprofitar el format grid */
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+    .logo {
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
 
-        .logo {
-            font-size: 3.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
+    .logo span { color: var(--accent); }
 
-        .logo span {
-            color: var(--accent);
-        }
+    /* BARRA DE CERCA COM ABANS: Gran i directa */
+    .search-container {
+        margin-bottom: 50px;
+    }
 
-        .search-container {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            margin-bottom: 50px;
-            max-width: 800px; /* La barra de cerca no cal que sigui tan ampla */
-            margin-left: auto;
-            margin-right: auto;
-        }
+    #user-input {
+        width: 100%;
+        padding: 20px 25px;
+        font-size: 1.2rem;
+        background: #0f172a;
+        border: 2px solid #1e293b;
+        border-radius: 15px;
+        color: white;
+        outline: none;
+        box-sizing: border-box;
+    }
 
-        #user-input {
-            width: 100%;
-            padding: 20px 30px;
-            font-size: 1.2rem;
-            background: #0f172a;
-            border: 2px solid #1e293b;
-            border-radius: 50px; /* Més arrodonit */
-            color: white;
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
+    #user-input:focus {
+        border-color: var(--accent);
+    }
 
-        #user-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-        }
+    /* GRID NET */
+    #result-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
 
-        /* CONFIGURACIÓ DEL GRID */
-        #result-container {
-            display: grid;
-            /* Crea columnes d'un mínim de 320px. 
-               Si hi ha espai, en posarà 2 o 3, si no, 1. */
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            align-items: stretch;
-        }
+    .response-card {
+        background: var(--card-bg);
+        border: 1px solid #1e293b;
+        padding: 25px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .response-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 30px;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            box-sizing: border-box;
-        }
+    .response-card h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        line-height: 1.3;
+    }
 
-        /* Efecte en passar el ratolí */
-        .response-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
-        }
+    .response-card p {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
 
-        footer {
-            text-align: center;
-            margin-top: 100px;
-            padding: 40px;
-            border-top: 1px solid #1e293b;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
+    .source-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        border-top: 1px solid #1e293b;
+        padding-top: 15px;
+    }
 
-        /* Ajustos per a mòbils petits */
-        @media (max-width: 480px) {
-            .logo { font-size: 2.5rem; }
-            .container { padding: 30px 15px; }
-            #result-container { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
+    .source-link span { color: var(--text-dim); }
 
-<div class="container">
-    <header>
-        <div class="logo">Sitges <span>Art</span></div>
-    </header>
+    /* BOTÓ NET */
+    .btn-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-    <div class="search-container">
-        <input type="text" id="user-input" placeholder="Cerca exposicions, artistes..." autocomplete="off">
-    </div>
-
-    <div id="result-container"></div>
-
-    <footer>
-        Creat per <strong>Pere Badia i Lorenz</strong><br>
-        pbadialorenz@gmail.com
-    </footer>
-</div>
-
-<script type="module" src="script.js"></script>
-
-</body>
-</html>
+    footer {
+        text-align: center;
+        padding: 60px 0;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+    }
+</style>
