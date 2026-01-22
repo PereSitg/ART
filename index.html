@@ -12,11 +12,12 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Estils base per assegurar que tot es vegi bé */
+        /* Estils base */
         :root {
             --accent: #3b82f6;
             --text-secondary: #94a3b8;
             --card-border: #1e293b;
+            --card-bg: #0f172a;
         }
 
         body {
@@ -28,7 +29,8 @@
         }
 
         .container {
-            max-width: 900px;
+            /* Hem ampliat el max-width per aprofitar el format grid */
+            max-width: 1200px;
             margin: 0 auto;
             padding: 60px 20px;
         }
@@ -39,7 +41,7 @@
         }
 
         .logo {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 800;
             letter-spacing: -1px;
         }
@@ -53,6 +55,9 @@
             top: 20px;
             z-index: 100;
             margin-bottom: 50px;
+            max-width: 800px; /* La barra de cerca no cal que sigui tan ampla */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         #user-input {
@@ -61,7 +66,7 @@
             font-size: 1.2rem;
             background: #0f172a;
             border: 2px solid #1e293b;
-            border-radius: 25px;
+            border-radius: 50px; /* Més arrodonit */
             color: white;
             box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
@@ -74,19 +79,34 @@
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
         }
 
-        /* Contenidor per a les targetes (response-card) que genera el JS */
+        /* CONFIGURACIÓ DEL GRID */
         #result-container {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            /* Crea columnes d'un mínim de 320px. 
+               Si hi ha espai, en posarà 2 o 3, si no, 1. */
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
+            align-items: stretch;
         }
 
         .response-card {
-            background: #0f172a;
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
             padding: 30px;
             border-radius: 25px;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Efecte en passar el ratolí */
+        .response-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
         }
 
         footer {
@@ -98,6 +118,13 @@
             font-size: 0.9rem;
             line-height: 1.6;
         }
+
+        /* Ajustos per a mòbils petits */
+        @media (max-width: 480px) {
+            .logo { font-size: 2.5rem; }
+            .container { padding: 30px 15px; }
+            #result-container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -108,7 +135,7 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="user-input" placeholder="Comença a escriure per cercar..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Cerca exposicions, artistes..." autocomplete="off">
     </div>
 
     <div id="result-container"></div>
