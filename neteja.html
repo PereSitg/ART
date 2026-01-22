@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <title>Correcció Final SitgesArt</title>
 </head>
-<body style="font-family: sans-serif; padding: 20px;">
-    <h1 id="estat">Corregint dades de Criticartt...</h1>
-    <div id="llista" style="background: #f0f0f0; padding: 15px; border-radius: 8px;"></div>
+<body style="font-family: sans-serif; padding: 30px; background: #f4f4f4;">
+    <h1 id="estat">Connectant amb Firebase...</h1>
+    <div id="llista" style="background: white; border: 1px solid #ccc; padding: 20px; max-height: 500px; overflow-y: auto;">
+        Esperant...
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -36,23 +38,24 @@
                     const d = docSnap.data();
                     const link = (d.link || "").toLowerCase();
 
-                    // Busquem criticart amb una o dues "t"
+                    // Condició per trobar els articles de la Beli Artigas
                     if (link.includes("criticart.blogspot") || link.includes("criticartt.blogspot")) {
                         await updateDoc(doc(db, "obres", docSnap.id), {
-                            font: "CRITICART",
-                            origen: "Crítica d'Art de Sitges"
+                            font: "BELI ARTIGAS", // Etiqueta superior
+                            origen: "Criticart"   // Text inferior
                         });
-                        llista.innerHTML += "✅ Arreglat: " + d.nom + "<br>";
+                        llista.innerHTML += "✅ Actualitzat: " + d.nom + "<br>";
                         total++;
                     }
                 }
-                estat.innerText = "🎉 FET! S'han corregit " + total + " entrades.";
+                estat.innerText = "🎉 FET! S'han actualitzat " + total + " entrades.";
             } catch (err) {
-                estat.innerText = "❌ Error de permisos o connexió";
-                llista.innerHTML = err.message;
+                estat.innerText = "❌ Error";
+                llista.innerHTML = err.message + "<br><br>Recorda obrir les Rules a Firebase!";
             }
         }
 
+        // Executem la funció
         corregir();
     </script>
 </body>
