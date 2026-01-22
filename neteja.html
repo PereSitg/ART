@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Correcció SitgesArt</title>
+</head>
+<body style="font-family: sans-serif; padding: 30px; background: #f4f4f4;">
+    <h1 id="estat">Connectant amb Firebase...</h1>
+    <div id="detalls" style="font-family: monospace; background: white; border: 1px solid #ccc; padding: 20px; max-height: 400px; overflow-y: auto;">
+        > Esperant ordre...
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function corregir() {
+            const estat = document.getElementById('estat');
+            const detalls = document.getElementById('detalls');
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "obres"));
+                let total = 0;
+
+                detalls.innerHTML = "> Analitzant base de dades...<br>";
+
+                for (const document_ of querySnapshot.docs) {
+                    const data = document_.data();
+                    
+                    // Condició: Si és de criticart o és l'entrada del Morando que estava malament
+                    const esDeCriticart = data.link && data.link.includes("criticart.com");
+                    const esMorandoMalament = data.nom && data.nom.includes("Vicenç Morando") && data.font === "VIQUIPÈDIA";
+
+                    if (esDeCriticart || esMorandoMalament) {
+                        await updateDoc(doc(db, "obres", document_.id), {
+                            font: "CRITICART",
+                            origen: "Crítica d'Art de Sitges"
+                        });
+                        detalls.innerHTML += `<span style="color: green;">✅ Corregit:</span> ${data.nom}<br>`;
+                        total++;
+                    }
+                }
+                estat.innerText = "✅ Correcció finalitzada!";
+                detalls.innerHTML += `<strong><br>FET! S'han arreglat ${total} entrades.</strong>`;
+            } catch (error) {
+                estat.innerText = "❌ Error de permisos";
+                detalls.innerHTML = `<span style="color: red;">ERROR:</span> ${error.message}<br><br><b>Recorda:</b> Has de canviar les Rules a Firebase a "allow write: if true;" i clicar el botó PUBLISH.`;
+            }
+        }
+
+        corregir();
+    </script>
+</body>
+</html>
