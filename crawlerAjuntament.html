@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SitgesArt - Crawler Ajuntament (Cultura)</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Blau Ajuntament */
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --glass: rgba(15, 23, 42, 0.8);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            background: var(--bg-dark);
+            background-image: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.2) 0, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 5vh 20px;
+        }
+        .container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 2rem; }
+        header { text-align: center; margin-bottom: 2rem; }
+        header .logo { font-size: 3.5rem; font-weight: 800; background: linear-gradient(to bottom, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header .logo span { background: linear-gradient(to right, #1e3a8a, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .admin-panel { background: var(--glass); border: 1px solid var(--card-border); border-radius: 28px; padding: 2.5rem; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
+        
+        .btn-main { background: linear-gradient(to right, #1e3a8a, #1e40af); color: white; padding: 1.2rem 2.5rem; border-radius: 18px; font-weight: 800; font-size: 1.2rem; border: none; cursor: pointer; transition: 0.3s; }
+        .btn-secondary { background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent); padding: 1rem 2rem; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; max-width: 400px; transition: 0.3s; }
+
+        .log-console { margin-top: 1.5rem; background: #000; border-radius: 12px; padding: 1rem; font-family: monospace; font-size: 0.8rem; color: #3b82f6; height: 100px; overflow-y: auto; text-align: left; border: 1px solid var(--card-border); }
+        
+        .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
+        @media (max-width: 768px) { .results-grid { grid-template-columns: 1fr; } }
+        
+        .response-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.5rem; border-radius: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; transition: 0.3s; }
+        .ja-importat { opacity: 0.4; filter: grayscale(0.8); }
+        
+        .import-btn { background: var(--accent); color: white; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; width: 100%; transition: 0.2s; }
+        .status-tag { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); color: #10b981; text-transform: uppercase; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">SitgesArt <span>Ajuntament</span></div>
+            <p style="color: var(--text-secondary)">Notícies de Cultura Sitges</p>
+            <div id="auth-box" class="mt-4"></div>
+        </header>
+
+        <div id="main-content" class="hidden">
+            <div class="admin-panel">
+                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🏛️ BUSCAR NOTÍCIES OFICIALS</button>
+                <div class="log-console" id="log-console">> Connectat a CulturaSitges.cat</div>
+            </div>
+
+            <div id="results-grid" class="results-grid"></div>
+
+            <div id="pagination-footer" class="hidden py-8 flex justify-center">
+                <button onclick="executarCerca(true)" id="btn-mes" class="btn-secondary">⬇️ CARREGAR MÉS NOTÍCIES</button>
+            </div>
+        </div>
+
+        <div id="login-warning" class="admin-panel">
+            <button onclick="loginGoogle()" class="btn-main" style="background: white; color: black;">Accedir com Admin</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let guardatsGlobal = [];
+        let paginaActual = 0;
+
+        function normalitzarClau(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "").trim();
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === "pbadialorenz@gmail.com") {
+                document.getElementById('main-content').classList.remove('hidden');
+                document.getElementById('login-warning').classList.add('hidden');
+            }
+        });
+
+        window.loginGoogle = () => signInWithPopup(auth, provider);
+
+        function log(msg) {
+            const consoleBox = document.getElementById('log-console');
+            consoleBox.innerHTML += `<div>> ${msg}</div>`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        window.executarCerca = async (esPaginacio = false) => {
+            const btn = esPaginacio ? document.getElementById('btn-mes') : document.getElementById('btn-cerca');
+            const resBox = document.getElementById('results-grid');
+            btn.disabled = true;
+
+            if (!esPaginacio) {
+                resBox.innerHTML = "";
+                paginaActual = 0;
+                const snap = await getDocs(collection(db, "obres"));
+                guardatsGlobal = snap.docs.map(d => normalitzarClau(d.data().nom));
+            } else {
+                paginaActual += 12; // L'Ajuntament sol carregar de 12 en 12
+            }
+
+            try {
+                log("Demanant dades a Cultura Sitges...");
+                // CulturaSitges sol tenir feed RSS a /feed/
+                let feedUrl = `https://www.culturasitges.cat/actualitat/noticies/feed/`;
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}&ts=${Date.now()}`);
+                const data = await response.json();
+                
+                const xml = new DOMParser().parseFromString(data.contents, "text/xml");
+                const items = xml.querySelectorAll("item");
+
+                items.forEach((item) => {
+                    const titol = item.querySelector("title").textContent;
+                    const clau = normalitzarClau(titol);
+                    const link = item.querySelector("link").textContent;
+                    let resum = item.querySelector("description")?.textContent || "";
+                    resum = resum.replace(/<[^>]*>?/gm, '').trim().substring(0, 150) + "...";
+
+                    const jaExisteix = guardatsGlobal.includes(clau);
+                    const card = document.createElement('div');
+                    card.className = `response-card ${jaExisteix ? 'ja-importat' : ''}`;
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                ${jaExisteix ? '<span class="status-tag">Ja importat</span>' : '<span class="status-tag" style="color:#3b82f6;">Oficial</span>'}
+                            </div>
+                            <h3 class="font-bold text-white text-sm">${titol}</h3>
+                            <p class="text-xs text-slate-400 mt-2">${resum}</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-800">
+                            ${jaExisteix ? '<div class="text-center text-xs opacity-50">DINS LA BASE DE DADES</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${btoa(encodeURIComponent(resum))}', '${link}')" class="import-btn">IMPORTAR NOTÍCIA</button>`}
+                        </div>
+                    `;
+                    resBox.appendChild(card);
+                });
+
+                log(`Analitzades les darreres notícies.`);
+            } catch (e) {
+                log("Error llegint el feed oficial.");
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        window.importar = async (btn, tB64, rB64, link) => {
+            const titol = decodeURIComponent(atob(tB64));
+            const resum = decodeURIComponent(atob(rB64));
+            btn.innerText = "⏳..."; btn.disabled = true;
+            try {
+                await addDoc(collection(db, "obres"), {
+                    nom: titol, resum: resum, link: link, font: "Ajuntament de Sitges", origen: "Cultura Sitges", data_importacio: new Date().toISOString()
+                });
+                btn.innerText = "IMPORTAT ✅"; btn.style.background = "#10b981";
+                log(`Importat: ${titol}`);
+            } catch (e) {
+                alert("Error: " + e.message); btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
