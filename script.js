@@ -21,7 +21,7 @@ const db = getFirestore(app);
 const input = document.getElementById('user-input');
 const results = document.getElementById('result-container');
 
-// --- NORMALITZACIÓ DE TEXT ---
+// --- NORMALITZACIÓ DE TEXT (Sense accents i minúscules) ---
 const netejarText = (text) => {
     if (!text) return "";
     return text.toString()
@@ -31,41 +31,29 @@ const netejarText = (text) => {
         .replace(/[\u0300-\u036f]/g, "");
 };
 
-// --- FUNCIÓ PER PINTAR LES TARGETES ---
+// --- FUNCIÓ PER PINTAR LES TARGETES (NETES) ---
 function crearCard(data) {
     const nomOriginal = data.nom || "";
     const resumOriginal = data.resum || "";
     const font = data.font || "Museus de Sitges";
-    
-    let linkBrut = data.link || data.url || ""; 
-    let linkFinal = "";
-    
-    if (linkBrut) {
-        linkFinal = linkBrut.toString().trim();
-        if (linkFinal !== "" && !linkFinal.startsWith('http')) {
-            linkFinal = 'https://' + linkFinal;
-        }
-    }
+    const linkFinal = data.link || "";
 
     const card = document.createElement('div');
     card.className = 'response-card';
     
-    const botoHTML = (linkFinal) 
-        ? `<a href="${linkFinal}" target="_blank" rel="noopener noreferrer" class="btn-link">Més informació</a>` 
-        : `<span style="color:gray; font-size:0.8rem;">(Sense enllaç)</span>`;
-
+    // Generem contingut net sense estils "inline" pesats
     card.innerHTML = `
-        <h2 style="font-size:1.6rem; margin-bottom:1rem; color:white">${nomOriginal}</h2>
-        <p style="line-height:1.6; color:#e2e8f0; margin-bottom:1.5rem; flex-grow:1;">${resumOriginal}</p>
+        <h2>${nomOriginal}</h2>
+        <p>${resumOriginal}</p>
         <div class="source-link">
             <span>Font: ${font}</span>
-            ${botoHTML}
+            ${linkFinal ? `<a href="${linkFinal}" target="_blank" class="btn-link">Saber-ne més ↗</a>` : ''}
         </div>
     `;
     return card;
 }
 
-// --- FUNCIÓ PRINCIPAL DE CERCA ---
+// --- FUNCIÓ DE CERCA I CÀRREGA INICIAL ---
 async function buscar() {
     const textBuscat = netejarText(input.value);
     
@@ -79,19 +67,17 @@ async function buscar() {
             const nomPerComparar = netejarText(data.nom);
             const resumPerComparar = netejarText(data.resum);
 
-            // Si l'input està buit, mostrem tot (o pots limitar-ho a 6)
             if (textBuscat === "" || nomPerComparar.includes(textBuscat) || resumPerComparar.includes(textBuscat)) {
                 results.appendChild(crearCard(data));
                 trobats++;
             }
         });
 
-        // Missatge si no hi ha resultats
+        // Missatge simple si no hi ha resultats
         if (trobats === 0) {
             results.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                    <p style="font-size: 2rem; margin-bottom: 1rem;">🔍</p>
-                    <p>No hem trobat cap exposició que coincideixi amb "<strong>${input.value}</strong>".</p>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">
+                    <p>No hi ha resultats per a la cerca.</p>
                 </div>
             `;
         }
@@ -100,8 +86,6 @@ async function buscar() {
     }
 }
 
-// Escoltadors
+// Escoltadors d'esdeveniments
 input.addEventListener('input', buscar);
-
-// Carregar dades en obrir la pàgina
 window.addEventListener('DOMContentLoaded', buscar);
