@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sitges Art</title>
+    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -35,7 +38,6 @@
         .logo { font-size: 2.5rem; font-weight: 800; }
         .logo span { color: var(--accent); }
 
-        /* BUSCADOR NET */
         .search-box {
             margin-bottom: 40px;
             max-width: 600px;
@@ -56,7 +58,6 @@
 
         #user-input:focus { border-color: var(--accent); }
 
-        /* GRID DE RESULTATS */
         #result-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -70,10 +71,16 @@
             border-radius: 12px;
             display: flex;
             flex-direction: column;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .response-card h2 { font-size: 1.3rem; margin-top: 0; }
-        .response-card p { font-size: 0.95rem; color: #cbd5e1; flex-grow: 1; }
+        .response-card p { font-size: 0.95rem; color: #cbd5e1; flex-grow: 1; line-height: 1.5; }
 
         .source-link {
             margin-top: 15px;
