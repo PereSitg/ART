@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>SitgesArt - Entrada Ràpida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        body { background: #020617; color: white; font-family: sans-serif; }
+        .input-field { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; width: 100%; color: white; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 0.9rem; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-height-screen p-6">
+
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-xl">
+        <h1 class="text-2xl font-bold mb-6 text-blue-400">Dades de la Fitxa</h1>
+
+        <label>Selecciona un personatge pendent:</label>
+        <select id="selector" class="input-field border-blue-500 bg-slate-800" onchange="carregarDades()">
+            <option value="">-- Tria un nom per auto-omplir --</option>
+            </select>
+
+        <hr class="border-slate-800 my-6">
+
+        <label>Nom de l'obra / Personatge</label>
+        <input type="text" id="nom" class="input-field">
+
+        <label>Font (Ex: Viquipèdia)</label>
+        <input type="text" id="font" class="input-field">
+
+        <label>Resum descriptiu...</label>
+        <textarea id="resum" class="input-field h-32"></textarea>
+
+        <label>URL de l'enllaç</label>
+        <input type="text" id="url" class="input-field">
+
+        <button onclick="guardarAFirebase()" id="btn-save" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all">
+            GUARDAR A LA BBDD
+        </button>
+        
+        <p id="status" class="mt-4 text-center text-sm"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DADES PREPARADES (Pots anar afegint més aquí)
+        const dadesPersonatges = {
+            "Joan Maragall": {
+                font: "Viquipèdia",
+                resum: "Poeta cabdal de la literatura catalana i figura central del Modernisme. Molt vinculat a les Festes Modernistes de Sitges convidades per Rusiñol.",
+                url: "https://ca.wikipedia.org/wiki/Joan_Maragall_i_Gorina"
+            },
+            "Josep Maria de Sagarra": {
+                font: "Viquipèdia",
+                resum: "Escriptor, poeta i dramaturg. Va immortalitzar l'esperit i el paisatge de Sitges en diverses de les seves obres i memòries.",
+                url: "https://ca.wikipedia.org/wiki/Josep_Maria_de_Sagarra_i_de_Castellarnau"
+            },
+            "Facundo Bacardí": {
+                font: "Viquipèdia",
+                resum: "Empresari sitgetà que va emigrar a Cuba on va fundar la destil·leria Bacardí, transformant la indústria del rom a nivell mundial.",
+                url: "https://ca.wikipedia.org/wiki/Facundo_Bacardí_i_Massó"
+            },
+            "Vinyet Panyella": {
+                font: "Viquipèdia",
+                resum: "Escriptora i investigadora cultural. Ha estat directora dels Museus de Sitges i és una de les veus més expertes en el Modernisme sitgetà.",
+                url: "https://ca.wikipedia.org/wiki/Vinyet_Panyella_i_Balcells"
+            }
+        };
+
+        // Omplir el selector automàticament
+        const selector = document.getElementById('selector');
+        for (let nom in dadesPersonatges) {
+            let opt = document.createElement('option');
+            opt.value = nom;
+            opt.innerHTML = nom;
+            selector.appendChild(opt);
+        }
+
+        window.carregarDades = () => {
+            const seleccionat = document.getElementById('selector').value;
+            if (dadesPersonatges[seleccionat]) {
+                document.getElementById('nom').value = seleccionat;
+                document.getElementById('font').value = dadesPersonatges[seleccionat].font;
+                document.getElementById('resum').value = dadesPersonatges[seleccionat].resum;
+                document.getElementById('url').value = dadesPersonatges[seleccionat].url;
+            }
+        };
+
+        window.guardarAFirebase = async () => {
+            const btn = document.getElementById('btn-save');
+            const status = document.getElementById('status');
+            
+            const dades = {
+                nom: document.getElementById('nom').value,
+                font: document.getElementById('font').value,
+                resum: document.getElementById('resum').value,
+                link: document.getElementById('url').value,
+                data: new Date().toISOString()
+            };
+
+            if (!dades.nom) return alert("Falta el nom!");
+
+            btn.disabled = true;
+            status.innerText = "⏳ Guardant...";
+
+            try {
+                await addDoc(collection(db, "obres"), dades);
+                status.className = "mt-4 text-center text-sm text-green-400";
+                status.innerText = "✅ Guardat amb èxit!";
+                // Netejar camps
+                document.getElementById('nom').value = "";
+                document.getElementById('resum').value = "";
+                document.getElementById('url').value = "";
+            } catch (e) {
+                status.innerText = "❌ Error en guardar";
+            } finally {
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
