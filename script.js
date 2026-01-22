@@ -36,14 +36,11 @@ function crearCard(data) {
     const nomOriginal = data.nom || "";
     const resumOriginal = data.resum || "";
     const font = data.font || "Museus de Sitges";
-    
-    // Agafem el link de qualsevol camp possible per no perdre'n cap
     let enllac = data.link || data.url || data.enllaç || "";
 
     const card = document.createElement('div');
     card.className = 'response-card';
     
-    // Si l'enllaç existeix però no té el format correcte (http), el corregim al moment
     if (enllac && !enllac.startsWith('http')) {
         enllac = 'https://' + enllac;
     }
@@ -61,16 +58,25 @@ function crearCard(data) {
 
 // --- FUNCIÓ DE CERCA ---
 async function buscar() {
-    const textBuscat = netejarText(input.value);
+    // 1. Capturem el valor actual de l'input
+    const valorInput = input.value.trim();
+    const textBuscat = netejarText(valorInput);
     
-    // Pantalla neta si no hi ha prou text
+    // 2. CORRECCIÓ: Si l'input està buit o té menys de 2 caràcters, netejem i sortim
     if (textBuscat.length < 2) {
         results.innerHTML = "";
-        return;
+        return; 
     }
 
     try {
         const querySnapshot = await getDocs(collection(db, "obres"));
+        
+        // Tornem a comprovar si l'usuari ha esborrat mentre esperàvem la resposta de Firebase
+        if (netejarText(input.value).length < 2) {
+            results.innerHTML = "";
+            return;
+        }
+
         results.innerHTML = "";
         let trobats = 0;
 
@@ -86,11 +92,12 @@ async function buscar() {
         });
 
         if (trobats === 0) {
-            results.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">No hi ha resultats.</div>`;
+            results.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">No hi ha resultats per a la cerca.</div>`;
         }
     } catch (e) {
         console.error("Error Firebase:", e);
     }
 }
 
+// Escoltador d'esdeveniments
 input.addEventListener('input', buscar);
