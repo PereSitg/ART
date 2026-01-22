@@ -2,11 +2,10 @@
     --primary: #3b82f6;
     --bg-dark: #020617;
     --card-bg: #0f172a;
-    --card-border: rgba(255, 255, 255, 0.08);
+    --card-border: #1e293b;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --accent: #60a5fa;
-    --glass: rgba(15, 23, 42, 0.8);
 }
 
 * { 
@@ -18,15 +17,14 @@
 
 body {
     background: var(--bg-dark);
-    background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
     color: var(--text-primary);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    padding: 5vh 20px;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
 }
 
-/* Hem ampliat el container a 1200px per al Grid */
 .container { 
     width: 100%; 
     max-width: 1200px; 
@@ -35,43 +33,65 @@ body {
     gap: 2rem; 
 }
 
-header { text-align: center; }
+/* HEADER I SUBTÍTOL */
+header { 
+    text-align: center; 
+    margin-bottom: 20px;
+}
+
 header .logo { 
     font-size: 3.5rem; 
     font-weight: 800; 
-    background: linear-gradient(to bottom, #ffffff, #94a3b8); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-}
-header .logo span { 
-    background: linear-gradient(to right, #60a5fa, #3b82f6); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
+    color: white; /* Color sòlid, sense degradats */
 }
 
+header .logo span { 
+    color: var(--primary); /* Blau sòlid net */
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    margin-top: 15px;
+    font-size: 1.1rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+}
+
+/* BARRA DE CERCA NETA (Sense glassmorphism) */
 .search-container {
-    background: var(--glass);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 12px 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 15px;
+    padding: 15px 25px;
     display: flex;
     gap: 10px;
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 20px;
-    z-index: 100;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    max-width: 600px; /* La barra de cerca es manté centrada i no tan ampla */
-    margin: 0 auto 2rem auto;
+    max-width: 600px;
+    width: 100%;
+    margin: 20px auto 40px auto;
+    transition: border-color 0.3s ease;
 }
 
-input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
+.search-container:focus-within {
+    border-color: var(--primary);
+}
 
-/* NOU: Contenidor Grid per als resultats */
+input { 
+    flex: 1; 
+    background: transparent; 
+    border: none; 
+    outline: none; 
+    color: white; 
+    font-size: 1.1rem; 
+}
+
+/* GRID DE RESULTATS */
 #result-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 20px;
+    gap: 25px;
     width: 100%;
 }
 
@@ -79,22 +99,29 @@ input { flex: 1; background: transparent; border: none; outline: none; color: wh
     background: var(--card-bg); 
     border: 1px solid var(--card-border);
     padding: 2rem; 
-    border-radius: 28px; 
+    border-radius: 18px; 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     animation: fadeIn 0.4s ease-out;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
-.response-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
+.response-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.response-card p {
+    line-height: 1.6;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
 }
 
 .source-link {
-    margin-top: 1.5rem; 
+    margin-top: 1rem; 
     padding-top: 1rem;
     border-top: 1px solid var(--card-border);
     display: flex; 
@@ -104,25 +131,35 @@ input { flex: 1; background: transparent; border: none; outline: none; color: wh
     color: var(--text-secondary);
 }
 
-.source-link a { 
-    color: var(--accent); 
+.btn-link { 
+    color: var(--primary); 
     text-decoration: none; 
     font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 10px;
-    background: rgba(96, 165, 250, 0.1);
-    transition: 0.3s;
+    transition: opacity 0.2s;
 }
-.source-link a:hover { background: rgba(96, 165, 250, 0.2); }
 
-footer { text-align: center; color: #475569; margin-top: 4rem; padding-bottom: 2rem; font-size: 0.9rem; }
+.btn-link:hover { 
+    text-decoration: underline;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+footer { 
+    text-align: center; 
+    color: #475569; 
+    margin-top: 5rem; 
+    padding-bottom: 2rem; 
+    font-size: 0.85rem; 
+}
 
-/* Ajust per a mòbils */
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* AJUST PER A MÒBILS */
 @media (max-width: 768px) {
     #result-container {
         grid-template-columns: 1fr;
     }
     header .logo { font-size: 2.5rem; }
+    .subtitle { font-size: 1rem; padding: 0 10px; }
 }
