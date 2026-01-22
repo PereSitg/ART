@@ -1,111 +1,113 @@
-<style>
-    :root {
-        --accent: #3b82f6;
-        --bg: #020617;
-        --card-bg: #0f172a;
-        --text: #f8fafc;
-        --text-dim: #94a3b8;
-    }
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitges Art</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #3b82f6;
+            --bg: #020617;
+            --card-bg: #0f172a;
+            --text: #f8fafc;
+            --border: #1e293b;
+        }
 
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: var(--bg);
-        color: var(--text);
-        margin: 0;
-        padding: 0;
-    }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
 
-    .container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 40px 20px;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
 
-    .logo {
-        font-size: 2.5rem;
-        font-weight: 800;
-    }
+        .logo { font-size: 2.5rem; font-weight: 800; }
+        .logo span { color: var(--accent); }
 
-    .logo span { color: var(--accent); }
+        /* BUSCADOR NET */
+        .search-box {
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    /* BARRA DE CERCA COM ABANS: Gran i directa */
-    .search-container {
-        margin-bottom: 50px;
-    }
+        #user-input {
+            width: 100%;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+        }
 
-    #user-input {
-        width: 100%;
-        padding: 20px 25px;
-        font-size: 1.2rem;
-        background: #0f172a;
-        border: 2px solid #1e293b;
-        border-radius: 15px;
-        color: white;
-        outline: none;
-        box-sizing: border-box;
-    }
+        #user-input:focus { border-color: var(--accent); }
 
-    #user-input:focus {
-        border-color: var(--accent);
-    }
+        /* GRID DE RESULTATS */
+        #result-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
 
-    /* GRID NET */
-    #result-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-    }
+        .response-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .response-card {
-        background: var(--card-bg);
-        border: 1px solid #1e293b;
-        padding: 25px;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-    }
+        .response-card h2 { font-size: 1.3rem; margin-top: 0; }
+        .response-card p { font-size: 0.95rem; color: #cbd5e1; flex-grow: 1; }
 
-    .response-card h2 {
-        font-size: 1.4rem;
-        margin-bottom: 15px;
-        line-height: 1.3;
-    }
+        .source-link {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
 
-    .response-card p {
-        font-size: 0.95rem;
-        color: #cbd5e1;
-        line-height: 1.5;
-        margin-bottom: 20px;
-        flex-grow: 1;
-    }
+        .btn-link { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-    .source-link {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.85rem;
-        border-top: 1px solid #1e293b;
-        padding-top: 15px;
-    }
+        footer { text-align: center; padding: 40px; color: #475569; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
 
-    .source-link span { color: var(--text-dim); }
+<div class="container">
+    <header>
+        <div class="logo">Sitges <span>Art</span></div>
+    </header>
 
-    /* BOTÓ NET */
-    .btn-link {
-        color: var(--accent);
-        text-decoration: none;
-        font-weight: 600;
-    }
+    <div class="search-box">
+        <input type="text" id="user-input" placeholder="Escriu per cercar..." autocomplete="off">
+    </div>
 
-    footer {
-        text-align: center;
-        padding: 60px 0;
-        color: var(--text-dim);
-        font-size: 0.8rem;
-    }
-</style>
+    <div id="result-container"></div>
+
+    <footer>
+        Creat per Pere Badia i Lorenz
+    </footer>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
