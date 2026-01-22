@@ -76,22 +76,22 @@
         const provider = new GoogleAuthProvider();
 
         // BASE DE DADES INTERNA PER ANAR RÀPID
-       const dadesPersonatges = {
-            "Manuel Vidal-Quadras": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Manuel_Vidal-Quadras_i_Ramon", resum: "Bancer i col·leccionista d'art vinculat a la burgesia barcelonina amb fortes arrels i llegat a Sitges." },
-            "Josep Canals": { font: "Web", url: "https://www.canalsgaleriaart.cat", resum: "Gallerista i promotor d'art que ha treballat intensament per la difusió dels artistes de la vila i del Penedès." },
-            "Albert Catasús": { font: "Web", url: "https://ca.wikipedia.org/wiki/Albert_Catasús", resum: "Historiador de l'art especialitzat en el Modernisme i el Noucentisme a Sitges, col·laborador de museus." },
-            "Manel Torrens": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Manel_Torrens_i_Gironella", resum: "Compositor de sardanes i músic molt actiu en la vida cultural sitgetana i en la seva Festa Major." },
-            "Xavier Montsalvatge": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Xavier_Montsalvatge_i_Bassols", resum: "Un dels compositors catalans més influents del segle XX, amb estades i vincles artístics a la nostra vila." },
-            "Anna Ricci": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Anna_Ricci", resum: "Mezzosoprano catalana d'un gust exquisit que va triar Sitges com un dels seus refugis de creació i vida." },
-            "Ovidi Montllor": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ovidi_Montllor_i_Mengual", resum: "Actor i cantautor de la Nova Cançó que va viure una etapa significativa a Sitges, integrat en la seva cultura." },
-            "Pawel Rouba": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Pawel_Rouba", resum: "Mestre de mim i pantomima polonès resident a Sitges, que va formar generacions d'actors des de la vila." },
-            "Lindsay Kemp": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Lindsay_Kemp", resum: "Coreògraf i mim britànic de fama mundial, estretament vinculat al Festival de Teatre de Sitges." },
-            "Ricard Salvat": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ricard_Salvat_i_Ferré", resum: "Director teatral i escriptor, una de les figures més importants de l'escena catalana i del Festival sitgetà." },
-            "Mercè Comes": { font: "Web", url: "https://ca.wikipedia.org/wiki/Mercè_Comes", resum: "Actriu còmica nascuda o vinculada professionalment a Sitges a través de la companyia La Cubana." },
-            "José Mojica": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/José_Mojica", resum: "Tenor i actor mexicà que va viure a Sitges abans de fer-se frare, deixant una forta empremta popular." },
-            "Ignasi Mas i Morell": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ignasi_Mas_i_Morell", resum: "Arquitecte modernista i noucentista, autor d'edificis tan emblemàtics com l'antic escorxador de Sitges." },
-            "Bonaventura Pollés": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Bonaventura_Pollés_i_Vivó", resum: "Arquitecte actiu a finals del XIX i principis del XX, autor de diversos xalets i cases de reforma a la vila." },
-            "Jaume Sunyer": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Jaume_Sunyer_i_Juncosa", resum: "Arquitecte sitgetà autor de nombroses obres d'estil modernista que defineixen el perfil urbà local." }
+      const dadesPersonatges = {
+            "Josep Artigas": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Artigas_i_Ojeda", resum: "Un dels cartellistes i dissenyadors gràfics catalans més internacionals; va viure i treballar a Sitges molts anys." },
+            "Cini Boeri": { font: "Viquipèdia", url: "https://it.wikipedia.org/wiki/Cini_Boeri", resum: "Arquitecta i dissenyadora italiana de gran prestigi que va deixar la seva empremta a Sitges amb la Casa Bunker." },
+            "Coderch": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Josep_Antoni_Coderch_i_de_Sentmenat", resum: "Josep Antoni Coderch, l'arquitecte més important de la postguerra, autor d'edificis magistrals a la costa sitgetana." },
+            "Pepito Pascual": { font: "Web", url: "https://www.l'eco.cat", resum: "Músic multiinstrumentista i ànima lliure de la cultura sitgetana, col·laborador de Pascal Comelade i molts altres." },
+            "Jordi Pañella": { font: "Web", url: "https://www.visitsitges.com", resum: "Figura clau de la cultura popular, molt vinculat a la conservació de les tradicions i a la història del Carnaval." },
+            "Isidre Pañella": { font: "Web", url: "https://ca.wikipedia.org/wiki/Isidre_Pañella_i_Virella", resum: "Mestre pirotècnic de referència, responsable durant dècades de l'espectacular Castell de Foc de la Festa Major." },
+            "Agustí Albors": { font: "Web", url: "https://www.sitges.cat", resum: "Activista cultural i prohom de la vila, sempre implicat en les institucions i la preservació del patrimoni." },
+            "Miguel Condé": { font: "Viquipèdia", url: "https://en.wikipedia.org/wiki/Miguel_Condé", resum: "Pintor i gravador mexicà de reconeixement mundial que té el seu taller i residència a Sitges des de fa dècades." },
+            "Horacio Elena": { font: "Web", url: "https://www.horacioelena.es", resum: "Il·lustrador de llibres infantils i artista resident a Sitges, amb una obra plena de tendresa i color." },
+            "Bruno de Fabriziis": { font: "Web", url: "https://www.brunoart.com", resum: "Artista polifacètic i escultor resident a Sitges, conegut per les seves formes orgàniques i el treball amb el ferro." },
+            "Thomas Spieker": { font: "Web", url: "https://www.l'eco.cat", resum: "Periodista alemany arrelat a Sitges, gran ambaixador de la vila i cronista de la vida internacional a la costa." },
+            "Nati de Castellar": { font: "Web", url: "https://www.sitgesheritages.com", resum: "Ballarina i figura mítica de l'espectacle a Sitges, recordada per la seva elegància i passió per la dansa." },
+            "Manuel Llopis de Casades": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Llegat_Llopis", resum: "L'últim propietari de la Casa Llopis (Museu Romàntic), qui va llegar el seu patrimoni i el celler de Malvasia a la Generalitat." },
+            "Ramon de Dalmases": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Ramon_de_Dalmases_i_de_Olabarría", resum: "Marquès de Mura, bibliòfil i personatge de la societat sitgetana que va viure al Palau de Maricel." },
+            "Antonio Baños": { font: "Viquipèdia", url: "https://ca.wikipedia.org/wiki/Antonio_Baños_i_Boncompain", resum: "Periodista i escriptor resident a Sitges, conegut per la seva anàlisi política i social i la seva estima per la vila." }
         };
 
         // Identificació
