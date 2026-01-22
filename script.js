@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// He afegit addDoc aquí per poder pujar les dades
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
@@ -28,7 +29,6 @@ const netejarText = (text) => {
 };
 
 async function buscar() {
-    // Normalitzem el que l'usuari escriu
     const textBuscat = netejarText(input.value);
     
     if (textBuscat.length < 2) { 
@@ -46,14 +46,11 @@ async function buscar() {
             const resumOriginal = data.resum || "";
             const font = data.font || "Retalls de Sitges";
 
-            // Normalitzem les dades de Firebase per a la comparació
             const nomPerComparar = netejarText(nomOriginal);
             const resumPerComparar = netejarText(resumOriginal);
             
-            // --- LOGICA DE CERCA (ARA SENSE ACCENTS) ---
             if (nomPerComparar.includes(textBuscat) || resumPerComparar.includes(textBuscat)) {
                 
-                // Busquem el link en tots els camps possibles
                 let linkBrut = data.link || data.url || data.enllaç || ""; 
                 let linkFinal = "";
                 
@@ -88,3 +85,31 @@ async function buscar() {
 }
 
 input.addEventListener('input', buscar);
+
+// --- FUNCIÓ D'IMPORTACIÓ DEL BLOC 1 (Només per carregar dades) ---
+async function importarBloc1() {
+    const bloc1 = [
+        { nom: "Ramon Casas. La modernitat anhelada", resum: "Exposició central del centenari de Maricel sobre el gran mestre del modernisme.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/ramon-casas-la-modernidad-anhelada" },
+        { nom: "Miquel Utrillo i les arts", resum: "Una crònica de la polièdrica activitat de Miquel Utrillo com a crític i promotor.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/noticies/el-museu-de-maricel-rep-lobra-sitges-al-segle-xx-de-miquel-utrillo" },
+        { nom: "L'elogi del dibuix", resum: "Exposició sobre la Col·lecció Manuel Puig centrada en la bellesa i tècnica del dibuix.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/lelogi-del-dibuix-la-colleccio-manuel-puig" },
+        { nom: "L’Amic de les Arts (1926-1929)", resum: "Una mirada a l'avantguarda de Sitges a través d'aquesta mítica revista cultural.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/lamic-de-les-arts-art-i-poesia-sitges-1926-1929" },
+        { nom: "La figura emmarcada", resum: "Obres singulars de la col·lecció Casacuberta Marsans al Palau de Maricel.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/la-figura-emmarcada-obres-singulars-de-la-colleccio-casacuberta-marsans" },
+        { nom: "Peter Stämpfli: In the wind", resum: "Mostra de l'obra contemporània de l'artista suís vinculat a Sitges.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/wind-de-peter-stampfli" },
+        { nom: "Models de bellesa", resum: "Recull de l'antic Museu de Reproduccions Artístiques al Museu de Maricel.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/models-de-bellesa-lantic-museu-de-reproduccions-artistiques" },
+        { nom: "La Col·lecció Bertrán", resum: "La memòria d'un llegat familiar amb obres mestres del barroc i el renaixement.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/exposicio-la-colleccio-bertran-la-memoria-dun-llegat-familiar" },
+        { nom: "Rusiñol vist per Picasso", resum: "La relació i influència mútua entre Santiago Rusiñol i Pablo Picasso.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/rusinol-vist-picasso" },
+        { nom: "Atrapar la llum", resum: "Mirades al vidre català contemporani. Una mostra de transparències i color.", font: "Museus de Sitges", link: "https://museusdesitges.cat/ca/exposicions/atrapar-la-llum-mirades-al-vidre-catala-contemporani" }
+    ];
+
+    try {
+        for (const obra of bloc1) {
+            await addDoc(collection(db, "obres"), obra);
+        }
+        alert("Bloc 1 d'exposicions importat correctament!");
+    } catch (e) {
+        console.error("Error en la importació:", e);
+    }
+}
+
+// Activa la següent línia per carregar les dades, després esborra-la o comenta-la
+importarBloc1();
