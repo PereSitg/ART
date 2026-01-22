@@ -1,39 +1,58 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Neteja Sitges Art</title>
+</head>
+<body>
+    <h1 id="estat">Treballant...</h1>
+    <div id="llista"></div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
-        authDomain: "sitgesart.firebaseapp.com",
-        projectId: "sitgesart",
-        storageBucket: "sitgesart.firebasestorage.app",
-        messagingSenderId: "673959867307",
-        appId: "1:673959867307:web:80607c11d79db42b4918ee"
-    };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+            authDomain: "sitgesart.firebaseapp.com",
+            projectId: "sitgesart",
+            storageBucket: "sitgesart.firebasestorage.app",
+            messagingSenderId: "673959867307",
+            appId: "1:673959867307:web:80607c11d79db42b4918ee"
+        };
 
-    async function correccioAgressiva() {
-        const detalls = document.getElementById('detalls');
-        const querySnapshot = await getDocs(collection(db, "obres"));
-        let total = 0;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        for (const document_ de querySnapshot.docs) {
-            const data = document_.data();
-            const link = data.link ? data.link.toLowerCase() : "";
+        async function executar() {
+            const estat = document.getElementById('estat');
+            const llista = document.getElementById('llista');
             
-            // Si el link conté "criticart", l'arreglem sí o sí
-            if (link.includes("criticart.com")) {
-                await updateDoc(doc(db, "obres", document_.id), {
-                    font: "CRITICART",
-                    origen: "Crítica d'Art de Sitges"
-                });
-                detalls.innerHTML += `Corregit: ${data.nom}<br>`;
-                total++;
+            try {
+                const snapshot = await getDocs(collection(db, "obres"));
+                let total = 0;
+
+                for (const docSnap of snapshot.docs) {
+                    const dades = docSnap.data();
+                    const textLink = dades.link || "";
+
+                    if (textLink.includes("criticart.com")) {
+                        await updateDoc(doc(db, "obres", docSnap.id), {
+                            font: "CRITICART",
+                            origen: "Crítica d'Art de Sitges"
+                        });
+                        llista.innerHTML += "✅ Corregit: " + dades.nom + "<br>";
+                        total++;
+                    }
+                }
+                estat.innerText = "FET! Corregits: " + total;
+            } catch (err) {
+                estat.innerText = "Error de connexió";
+                llista.innerHTML = err.message;
             }
         }
-        document.getElementById('estat').innerText = "✅ FET! " + total + " corregits.";
-    }
-    correccioAgressiva();
-</script>
+
+        executar();
+    </script>
+</body>
+</html>
