@@ -15,6 +15,7 @@
             --card-bg: #0f172a;
             --text: #f8fafc;
             --border: #1e293b;
+            --text-dim: #94a3b8;
         }
 
         body {
@@ -37,6 +38,17 @@
 
         .logo { font-size: 2.5rem; font-weight: 800; }
         .logo span { color: var(--accent); }
+
+        /* Estil per al nou subtítol */
+        .subtitle {
+            color: var(--text-dim);
+            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         .search-box {
             margin-bottom: 40px;
@@ -102,6 +114,7 @@
 <div class="container">
     <header>
         <div class="logo">Sitges <span>Art</span></div>
+        <p class="subtitle">Un viatge per l'art, la cultura i la memòria de Sitges.</p>
     </header>
 
     <div class="search-box">
