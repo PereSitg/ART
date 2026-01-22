@@ -36,17 +36,24 @@ function crearCard(data) {
     const nomOriginal = data.nom || "";
     const resumOriginal = data.resum || "";
     const font = data.font || "Museus de Sitges";
-    const linkFinal = data.link || "";
+    
+    // Agafem el link de qualsevol camp possible per no perdre'n cap
+    let enllac = data.link || data.url || data.enllaç || "";
 
     const card = document.createElement('div');
     card.className = 'response-card';
     
+    // Si l'enllaç existeix però no té el format correcte (http), el corregim al moment
+    if (enllac && !enllac.startsWith('http')) {
+        enllac = 'https://' + enllac;
+    }
+
     card.innerHTML = `
         <h2>${nomOriginal}</h2>
         <p>${resumOriginal}</p>
         <div class="source-link">
             <span>Font: ${font}</span>
-            ${linkFinal ? `<a href="${linkFinal}" target="_blank" class="btn-link">Més informació ↗</a>` : ''}
+            ${enllac ? `<a href="${enllac}" target="_blank" class="btn-link">Saber-ne més ↗</a>` : ''}
         </div>
     `;
     return card;
@@ -56,7 +63,7 @@ function crearCard(data) {
 async function buscar() {
     const textBuscat = netejarText(input.value);
     
-    // SI EL CERCADOR ESTÀ BUIT O TÉ MENYS DE 2 LLETRES, NETEJEM LA PANTALLA
+    // Pantalla neta si no hi ha prou text
     if (textBuscat.length < 2) {
         results.innerHTML = "";
         return;
@@ -78,20 +85,12 @@ async function buscar() {
             }
         });
 
-        // Missatge si no hi ha resultats després de buscar
         if (trobats === 0) {
-            results.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">
-                    <p>No hi ha resultats per a la cerca.</p>
-                </div>
-            `;
+            results.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8;">No hi ha resultats.</div>`;
         }
     } catch (e) {
         console.error("Error Firebase:", e);
     }
 }
 
-// Escoltador: Només busca quan l'usuari escriu
 input.addEventListener('input', buscar);
-
-// HEM ELIMINAT EL DOMContentLoaded PERQUÈ LA PANTALLA SURTI NETA
