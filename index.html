@@ -45,7 +45,6 @@
         .logo { font-size: 2.5rem; font-weight: 800; }
         .logo span { color: var(--accent); }
 
-        /* Estil per al subtítol */
         .subtitle {
             color: var(--text-dim);
             margin-top: 10px;
@@ -72,9 +71,10 @@
             border-radius: 12px;
             color: white;
             outline: none;
+            transition: 0.3s;
         }
 
-        #user-input:focus { border-color: var(--accent); }
+        #user-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
 
         #result-container {
             display: grid;
@@ -90,15 +90,27 @@
             display: flex;
             flex-direction: column;
             animation: fadeIn 0.3s ease-in;
+            transition: 0.3s;
         }
+        
+        .response-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .response-card h2 { font-size: 1.3rem; margin-top: 0; }
-        .response-card p { font-size: 0.95rem; color: #cbd5e1; flex-grow: 1; line-height: 1.5; }
+        .response-card h2 { font-size: 1.2rem; margin-top: 0; line-height: 1.3; }
+        .response-card p { font-size: 0.9rem; color: #cbd5e1; flex-grow: 1; line-height: 1.5; }
+
+        .source-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
 
         .source-link {
             margin-top: 15px;
@@ -107,12 +119,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .btn-link { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-        footer { text-align: center; padding: 40px; color: #475569; font-size: 0.8rem; }
+        footer { text-align: center; padding: 60px 40px; color: #475569; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -124,18 +136,94 @@
     </header>
 
     <div class="search-box">
-        <input type="text" id="user-input" placeholder="Escriu per cercar..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Busca artistes, història o llocs..." autocomplete="off">
     </div>
 
     <div id="result-container"></div>
 
     <footer>
-        Creat per Pere Badia i Lorenz
+        Creat per Pere Badia i Lorenz &copy; 2026
     </footer>
 </div>
 
-<script type="module" src="script.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let obresCache = [];
+
+    // Funció per netejar text (accents, etc)
+    function normalitzar(text) {
+        return text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
+    }
+
+    async function carregarDades() {
+        const querySnapshot = await getDocs(collection(db, "obres"));
+        obresCache = querySnapshot.docs.map(doc => doc.data());
+    }
+
+    function mostrarResultats(terme) {
+        const container = document.getElementById('result-container');
+        container.innerHTML = "";
+        
+        if (!terme || terme.length < 2) return;
+
+        const termeNet = normalitzar(terme);
+
+        const filtrats = obresCache.filter(o => {
+            return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
+        });
+
+        // SISTEMA DE PRIORITATS (Lògica d'ordenació)
+        filtrats.sort((a, b) => {
+            const nomA = normalitzar(a.nom);
+            const nomB = normalitzar(b.nom);
+
+            // 1. Prioritat màxima: El títol és EXACTAMENT el que busquem (Bernat de Fonollar)
+            if (nomA === termeNet && nomB !== termeNet) return -1;
+            if (nomB === termeNet && nomA !== termeNet) return 1;
+
+            // 2. Prioritat alta: El títol començà per la paraula cercada
+            if (nomA.startsWith(termeNet) && !nomB.startsWith(termeNet)) return -1;
+            if (nomB.startsWith(termeNet) && !nomA.startsWith(termeNet)) return 1;
+
+            return 0;
+        });
+
+        filtrats.forEach(o => {
+            const card = document.createElement('div');
+            card.className = 'response-card';
+            card.innerHTML = `
+                <div class="source-tag">${o.font || 'SITGES ART'}</div>
+                <h2>${o.nom}</h2>
+                <p>${o.resum ? o.resum.substring(0, 150) + '...' : ''}</p>
+                <div class="source-link">
+                    <span>${o.origen || ''}</span>
+                    <a href="${o.link}" target="_blank" class="btn-link">Llegir més →</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Event listener per a la cerca
+    document.getElementById('user-input').addEventListener('input', (e) => {
+        mostrarResultats(e.target.value);
+    });
+
+    carregarDades();
+</script>
+
 </body>
 </html>
-
-
