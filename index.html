@@ -237,18 +237,41 @@
         pintarCards(filtrats);
     }
 
-    function filtrarNovetats() {
+    function veureNovetats() {
         document.getElementById('user-input').value = "";
-        // Mostra les últimes 15 obres de la llista (les més noves a la base de dades)
-        const novetats = [...obresCache].reverse().slice(0, 15);
-        pintarCards(novetats);
+        
+        const avui = new Date();
+        const faUnMes = new Date();
+        faUnMes.setDate(avui.getDate() - 30);
+
+        // Filtrem per data real en qualsevol camp possible
+        const resultats = obresCache.filter(o => {
+            const dataValor = o.data || o.timestamp || o.fecha || o.createdAt;
+            if (!dataValor) return false;
+            const dataObra = new Date(dataValor);
+            return dataObra instanceof Date && !isNaN(dataObra) && dataObra >= faUnMes;
+        });
+
+        // Ordenem: les més noves primer
+        resultats.sort((a, b) => {
+            const dataA = new Date(a.data || a.timestamp || a.fecha || 0);
+            const dataB = new Date(b.data || b.timestamp || b.fecha || 0);
+            return dataB - dataA;
+        });
+
+        if (resultats.length === 0) {
+            document.getElementById('result-container').innerHTML = 
+                "<p style='text-align:center; width:100%; color:var(--text-dim);'>No hi ha novetats d'aquest mes.</p>";
+        } else {
+            pintarCards(resultats);
+        }
     }
 
     document.getElementById('user-input').addEventListener('input', (e) => {
         mostrarResultats(e.target.value);
     });
 
-    document.getElementById('btn-news').addEventListener('click', filtrarNovetats);
+    document.getElementById('btn-news').addEventListener('click', veureNovetats);
 
     carregarDades();
 </script>
