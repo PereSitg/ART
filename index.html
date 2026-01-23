@@ -228,12 +228,10 @@
             document.getElementById('result-container').innerHTML = "";
             return;
         }
-
         const termeNet = normalitzar(terme);
         const filtrats = obresCache.filter(o => {
             return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
         });
-
         pintarCards(filtrats);
     }
 
@@ -244,27 +242,27 @@
         const faUnMes = new Date();
         faUnMes.setDate(avui.getDate() - 30);
 
-        // Filtrem per data real en qualsevol camp possible
-        const resultats = obresCache.filter(o => {
+        // 1. Intentem filtrar per data (dels últims 30 dies)
+        let resultats = obresCache.filter(o => {
             const dataValor = o.data || o.timestamp || o.fecha || o.createdAt;
             if (!dataValor) return false;
             const dataObra = new Date(dataValor);
             return dataObra instanceof Date && !isNaN(dataObra) && dataObra >= faUnMes;
         });
 
-        // Ordenem: les més noves primer
-        resultats.sort((a, b) => {
-            const dataA = new Date(a.data || a.timestamp || a.fecha || 0);
-            const dataB = new Date(b.data || b.timestamp || b.fecha || 0);
-            return dataB - dataA;
-        });
-
+        // 2. Si no hi ha res recent o les dates fallen, agafem les últimes 15 de la llista (PLA B)
         if (resultats.length === 0) {
-            document.getElementById('result-container').innerHTML = 
-                "<p style='text-align:center; width:100%; color:var(--text-dim);'>No hi ha novetats d'aquest mes.</p>";
+            resultats = [...obresCache].reverse().slice(0, 15);
         } else {
-            pintarCards(resultats);
+            // Si n'hi ha, les ordenem per data de més nova a més vella
+            resultats.sort((a, b) => {
+                const dataA = new Date(a.data || a.timestamp || 0);
+                const dataB = new Date(b.data || b.timestamp || 0);
+                return dataB - dataA;
+            });
         }
+
+        pintarCards(resultats);
     }
 
     document.getElementById('user-input').addEventListener('input', (e) => {
