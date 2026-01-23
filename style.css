@@ -1,165 +1,257 @@
-:root {
-    --primary: #3b82f6;
-    --bg-dark: #020617;
-    --card-bg: #0f172a;
-    --card-border: #1e293b;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent: #60a5fa;
-}
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitges Art</title>
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-}
+    <meta property="og:title" content="Sitges Art">
+    <meta property="og:description" content="Un viatge per l'art, la cultura i la memòria de Sitges.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peresitg.github.io/ART/">
+    <meta property="og:image" content="https://peresitg.github.io/ART/sitgesArt.jpg">
+    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --card-border: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #60a5fa;
+        }
 
-body {
-    background: var(--bg-dark);
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-.container { 
-    width: 100%; 
-    max-width: 1200px; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 2rem; 
-}
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
 
-/* HEADER I SUBTÍTOL */
-header { 
-    text-align: center; 
-    margin-bottom: 20px;
-}
+        .container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 2rem; }
 
-header .logo { 
-    font-size: 3.5rem; 
-    font-weight: 800; 
-    color: white; /* Color sòlid, sense degradats */
-}
+        header { text-align: center; margin-bottom: 20px; }
+        header .logo { font-size: 3.5rem; font-weight: 800; color: white; }
+        header .logo span { color: var(--primary); }
 
-header .logo span { 
-    color: var(--primary); /* Blau sòlid net */
-}
+        .subtitle {
+            color: var(--text-secondary);
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
 
-.subtitle {
-    color: var(--text-secondary);
-    margin-top: 15px;
-    font-size: 1.1rem;
-    font-weight: 400;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.4;
-}
+        .search-container {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 15px;
+            padding: 15px 25px;
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            width: 100%;
+            margin: 20px auto 10px auto; /* Reduït per apropar el botó */
+            transition: border-color 0.3s ease;
+        }
 
-/* BARRA DE CERCA NETA (Sense glassmorphism) */
-.search-container {
-    background: var(--card-bg);
-    border: 2px solid var(--card-border);
-    border-radius: 15px;
-    padding: 15px 25px;
-    display: flex;
-    gap: 10px;
-    max-width: 600px;
-    width: 100%;
-    margin: 20px auto 40px auto;
-    transition: border-color 0.3s ease;
-}
+        .search-container:focus-within { border-color: var(--primary); }
+        input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 1.1rem; }
 
-.search-container:focus-within {
-    border-color: var(--primary);
-}
+        /* ESTIL PER AL BOTÓ DE NOVETATS */
+        .news-actions {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-input { 
-    flex: 1; 
-    background: transparent; 
-    border: none; 
-    outline: none; 
-    color: white; 
-    font-size: 1.1rem; 
-}
+        #btn-news {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-/* GRID DE RESULTATS */
-#result-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    width: 100%;
-}
+        #btn-news:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
 
-.response-card {
-    background: var(--card-bg); 
-    border: 1px solid var(--card-border);
-    padding: 2rem; 
-    border-radius: 18px; 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    animation: fadeIn 0.4s ease-out;
-    transition: transform 0.2s ease;
-}
+        #result-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
 
-.response-card h2 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    color: white;
-}
+        .response-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border);
+            padding: 2rem; 
+            border-radius: 18px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.4s ease-out;
+            transition: transform 0.2s ease;
+        }
 
-.response-card p {
-    line-height: 1.6;
-    color: #e2e8f0;
-    margin-bottom: 1.5rem;
-    flex-grow: 1;
-}
+        .response-card:hover { transform: translateY(-5px); border-color: var(--primary); }
 
-.source-link {
-    margin-top: 1rem; 
-    padding-top: 1rem;
-    border-top: 1px solid var(--card-border);
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    font-size: 0.85rem; 
-    color: var(--text-secondary);
-}
+        .source-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
 
-.btn-link { 
-    color: var(--primary); 
-    text-decoration: none; 
-    font-weight: 600;
-    transition: opacity 0.2s;
-}
+        .response-card h2 { font-size: 1.4rem; margin-bottom: 1rem; color: white; }
+        .response-card p { line-height: 1.6; color: #e2e8f0; margin-bottom: 1.5rem; flex-grow: 1; }
 
-.btn-link:hover { 
-    text-decoration: underline;
-}
+        .source-link {
+            margin-top: 1rem; 
+            padding-top: 1rem;
+            border-top: 1px solid var(--card-border);
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            font-size: 0.85rem; 
+            color: var(--text-secondary);
+        }
 
-footer { 
-    text-align: center; 
-    color: #475569; 
-    margin-top: 5rem; 
-    padding-bottom: 2rem; 
-    font-size: 0.85rem; 
-}
+        .btn-link { color: var(--primary); text-decoration: none; font-weight: 600; transition: 0.2s; }
+        .btn-link:hover { text-decoration: underline; }
 
-@keyframes fadeIn { 
-    from { opacity: 0; transform: translateY(10px); } 
-    to { opacity: 1; transform: translateY(0); } 
-}
+        footer { text-align: center; color: #475569; margin-top: 5rem; padding-bottom: 2rem; font-size: 0.85rem; }
 
-/* AJUST PER A MÒBILS */
-@media (max-width: 768px) {
-    #result-container {
-        grid-template-columns: 1fr;
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        @media (max-width: 768px) {
+            #result-container { grid-template-columns: 1fr; }
+            header .logo { font-size: 2.5rem; }
+            .subtitle { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">Sitges <span>Art</span></div>
+        <p class="subtitle">Un viatge per l'art, la cultura i la memòria de Sitges.</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="user-input" placeholder="Busca artistes, història o llocs..." autocomplete="off">
+    </div>
+
+    <div class="news-actions">
+        <button id="btn-news">✨ Últimes Notícies (Beli Artigas)</button>
+    </div>
+
+    <div id="result-container"></div>
+
+    <footer>
+        Creat per Pere Badia i Lorenz &copy; 2026
+    </footer>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
+        authDomain: "sitgesart.firebaseapp.com",
+        projectId: "sitgesart",
+        storageBucket: "sitgesart.firebasestorage.app",
+        messagingSenderId: "673959867307",
+        appId: "1:673959867307:web:80607c11d79db42b4918ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let obresCache = [];
+
+    function normalitzar(text) {
+        return text ? text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
     }
-    header .logo { font-size: 2.5rem; }
-    .subtitle { font-size: 1rem; padding: 0 10px; }
-}
+
+    async function carregarDades() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "obres"));
+            obresCache = querySnapshot.docs.map(doc => doc.data());
+        } catch (e) {
+            console.error("Error carregant dades:", e);
+        }
+    }
+
+    function pintarCards(llista) {
+        const container = document.getElementById('result-container');
+        container.innerHTML = "";
+        llista.forEach(o => {
+            const card = document.createElement('div');
+            card.className = 'response-card';
+            card.innerHTML = `
+                <div>
+                    <div class="source-tag">${o.font || 'SITGES ART'}</div>
+                    <h2>${o.nom}</h2>
+                    <p>${o.resum ? o.resum.substring(0, 160) + '...' : ''}</p>
+                </div>
+                <div class="source-link">
+                    <span>${o.origen || ''}</span>
+                    <a href="${o.link}" target="_blank" class="btn-link">Llegir més →</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function cercar(terme) {
+        if (!terme || terme.length < 2) {
+            document.getElementById('result-container').innerHTML = "";
+            return;
+        }
+        const net = normalitzar(terme);
+        const filtrats = obresCache.filter(o => 
+            normalitzar(o.nom).includes(net) || normalitzar(o.resum).includes(net)
+        );
+        pintarCards(filtrats);
+    }
+
+    function veureNovetats() {
+        document.getElementById('user-input').value = "";
+        const novetats = obresCache.filter(o => o.font === "BELI ARTIGAS");
+        pintarCards(novetats);
+    }
+
+    document.getElementById('user-input').addEventListener('input', (e) => cercar(e.target.value));
+    document.getElementById('btn-news').addEventListener('click', veureNovetats);
+
+    carregarDades();
+</script>
+
+</body>
+</html>
