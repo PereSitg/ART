@@ -61,7 +61,7 @@
         }
 
         .search-box {
-            margin-bottom: 20px;
+            margin-bottom: 40px; /* Augmentat per compensar la falta del botó */
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
@@ -80,29 +80,6 @@
         }
 
         #user-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
-
-        .news-button-container {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        #btn-news {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 8px 24px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        #btn-news:hover {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-        }
 
         #result-container {
             display: grid;
@@ -167,10 +144,6 @@
         <input type="text" id="user-input" placeholder="Busca artistes, història o llocs..." autocomplete="off">
     </div>
 
-    <div class="news-button-container">
-        <button id="btn-news">✨ Últimes Notícies</button>
-    </div>
-
     <div id="result-container"></div>
 
     <footer>
@@ -231,65 +204,26 @@
 
         const termeNet = normalitzar(terme);
         
-        // 1. Filtrem
         let filtrats = obresCache.filter(o => {
             return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
         });
 
-        // 2. REORDENEM PER PRIORITAT (Perquè la biografia de Rusiñol surti primer)
         filtrats.sort((a, b) => {
             const nomA = normalitzar(a.nom);
             const nomB = normalitzar(b.nom);
-
-            // Coincidència exacta del títol
             if (nomA === termeNet && nomB !== termeNet) return -1;
             if (nomB === termeNet && nomA !== termeNet) return 1;
-
-            // El títol comença amb el terme cercat
             if (nomA.startsWith(termeNet) && !nomB.startsWith(termeNet)) return -1;
             if (nomB.startsWith(termeNet) && !nomA.startsWith(termeNet)) return 1;
-
             return 0;
         });
 
         pintarCards(filtrats);
     }
 
-    function veureNovetats() {
-        document.getElementById('user-input').value = "";
-        
-        const avui = new Date();
-        const faUnMes = new Date();
-        faUnMes.setDate(avui.getDate() - 30);
-
-        // 1. Intentem filtrar per data real
-        let resultats = obresCache.filter(o => {
-            const dataValor = o.data || o.timestamp || o.fecha || o.createdAt;
-            if (!dataValor) return false;
-            const dataObra = new Date(dataValor);
-            return dataObra instanceof Date && !isNaN(dataObra) && dataObra >= faUnMes;
-        });
-
-        // 2. PLA B: Si no hi ha res recent, agafem les últimes 15 entrades de la base de dades
-        if (resultats.length === 0) {
-            resultats = [...obresCache].reverse().slice(0, 15);
-        } else {
-            // Ordenem per la més nova
-            resultats.sort((a, b) => {
-                const dataA = new Date(a.data || a.timestamp || 0);
-                const dataB = new Date(b.data || b.timestamp || 0);
-                return dataB - dataA;
-            });
-        }
-
-        pintarCards(resultats);
-    }
-
     document.getElementById('user-input').addEventListener('input', (e) => {
         mostrarResultats(e.target.value);
     });
-
-    document.getElementById('btn-news').addEventListener('click', veureNovetats);
 
     carregarDades();
 </script>
