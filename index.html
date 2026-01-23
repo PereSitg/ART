@@ -61,7 +61,7 @@
         }
 
         .search-box {
-            margin-bottom: 40px;
+            margin-bottom: 20px; /* Reduït per fer espai al botó */
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
@@ -80,6 +80,30 @@
         }
 
         #user-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+
+        /* Estil per al nou botó de novetats */
+        .news-button-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        #btn-news {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        #btn-news:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
 
         #result-container {
             display: grid;
@@ -144,6 +168,10 @@
         <input type="text" id="user-input" placeholder="Busca artistes, història o llocs..." autocomplete="off">
     </div>
 
+    <div class="news-button-container">
+        <button id="btn-news">✨ Últimes Notícies (Beli Artigas)</button>
+    </div>
+
     <div id="result-container"></div>
 
     <footer>
@@ -177,29 +205,10 @@
         obresCache = querySnapshot.docs.map(doc => doc.data());
     }
 
-    function mostrarResultats(terme) {
+    function pintarCards(llista) {
         const container = document.getElementById('result-container');
         container.innerHTML = "";
-        
-        if (!terme || terme.length < 2) return;
-
-        const termeNet = normalitzar(terme);
-
-        const filtrats = obresCache.filter(o => {
-            return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
-        });
-
-        filtrats.sort((a, b) => {
-            const nomA = normalitzar(a.nom);
-            const nomB = normalitzar(b.nom);
-            if (nomA === termeNet && nomB !== termeNet) return -1;
-            if (nomB === termeNet && nomA !== termeNet) return 1;
-            if (nomA.startsWith(termeNet) && !nomB.startsWith(termeNet)) return -1;
-            if (nomB.startsWith(termeNet) && !nomA.startsWith(termeNet)) return 1;
-            return 0;
-        });
-
-        filtrats.forEach(o => {
+        llista.forEach(o => {
             const card = document.createElement('div');
             card.className = 'response-card';
             card.innerHTML = `
@@ -215,9 +224,47 @@
         });
     }
 
+    function mostrarResultats(terme) {
+        if (!terme || terme.length < 2) {
+            document.getElementById('result-container').innerHTML = "";
+            return;
+        }
+
+        const termeNet = normalitzar(terme);
+        const filtrats = obresCache.filter(o => {
+            return normalitzar(o.nom).includes(termeNet) || normalitzar(o.resum).includes(termeNet);
+        });
+
+        filtrats.sort((a, b) => {
+            const nomA = normalitzar(a.nom);
+            const nomB = normalitzar(b.nom);
+            if (nomA === termeNet && nomB !== termeNet) return -1;
+            if (nomB === termeNet && nomA !== termeNet) return 1;
+            if (nomA.startsWith(termeNet) && !nomB.startsWith(termeNet)) return -1;
+            if (nomB.startsWith(termeNet) && !nomA.startsWith(termeNet)) return 1;
+            return 0;
+        });
+
+        pintarCards(filtrats);
+    }
+
+    // Funció per al botó de novetats
+    function filtrarNovetats() {
+        document.getElementById('user-input').value = ""; // Neteja la cerca
+        const novetats = obresCache.filter(o => o.font === "BELI ARTIGAS");
+        
+        if (novetats.length === 0) {
+            document.getElementById('result-container').innerHTML = "<p style='text-align:center; width:100%; color:var(--text-dim);'>No hi ha novetats disponibles.</p>";
+        } else {
+            pintarCards(novetats);
+        }
+    }
+
     document.getElementById('user-input').addEventListener('input', (e) => {
         mostrarResultats(e.target.value);
     });
+
+    document.getElementById('btn-news').addEventListener('click', filtrarNovetats);
 
     carregarDades();
 </script>
