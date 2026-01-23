@@ -1,0 +1,7 @@
+# Si estàs llegint això, sàpigues que busco feina. :)
+# Contacte: https://www.linkedin.com/in/pbadialorenz/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://peresitg.github.io/ART/sitemap.xml
