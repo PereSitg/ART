@@ -9,9 +9,11 @@
         :root { --accent: #fbbf24; --bg: #020617; }
         body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; }
         .log-console { background: #000; color: #fbbf24; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; border: 1px solid #333; margin-bottom: 20px; }
-        .card { background: #0f172a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #1e293b; }
+        .card { background: #0f172a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #1e293b; transition: all 0.3s; }
+        .card:hover { border-color: var(--accent); }
         .btn-main { background: var(--accent); color: black; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .btn-import { background: #fbbf24; color: black; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-import { background: #fbbf24; color: black; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; }
+        .btn-import:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -25,7 +27,7 @@
 
         <div class="log-console" id="log-console">> Esperant autenticació...</div>
         
-        <button onclick="executarCerca()" id="btn-cerca" class="btn-main hidden">2. BUSCAR ARTICLES</button>
+        <button onclick="executarCerca()" id="btn-cerca" class="btn-main hidden">2. BUSCAR ARTICLES DEL BLOG</button>
 
         <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"></div>
     </div>
@@ -49,11 +51,13 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        let guardatsGlobal = [];
+        let guardatsGlobal = new Set();
 
         function log(msg) {
             const c = document.getElementById('log-console');
-            c.innerHTML += `<div>> ${msg}</div>`;
+            const d = document.createElement('div');
+            d.innerHTML = `> ${msg}`;
+            c.appendChild(d);
             c.scrollTop = c.scrollHeight;
         }
 
@@ -67,10 +71,10 @@
                 
                 try {
                     const snap = await getDocs(collection(db, "obres"));
-                    guardatsGlobal = snap.docs.map(d => d.data().link);
-                    log(`Sincronitzats ${guardatsGlobal.length} elements de Firebase.`);
+                    snap.forEach(doc => guardatsGlobal.add(doc.data().link));
+                    log(`Sincronitzats ${guardatsGlobal.size} elements per evitar duplicats.`);
                 } catch (e) {
-                    log("ERROR FIREBASE: No puc llegir. Revisa les Rules a la consola!");
+                    log("ERROR FIREBASE: Revisa les Rules!");
                 }
             }
         });
@@ -78,7 +82,7 @@
         window.executarCerca = async () => {
             log("Connectant amb el Blog del Nacho...");
             const resBox = document.getElementById('results');
-            resBox.innerHTML = "Carregant...";
+            resBox.innerHTML = "<div class='col-span-2 text-center'>Carregant articles...</div>";
 
             try {
                 const blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=json&max-results=50`;
@@ -88,23 +92,18 @@
                 const data = await response.json();
                 const entries = data.feed.entry || [];
 
-                if (entries.length === 0) {
-                    log("No s'han trobat articles.");
-                    return;
-                }
-
                 resBox.innerHTML = "";
                 entries.forEach(entry => {
                     const titol = entry.title.$t;
                     const link = entry.link.find(l => l.rel === 'alternate').href;
-                    const jaExisteix = guardatsGlobal.includes(link);
+                    const jaExisteix = guardatsGlobal.has(link);
 
                     const div = document.createElement('div');
-                    div.className = `card ${jaExisteix ? 'opacity-50' : ''}`;
+                    div.className = `card ${jaExisteix ? 'opacity-40' : ''}`;
                     div.innerHTML = `
-                        <h3 class="font-bold text-sm">${titol}</h3>
+                        <h3 class="font-bold text-sm h-12 overflow-hidden">${titol}</h3>
                         ${jaExisteix ? 
-                            '<p class="text-xs text-green-500 mt-2">✓ JA ÉS A FIREBASE</p>' : 
+                            '<p class="text-xs text-green-500 mt-2 font-bold text-center">✓ JA IMPORTAT</p>' : 
                             `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="btn-import">AFEGIR A SITGESART</button>`
                         }
                     `;
@@ -115,6 +114,7 @@
 
             } catch (e) {
                 log("ERROR DE CONNEXIÓ: " + e.message);
+                resBox.innerHTML = "Error al carregar les dades.";
             }
         };
 
@@ -124,19 +124,21 @@
             btn.disabled = true;
 
             try {
-                // AQUÍ ÉS ON ES DEFINEIX QUÈ ES GUARDA A FIREBASE
+                // ARA LES DADES ES GUARDEN AMB EL FORMAT CORRECTE
                 await addDoc(collection(db, "obres"), {
                     nom: titol,
                     link: link,
-                    font: "EL SITGES D'ABANS", // Nom de la font (en blau a la fitxa)
-                    autor: "Nacho Rubí",       // Nom de l'autor (a la banda de baix)
+                    font: "NACHO RUBÍ",          // Dalt en blau
+                    autor: "El Sitges d'abans",   // Baix a la fitxa
+                    origen: "El Sitges d'abans",  // Per seguretat amb altres crawlers
                     data_creacio: new Date().toISOString(),
                     tipus: "Memòria Històrica"
                 });
                 
                 btn.innerText = "IMPORTAT ✅";
                 btn.style.background = "#10b981";
-                log(`Guardat correctament: ${titol}`);
+                btn.style.color = "white";
+                log(`Guardat: ${titol}`);
             } catch (e) {
                 log("ERROR AL GUARDAR: " + e.message);
                 btn.disabled = false;
