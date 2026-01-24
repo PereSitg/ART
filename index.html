@@ -61,7 +61,7 @@
         }
 
         .search-box {
-            margin-bottom: 40px; /* Augmentat per compensar la falta del botó */
+            margin-bottom: 40px; 
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
@@ -154,6 +154,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 1. Importem Analytics
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
@@ -161,11 +163,16 @@
         projectId: "sitgesart",
         storageBucket: "sitgesart.firebasestorage.app",
         messagingSenderId: "673959867307",
-        appId: "1:673959867307:web:80607c11d79db42b4918ee"
+        appId: "1:673959867307:web:80607c11d79db42b4918ee",
+        // 2. Afegim el measurementId (aquest és el teu de SitgesArt)
+        measurementId: "G-G6LNRKV803" 
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    // 3. Inicialitzem Analytics
+    const analytics = getAnalytics(app);
+
     let obresCache = [];
 
     function normalitzar(text) {
