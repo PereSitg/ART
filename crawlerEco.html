@@ -65,7 +65,7 @@
         <div id="main-content" class="hidden">
             <div class="admin-panel">
                 <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🗞️ BUSCAR NOTÍCIES DE CULTURA</button>
-                <div class="log-console" id="log-console">> Sistema preparat. Etiquetes: L'ECO DE SITGES / Cultura.</div>
+                <div class="log-console" id="log-console">> Robot configurat per "L'ECO DE SITGES" i "Cultura".</div>
             </div>
 
             <div id="results-grid" class="results-grid"></div>
@@ -136,7 +136,7 @@
             if (!esPaginacio) {
                 resBox.innerHTML = "";
                 paginaActual = 1;
-                log("Verificant articles ja existents...");
+                log("Sincronitzant amb la base de dades...");
                 const snap = await getDocs(collection(db, "obres"));
                 guardatsGlobal = new Set(snap.docs.map(d => normalitzarClau(d.data().nom)));
             } else {
@@ -152,7 +152,7 @@
                 const items = xml.querySelectorAll("item");
 
                 if (items.length === 0) {
-                    log("No hi ha més articles.");
+                    log("Fi del contingut disponible.");
                     document.getElementById('pagination-footer').classList.add('hidden');
                     return;
                 }
@@ -173,13 +173,13 @@
                     card.innerHTML = `
                         <div>
                             <div class="flex justify-between mb-2">
-                                ${jaExisteix ? '<span class="status-tag">Importat</span>' : '<span class="status-tag" style="color:#eab308; background:rgba(234,179,8,0.1)">Nou article</span>'}
+                                ${jaExisteix ? '<span class="status-tag">Ja a la web</span>' : '<span class="status-tag" style="color:#eab308; background:rgba(234,179,8,0.1)">Notícia Nova</span>'}
                             </div>
                             <h3 class="font-bold text-white text-sm line-height-relaxed">${titolNet}</h3>
                             <p class="text-xs text-slate-400 mt-2">${resum}</p>
                         </div>
                         <div class="mt-4 pt-4 border-t border-slate-800">
-                            ${jaExisteix ? '<div class="text-center text-xs opacity-50 uppercase tracking-widest">A l\'arxiu</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titolNet))}', '${btoa(encodeURIComponent(resum))}', '${link}')" class="import-btn">IMPORTAR A SITGESART</button>`}
+                            ${jaExisteix ? '<div class="text-center text-xs opacity-50 uppercase tracking-widest">Importat</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titolNet))}', '${btoa(encodeURIComponent(resum))}', '${link}')" class="import-btn">IMPORTAR A SITGESART</button>`}
                         </div>
                     `;
                     resBox.appendChild(card);
@@ -189,7 +189,7 @@
                 log(`S'han trobat ${items.length} articles.`);
 
             } catch (e) {
-                log("Error al carregar el feed de l'Eco.");
+                log("Error en carregar les dades de L'Eco.");
             } finally {
                 btn.disabled = false;
             }
@@ -198,20 +198,20 @@
         window.importar = async (btn, tB64, rB64, link) => {
             const titol = decodeURIComponent(atob(tB64));
             const resum = decodeURIComponent(atob(rB64));
-            btn.innerText = "IMPORTANT..."; btn.disabled = true;
+            btn.innerText = "⏳..."; btn.disabled = true;
             try {
                 await addDoc(collection(db, "obres"), {
                     nom: titol, 
                     resum: resum, 
                     link: link, 
-                    font: "L'ECO DE SITGES", // DALT (En blau/groc segons el teu CSS)
-                    autor: "Cultura",        // BAIX
-                    origen: "L'Eco de Sitges", 
-                    data_creacio: new Date().toISOString(),
+                    font: "L'ECO DE SITGES",   // Franja blava superior
+                    origen: "Cultura",         // Sota el títol (OPCIÓ A)
+                    autor: "Cultura",          // Sota el títol (OPCIÓ B)
+                    data_importacio: new Date().toISOString(),
                     tipus: "Notícia"
                 });
-                btn.innerText = "FET ✅"; btn.style.background = "#10b981";
-                log(`Importat correctament: ${titol}`);
+                btn.innerText = "IMPORTAT ✅"; btn.style.background = "#10b981";
+                log(`Fet: ${titol}`);
             } catch (e) {
                 alert("Error Firebase: " + e.message); btn.disabled = false;
             }
