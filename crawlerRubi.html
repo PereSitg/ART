@@ -15,7 +15,7 @@
             --card-border: rgba(255, 255, 255, 0.08);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --accent: #fbbf24; /* Color groc/daurat per a la memòria històrica */
+            --accent: #fbbf24; 
             --glass: rgba(15, 23, 42, 0.8);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -148,9 +148,13 @@
 
             try {
                 log("Llegint blog de Nacho Rubí...");
-                // Fem servir el mateix sistema de proxy que el crawler de la Beli
-                let blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=rss&max-results=50`;
-                if (ultimaDataCercada) blogUrl += `&published-max=${ultimaDataCercada}`;
+                
+                // RUTA MILLORADA: Utilitzem rss.xml que és més compatible amb proxies
+                let blogUrl = `https://elsitgesdabans.blogspot.com/rss.xml?max-results=50`;
+                if (esPaginacio && ultimaDataCercada) {
+                   // Per paginar en RSS de Blogger sovint cal usar el feed original
+                   blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=rss&published-max=${ultimaDataCercada}&max-results=50`;
+                }
 
                 const response = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(blogUrl)}`);
                 const xmlText = await response.text();
@@ -158,8 +162,7 @@
                 const items = xml.querySelectorAll("item");
 
                 if (items.length === 0) {
-                    log("No hi ha més articles per carregar.");
-                    document.getElementById('pagination-footer').classList.add('hidden');
+                    log("No s'han trobat articles (el servidor proxy pot estar saturat, torna a provar).");
                     return;
                 }
 
@@ -182,17 +185,17 @@
                             <h3 style="font-size: 1rem; font-weight: 700; color: white;">${titol}</h3>
                         </div>
                         <div style="margin-top: 1rem; border-top: 1px solid var(--card-border); padding-top: 1rem;">
-                            ${jaExisteix ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem;">JA ÉS A L\'APP</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">AFEGIR A SITGESART</button>`}
+                            ${jaExisteix ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem;">DADES GUARDADES</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">AFEGIR A SITGESART</button>`}
                         </div>
                     `;
                     resBox.appendChild(card);
                 });
 
                 document.getElementById('pagination-footer').classList.remove('hidden');
-                log(`S'han trobat ${items.length} records històrics.`);
+                log(`S'han trobat ${items.length} records.`);
 
             } catch (e) {
-                log("ERROR DE CONEXIÓ: " + e.message);
+                log("ERROR: Prova de nou en uns segons. " + e.message);
             } finally {
                 btn.disabled = false;
             }
@@ -213,7 +216,7 @@
                 });
                 btn.innerText = "AFEGIT ✅";
                 btn.style.background = "#10b981";
-                log(`Guardat correctament: ${titol}`);
+                log(`Guardat: ${titol}`);
             } catch (e) {
                 alert("Error: " + e.message);
                 btn.disabled = false;
