@@ -142,8 +142,8 @@
 
             try {
                 log("Llegint blog de Nacho Rubí...");
-                // Fem servir l'adreça del blog del Nacho amb l'estructura que funciona al crawler de la Beli
-                let blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=rss&max-results=30`;
+                // Fem servir el format RSS de Blogger que és el més compatible amb el proxy
+                let blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=rss&max-results=30&m=1`;
                 if (ultimaDataCercada) blogUrl += `&published-max=${ultimaDataCercada}`;
 
                 const response = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(blogUrl)}`);
@@ -194,23 +194,3 @@
         window.importar = async (btn, titolB64, link) => {
             const titol = decodeURIComponent(atob(titolB64));
             btn.innerText = "⏳ DESANT...";
-            btn.disabled = true;
-            try {
-                await addDoc(collection(db, "obres"), {
-                    nom: titol, 
-                    link: link, 
-                    font: "El Sitges d'abans", 
-                    autor: "Nacho Rubí", 
-                    data_creacio: new Date().toISOString()
-                });
-                btn.innerText = "IMPORTAT ✅";
-                btn.style.background = "#10b981";
-                log(`Importat: ${titol}`);
-            } catch (e) {
-                alert("Error: " + e.message);
-                btn.disabled = false;
-            }
-        };
-    </script>
-</body>
-</html>
