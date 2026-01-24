@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SitgesArt - Rastrejador Professional</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>SitgesArt - Crawler Retalls (Francesc Parra)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -18,172 +17,74 @@
             --accent: #60a5fa;
             --glass: rgba(15, 23, 42, 0.8);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-
         body {
             background: var(--bg-dark);
             background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 5vh 20px;
+            display: flex; justify-content: center; padding: 40px 20px;
         }
-
-        .container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 2rem; }
-
-        header { text-align: center; margin-bottom: 2rem; }
-        header .logo { 
-            font-size: 3.5rem; 
-            font-weight: 800; 
-            background: linear-gradient(to bottom, #ffffff, #94a3b8); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
-        header .logo span { 
-            background: linear-gradient(to right, #3b82f6, #60a5fa); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
-
+        .container { width: 100%; max-width: 1000px; }
         .admin-panel {
             background: var(--glass);
             border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 2.5rem;
+            border-radius: 24px;
+            padding: 2rem;
             backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             text-align: center;
         }
-
         .btn-main {
             background: linear-gradient(to right, #3b82f6, #2563eb);
-            color: white;
-            padding: 1.2rem 2.5rem;
-            border-radius: 18px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+            color: white; padding: 1rem 2rem; border-radius: 14px;
+            font-weight: 800; border: none; cursor: pointer; transition: 0.3s;
         }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
-        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
-
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); }
         .log-console {
-            margin-top: 1.5rem;
-            background: #000;
-            border-radius: 12px;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: #60a5fa;
-            height: 120px;
-            overflow-y: auto;
-            text-align: left;
+            margin-top: 1.5rem; background: #000; border-radius: 12px;
+            padding: 1rem; font-family: monospace; font-size: 0.75rem;
+            color: #60a5fa; height: 150px; overflow-y: auto; text-align: left;
             border: 1px solid var(--card-border);
         }
-
-        .results-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 1.5rem; 
-            margin-top: 2rem; 
-        }
-
-        @media (max-width: 768px) {
-            .results-grid { grid-template-columns: 1fr; }
-        }
-
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
         .response-card {
-            background: var(--card-bg); 
-            border: 1px solid var(--card-border);
-            padding: 1.5rem; 
-            border-radius: 20px; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 1rem;
-            animation: fadeIn 0.4s ease-out;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            padding: 1.5rem; border-radius: 18px; display: flex; flex-direction: column; gap: 1rem;
         }
-
-        .ja-importat { opacity: 0.3; filter: grayscale(1); }
-
+        .ja-importat { opacity: 0.4; filter: grayscale(1); }
         .import-btn {
-            background: var(--accent);
-            color: var(--bg-dark);
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 0.75rem;
-            border: none;
-            cursor: pointer;
-            width: 100%;
+            background: var(--accent); color: var(--bg-dark);
+            padding: 10px; border-radius: 10px; font-weight: 800; width: 100%;
         }
-
-        .status-tag {
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            text-transform: uppercase;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header>
-            <div class="logo">SitgesArt <span>Crawler</span></div>
-            <p style="color: var(--text-secondary)">Sincronització amb Retalls de Sitges</p>
-            <div id="auth-box" class="mt-4"></div>
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold mb-2">SitgesArt <span class="text-blue-500">Parra</span></h1>
+            <p class="text-slate-400">Sincronització de Retalls de Sitges</p>
         </header>
 
-        <div id="content" class="hidden">
-            <div class="admin-panel">
-                <h2 style="font-weight: 800; margin-bottom: 1.5rem; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; tracking: 0.2em;">Escaneig de l'històric</h2>
-                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">
-                    🚀 INICIAR CERCA DE 500 ENTRADES
-                </button>
+        <div id="auth-section" class="admin-panel mb-6">
+            <button onclick="loginGoogle()" id="btn-login" class="btn-main" style="background: white; color: black;">1. Autenticar Admin</button>
+        </div>
 
-                <div id="status-area" class="mt-8 hidden border-t border-slate-800 pt-6">
-                    <div class="flex items-center justify-center gap-3 mb-4">
-                        <div id="spinner" class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                        <span id="status-text" class="font-black text-slate-500 uppercase text-[10px] tracking-[0.2em]">Preparant motors...</span>
-                    </div>
-                    <div id="log-console" class="log-console">
-                        > Sistema a punt.
-                    </div>
-                </div>
+        <div id="main-content" class="hidden">
+            <div class="admin-panel">
+                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">2. BUSCAR ENTRADES DEL BLOG</button>
+                <div id="log-console" class="log-console">> Esperant ordre...</div>
             </div>
 
-            <div id="resultats-info" class="mt-8 text-center text-sm font-bold text-slate-500"></div>
             <div id="resultats" class="results-grid"></div>
         </div>
-        
-        <div id="login-warning" class="admin-panel">
-            <p class="text-slate-400 font-medium italic mb-6">Accés restringit a l'administrador de SitgesArt.</p>
-            <button onclick="loginGoogle()" class="btn-main" style="background: white; color: black;">
-                Identifica't amb Google
-            </button>
-        </div>
-
-        <footer style="text-align: center; color: var(--text-secondary); margin: 4rem 0; font-size: 0.8rem;">
-            SitgesArt &copy; 2026 - Gestió de Continguts
-        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc",
@@ -199,132 +100,56 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        let guardatsGlobal = new Set();
+
+        function log(msg, color = "") {
+            const c = document.getElementById('log-console');
+            const line = document.createElement('div');
+            if(color) line.className = color;
+            line.innerText = `> ${msg}`;
+            c.prepend(line);
+        }
+
         window.loginGoogle = () => signInWithPopup(auth, provider);
-        window.logout = () => signOut(auth);
 
-        onAuthStateChanged(auth, (user) => {
-            const authBox = document.getElementById('auth-box');
-            const content = document.getElementById('content');
-            const warning = document.getElementById('login-warning');
-
+        onAuthStateChanged(auth, async (user) => {
             if (user && user.email === "pbadialorenz@gmail.com") {
-                authBox.innerHTML = `<button onclick="logout()" style="color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em;">SORTIR DE L'ADMIN</button>`;
-                content.classList.remove('hidden');
-                warning.classList.add('hidden');
-            } else {
-                if(user) signOut(auth);
-                content.classList.add('hidden');
-                warning.classList.remove('hidden');
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                log("Benvingut, Francesc. Connectant amb Firebase...");
+                
+                try {
+                    const snap = await getDocs(collection(db, "obres"));
+                    snap.forEach(doc => guardatsGlobal.add(doc.data().link));
+                    log(`Sincronització ok: ${guardatsGlobal.size} links ja existents.`, "text-green-400");
+                } catch (e) { log("Error Firebase: Revisa les Rules.", "text-red-400"); }
             }
         });
 
-        function log(msg, color = "") {
-            const console = document.getElementById('log-console');
-            const line = document.createElement('div');
-            line.style.color = color === "text-green-500 font-bold" ? "#10b981" : (color.includes("red") ? "#ef4444" : "");
-            line.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
-            console.prepend(line);
-        }
-
         window.executarCerca = async () => {
-            const btn = document.getElementById('btn-cerca');
-            const statusArea = document.getElementById('status-area');
-            const statusText = document.getElementById('status-text');
             const resBox = document.getElementById('resultats');
-            
-            btn.disabled = true;
-            statusArea.classList.remove('hidden');
             resBox.innerHTML = "";
-            log("Iniciant connexió de dades...");
+            log("Llegint el blog Retalls de Sitges...");
 
             try {
-                log("Pas 1: Verificant duplicats a Firebase...");
-                statusText.innerText = "Consultant base de dades...";
-                
-                let guardats = [];
-                try {
-                    const snap = await getDocs(collection(db, "obres"));
-                    guardats = snap.docs.map(d => d.data().link);
-                    log(`Firebase connectat: ${guardats.length} obres detectades.`, "text-blue-500 font-bold");
-                } catch (e) {
-                    log("Avís: No s'ha pogut llegir Firebase.", "text-orange-500");
-                }
-
-                log("Pas 2: Recuperant entrades del blog...");
-                statusText.innerText = "Llegint blog (Protocol segur)...";
-                
                 const blogUrl = "https://retallsdesitges.blogspot.com/feeds/posts/default?alt=rss&max-results=500";
                 const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(blogUrl)}`;
                 
                 const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Proxy no disponible");
-                
                 const xmlText = await response.text();
                 const xml = new DOMParser().parseFromString(xmlText, "text/xml");
                 const items = xml.querySelectorAll("item");
 
-                if (items.length === 0) throw new Error("Blogger no ha retornat dades.");
-
-                log(`Èxit: ${items.length} entrades descarregades.`, "text-green-500 font-bold");
-                statusText.innerText = "Generant targetes d'obra...";
+                log(`Trobades ${items.length} entrades.`);
 
                 items.forEach((item, i) => {
                     const titol = item.querySelector("title").textContent;
                     const link = item.querySelector("link").textContent;
-                    const descRaw = item.querySelector("description").textContent;
-                    const desc = descRaw.replace(/<[^>]*>/g, '').substring(0, 180).trim() + "...";
-                    const jaExisteix = guardats.includes(link);
+                    const jaExisteix = guardatsGlobal.has(link);
 
                     const card = document.createElement('div');
                     card.className = `response-card ${jaExisteix ? 'ja-importat' : ''}`;
-                    
                     card.innerHTML = `
-                        <div style="flex-grow: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                                ${jaExisteix ? '<span class="status-tag">Ja importada</span>' : '<span></span>'}
-                            </div>
-                            <h3 style="font-size: 1rem; font-weight: 700; color: white; line-height: 1.3;">${titol}</h3>
-                        </div>
-                        <div style="margin-top: 1rem; border-top: 1px solid var(--card-border); pt-3">
-                            ${jaExisteix 
-                                ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; margin-top: 10px;">DINS L\'ARXIU</div>' 
-                                : `<button onclick="importar(this, ${i})" class="import-btn">IMPORTAR ARA</button>`
-                            }
-                        </div>
-                    `;
-                    card.dataset.info = JSON.stringify({ nom: titol, link: link, resum: desc, font: "Retalls de Sitges", data_creacio: new Date().toISOString() });
-                    resBox.appendChild(card);
-                });
-
-                statusText.innerText = "Sincronització enllestida";
-                document.getElementById('spinner').classList.add('hidden');
-
-            } catch (e) {
-                log(`Error crític: ${e.message}`, "text-red-500 font-bold");
-                statusText.innerText = "Error en el rastreig";
-            } finally {
-                btn.disabled = false;
-            }
-        };
-
-        window.importar = async (btn, i) => {
-            const card = btn.closest('.response-card');
-            const data = JSON.parse(card.dataset.info);
-            btn.innerText = "ENVIANT...";
-            btn.disabled = true;
-
-            try {
-                await addDoc(collection(db, "obres"), data);
-                btn.innerText = "FET ✅";
-                btn.style.background = "#10b981";
-                card.classList.add('ja-importat');
-                log(`Importat: ${data.nom}`, "text-green-500");
-            } catch (err) {
-                alert("Error: Revisa les Rules de Firebase.");
-                btn.innerText = "ERROR";
-                btn.disabled = false;
-            }
-        };
-    </script>
-</body>
-</html>
+                        <h3 class="font-bold text-sm h-12 overflow-hidden">${titol}</h3>
+                        ${jaExisteix 
+                            ? '<p class="text-xs text-green-500 font-bold text-center">✓
