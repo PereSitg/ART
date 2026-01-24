@@ -2,174 +2,80 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>SitgesArt - Extractor Total Biografies</title>
+    <title>Importador de Biografies a Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #020617; color: #f1f5f9; font-family: 'Inter', sans-serif; padding: 2rem; }
-        .monitor-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 1rem; padding: 2rem; }
-        .tag-biografia { color: #3b82f6; font-weight: 900; letter-spacing: 2px; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .tag-viquipedia { color: #64748b; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-top: 1rem; border-top: 1px solid #1e293b; pt-4; }
-        .console-log { background: #000; border-radius: 0.5rem; height: 350px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; padding: 1rem; border: 1px solid #334155; }
-    </style>
 </head>
-<body>
-
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-4xl font-black text-white italic">Sitges Biografies</h1>
-                <p class="text-blue-400 tracking-widest uppercase text-xs mt-1">Recerca Integral: Sitgetans + Artistes + Modernisme</p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="executarRecercaTotal()" id="btn-start" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-blue-900/20">INICIAR ESCANEIG TOTAL</button>
-                <button onclick="descarregarCSV()" id="btn-csv" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-full font-bold transition-all">📥 DESCARREGAR CSV</button>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-center">
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-                <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Personatges Únics</span>
-                <span id="counter" class="text-5xl font-black text-white">0</span>
-            </div>
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-                <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Estat de la Xarxa</span>
-                <span id="status" class="text-lg font-bold text-blue-400">ESPERANT</span>
-            </div>
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-                <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Progrés d'extracció</span>
-                <div class="mt-3 h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div id="progress" class="h-full bg-blue-500 w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-                <h3 class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-tighter">Terminal de dades</h3>
-                <div id="console" class="console-log text-emerald-500">
-                    > Prem el botó per fusionar les categories i extreure les dades...
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-tighter">Previsualització Web</h3>
-                <div id="preview" class="monitor-card min-h-[350px] flex flex-col justify-center border-2 border-dashed border-slate-800">
-                    <p class="text-center text-slate-600 italic">La targeta del personatge apareixerà aquí en temps real.</p>
-                </div>
-            </div>
+<body class="bg-slate-950 text-white p-10">
+    <div class="max-w-2xl mx-auto bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
+        <h1 class="text-2xl font-bold mb-6 text-blue-400 italic">SitgesArt - Importador CSV</h1>
+        
+        <p class="text-sm text-slate-400 mb-6">Selecciona el fitxer <code class="text-blue-300">biografies_completes_sitges.csv</code> per pujar-lo a la base de dades.</p>
+        
+        <input type="file" id="csvFile" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 mb-6 cursor-pointer">
+        
+        <button onclick="processarCSV()" id="btn-pujar" class="w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20">🚀 PUJAR A FIREBASE</button>
+        
+        <div id="log" class="mt-6 p-4 bg-black rounded-lg h-48 overflow-y-auto font-mono text-xs text-emerald-500 border border-slate-800">
+            > Esperant fitxer...
         </div>
     </div>
 
-    <script>
-        let dadesFinals = [];
-        let nomsVistos = new Set();
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        async function fetchWiki(params) {
-            const url = `https://ca.wikipedia.org/w/api.php?origin=*&format=json&${params}`;
-            const r = await fetch(url);
-            return await r.json();
-        }
+        const config = { apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc", authDomain: "sitgesart.firebaseapp.com", projectId: "sitgesart", storageBucket: "sitgesart.firebasestorage.app", appId: "1:673959867307:web:80607c11d79db42b4918ee" };
+        const app = getApps().length === 0 ? initializeApp(config) : getApp();
+        const db = getFirestore(app);
 
-        async function executarRecercaTotal() {
-            document.getElementById('btn-start').disabled = true;
-            document.getElementById('btn-start').classList.add('opacity-50');
-            document.getElementById('status').innerText = "EXPLORANT CATEGORIES...";
-            const consola = document.getElementById('console');
-            consola.innerHTML = "";
+        window.processarCSV = async () => {
+            const fileInput = document.getElementById('csvFile');
+            const logBox = document.getElementById('log');
+            if (!fileInput.files[0]) return alert("Selecciona un fitxer primer!");
 
-            // TOTES les categories que hem parlat (fusionades)
-            const categories = [
-                'Category:Sitgetans',
-                'Category:Artistes_sitgetans',
-                'Category:Pintors_sitgetans',
-                'Category:Escriptors_sitgetans',
-                'Category:Modernisme_a_Sitges',
-                'Category:Alcaldes_de_Sitges',
-                'Category:Arquitectes_sitgetans',
-                'Category:Escultors_sitgetans',
-                'Category:Empresaris_sitgetans'
-            ];
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const text = e.target.result;
+                const lines = text.split("\n").slice(1); // Treiem la capçalera
+                logBox.innerHTML = "> Iniciant importació massiva...\n";
 
-            consola.innerHTML += `<div class="text-blue-400">> Mapant xarxa de categories...</div>`;
+                let pujats = 0;
+                for (let line of lines) {
+                    if (!line.trim()) continue;
+                    
+                    // Neteja simple de les columnes del CSV (delimitat per ;)
+                    const caps = line.match(/"([^"]*)"/g).map(c => c.replace(/"/g, ''));
+                    const [font, nom, resum, link, origen] = caps;
 
-            // 1. Recopilar tots els noms primer
-            for (const cat of categories) {
-                consola.innerHTML += `<div>> Escanejant: ${cat.replace('Category:', '')}...</div>`;
-                const data = await fetchWiki(`action=query&list=categorymembers&cmtitle=${cat}&cmlimit=200`);
-                if (data.query && data.query.categorymembers) {
-                    data.query.categorymembers.forEach(m => {
-                        if (m.ns === 0) nomsVistos.add(m.title);
-                    });
+                    try {
+                        // Comprovem si ja existeix per no duplicar
+                        const q = query(collection(db, "obres"), where("nom", "==", nom));
+                        const snap = await getDocs(q);
+
+                        if (snap.empty) {
+                            await addDoc(collection(db, "obres"), {
+                                font: font,
+                                nom: nom,
+                                resum: resum,
+                                link: link,
+                                origen: origen,
+                                data_creacio: new Date().toISOString()
+                            });
+                            pujats++;
+                            logBox.innerHTML += `<div>✅ Pujat: ${nom}</div>`;
+                        } else {
+                            logBox.innerHTML += `<div class="text-slate-500">skipping: ${nom} (ja existeix)</div>`;
+                        }
+                        logBox.scrollTop = logBox.scrollHeight;
+                    } catch (err) {
+                        logBox.innerHTML += `<div class="text-red-500">❌ ERROR: Quota superada o error de xarxa.</div>`;
+                        break;
+                    }
                 }
-            }
-
-            const totalNoms = Array.from(nomsVistos);
-            document.getElementById('counter').innerText = totalNoms.length;
-            document.getElementById('status').innerText = "EXTREIENT DADES...";
-            consola.innerHTML += `<div class="text-yellow-400 font-bold">> S'han trobat ${totalNoms.length} noms únics. Iniciant descàrrega individual...</div>`;
-
-            // 2. Processar un per un
-            let i = 0;
-            for (const nom of totalNoms) {
-                i++;
-                const pct = Math.round((i / totalNoms.length) * 100);
-                document.getElementById('progress').style.width = pct + "%";
-                
-                const data = await fetchWiki(`action=query&prop=extracts|info&exintro&explaintext&titles=${encodeURIComponent(nom)}&inprop=url`);
-                const page = Object.values(data.query.pages)[0];
-                
-                if (page.extract) {
-                    let resum = page.extract.replace(/\n/g, ' ').trim();
-                    if (resum.length > 280) resum = resum.substring(0, 277) + "...";
-
-                    const item = {
-                        font: "BIOGRAFIA",
-                        nom: page.title,
-                        resum: resum,
-                        link: page.fullurl,
-                        origen: "Viquipèdia"
-                    };
-
-                    dadesFinals.push(item);
-                    actualitzarInterficie(item, nom);
-                }
-            }
-
-            document.getElementById('status').innerText = "FINALITZAT";
-            document.getElementById('btn-csv').classList.remove('hidden');
-            consola.innerHTML += `<div class="text-white font-bold text-lg mt-4">> RECUPERACIÓ COMPLETADA. ${dadesFinals.length} biografies llistes per exportar.</div>`;
-        }
-
-        function actualitzarInterficie(item, nomOriginal) {
-            const consola = document.getElementById('console');
-            consola.innerHTML += `<div class="text-emerald-300">✓ ${nomOriginal}</div>`;
-            consola.scrollTop = consola.scrollHeight;
-
-            document.getElementById('preview').innerHTML = `
-                <div class="bg-slate-900 p-8 rounded-2xl border border-blue-500/50 shadow-2xl">
-                    <div class="tag-biografia">${item.font}</div>
-                    <h2 class="text-3xl font-black text-white mb-4 leading-tight">${item.nom}</h2>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-6 italic">"${item.resum}"</p>
-                    <div class="tag-viquipedia pt-4 flex justify-between items-center">
-                        <span>${item.origen}</span>
-                        <span class="text-blue-500 text-[10px]">Veure article original →</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function descarregarCSV() {
-            let csv = "Font;Nom;Resum;Enllaç;Origen\n";
-            dadesFinals.forEach(p => {
-                csv += `"${p.font}";"${p.nom}";"${p.resum.replace(/"/g, '""')}";"${p.link}";"${p.origen}"\n`;
-            });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `biografies_completes_sitges_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-        }
+                logBox.innerHTML += `<div class="text-blue-400 font-bold mt-2">> PROCÉS ACABAT. ${pujats} biografies noves.</div>`;
+            };
+            reader.readAsText(fileInput.files[0]);
+        };
     </script>
 </body>
 </html>
