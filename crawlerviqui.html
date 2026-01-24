@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor d'Extracció - Viquipèdia Sitges</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; padding: 2rem; }
+        .stats-card { background: #1e293b; border-radius: 1rem; padding: 1.5rem; border: 1px solid #334155; }
+        .progress-bar { height: 12px; background: #334155; border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #3b82f6; width: 0%; transition: width 0.3s; }
+        .log-box { background: #020617; border-radius: 0.5rem; height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px solid #334155; }
+        .tag-top { color: #60a5fa; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; }
+        .tag-bottom { color: #94a3b8; font-size: 0.7rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-white">📡 Monitor de Biografies</h1>
+                <p class="text-slate-400">Extracció de la categoria "Sitgetans"</p>
+            </div>
+            <div class="space-x-2">
+                <button onclick="iniciarCrawler()" id="btn-start" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold transition">INICIAR RECERCA</button>
+                <button onclick="descarregarCSV()" id="btn-csv" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-bold hidden">📥 BAIXAR CSV</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="stats-card">
+                <p class="text-slate-400 text-sm uppercase font-bold">Total Trobat</p>
+                <p id="total-found" class="text-4xl font-black">0</p>
+            </div>
+            <div class="stats-card">
+                <p class="text-slate-400 text-sm uppercase font-bold">Processats</p>
+                <p id="total-done" class="text-4xl font-black text-blue-400">0</p>
+            </div>
+            <div class="stats-card">
+                <p class="text-slate-400 text-sm uppercase font-bold">Estat del Procés</p>
+                <div class="mt-2 progress-bar"><div id="progress" class="progress-fill"></div></div>
+                <p id="percent" class="text-right text-xs mt-1 text-slate-500">0%</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h3 class="text-sm font-bold mb-2 text-slate-400 uppercase">Registre de treball</h3>
+                <div id="log" class="log-box">
+                    <div class="text-slate-500">> Premeu el botó per començar l'escaneig...</div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold mb-2 text-slate-400 uppercase">Vista prèvia Targeta</h3>
+                <div id="preview" class="bg-slate-800 p-8 rounded-2xl border-2 border-dashed border-slate-700 min-h-[200px] flex flex-col justify-center">
+                    <p class="text-center text-slate-500">Les targetes apareixeran aquí a mesura que es descarreguin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let personatges = [];
+
+        function log(msg, color = "text-emerald-400") {
+            const logBox = document.getElementById('log');
+            logBox.innerHTML += `<div class="${color}">> ${msg}</div>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        async function iniciarCrawler() {
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-start').classList.add('opacity-50');
+            log("Iniciant connexió amb l'API de Viquipèdia...", "text-blue-400");
+
+            try {
+                // 1. Cercar membres de la categoria
+                const url = `https://ca.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Sitgetans&cmlimit=150&format=json&origin=*`;
+                const res = await fetch(url);
+                const data = await res.json();
+                const llista = data.query.categorymembers.filter(m => m.ns === 0);
+
+                document.getElementById('total-found').innerText = llista.length;
+                log(`S'han localitzat ${llista.length} biografies. Començant descàrrega individual...`);
+
+                let comptador = 0;
+                for (const item of llista) {
+                    comptador++;
+                    
+                    // Actualitzar visuals
+                    document.getElementById('total-done').innerText = comptador;
+                    const pct = Math.round((comptador / llista.length) * 100);
+                    document.getElementById('progress').style.width = pct + "%";
+                    document.getElementById('percent').innerText = pct + "%";
+
+                    // Extreure detalls
+                    const detall = await extreureUn(item.title);
+                    personatges.push(detall);
+                    
+                    log(`Descarregat: ${item.title}`);
+                    actualitzarPreview(detall);
+                }
+
+                log("PROGRÉS FINALITZAT", "text-yellow-400 font-bold");
+                document.getElementById('btn-csv').classList.remove('hidden');
+
+            } catch (e) {
+                log("ERROR: " + e.message, "text-red-500");
+            }
+        }
+
+        async function extreureUn(titol) {
+            const url = `https://ca.wikipedia.org/w/api.php?action=query&prop=extracts|info&exintro&explaintext&titles=${encodeURIComponent(titol)}&inprop=url&format=json&origin=*`;
+            const r = await fetch(url);
+            const d = await r.json();
+            const p = Object.values(d.query.pages)[0];
+            
+            let text = p.extract ? p.extract.replace(/\n/g, ' ').trim() : "Biografia no disponible.";
+            if (text.length > 250) text = text.substring(0, 247) + "...";
+
+            return {
+                font: "BIOGRAFIA",
+                nom: p.title,
+                resum: text,
+                link: p.fullurl,
+                origen: "Viquipèdia"
+            };
+        }
+
+        function actualitzarPreview(d) {
+            const container = document.getElementById('preview');
+            container.innerHTML = `
+                <div class="bg-slate-900 p-6 rounded-xl border border-blue-500/30 shadow-2xl">
+                    <div class="tag-top mb-1">${d.font}</div>
+                    <h2 class="text-2xl font-bold text-white">${d.nom}</h2>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed italic">"${d.resum}"</p>
+                    <div class="tag-bottom mt-4 border-t border-slate-700 pt-3 flex justify-between">
+                        <span>${d.origen}</span>
+                        <span class="text-blue-500">Llegir més →</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function descarregarCSV() {
+            let csv = "Font;Nom;Resum;Enllaç;Origen\n";
+            personatges.forEach(p => {
+                csv += `"${p.font}";"${p.nom}";"${p.resum.replace(/"/g, '""')}";"${p.link}";"${p.origen}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "biografies_sitges.csv";
+            link.click();
+        }
+    </script>
+</body>
+</html>
