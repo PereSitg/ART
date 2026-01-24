@@ -65,13 +65,12 @@
                 document.getElementById('btn-login').classList.add('hidden');
                 document.getElementById('btn-cerca').classList.remove('hidden');
                 
-                // Pre-carregar el que ja tenim per evitar duplicats
                 try {
                     const snap = await getDocs(collection(db, "obres"));
                     guardatsGlobal = snap.docs.map(d => d.data().link);
                     log(`Sincronitzats ${guardatsGlobal.length} elements de Firebase.`);
                 } catch (e) {
-                    log("ERROR FIREBASE RULES: No puc llegir la base de dades. Revisa les regles!");
+                    log("ERROR FIREBASE: No puc llegir. Revisa les Rules a la consola!");
                 }
             }
         });
@@ -82,7 +81,6 @@
             resBox.innerHTML = "Carregant...";
 
             try {
-                // Canviem a format ATOM que Blogger prefereix
                 const blogUrl = `https://elsitgesdabans.blogspot.com/feeds/posts/default?alt=json&max-results=50`;
                 const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(blogUrl)}`;
 
@@ -91,7 +89,7 @@
                 const entries = data.feed.entry || [];
 
                 if (entries.length === 0) {
-                    log("No s'han trobat articles. El proxy podria estar limitant la connexió.");
+                    log("No s'han trobat articles.");
                     return;
                 }
 
@@ -106,8 +104,8 @@
                     div.innerHTML = `
                         <h3 class="font-bold text-sm">${titol}</h3>
                         ${jaExisteix ? 
-                            '<p class="text-xs text-green-500 mt-2">✓ GUARDAT</p>' : 
-                            `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="btn-import">IMPORTAR ARA</button>`
+                            '<p class="text-xs text-green-500 mt-2">✓ JA ÉS A FIREBASE</p>' : 
+                            `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="btn-import">AFEGIR A SITGESART</button>`
                         }
                     `;
                     resBox.appendChild(div);
@@ -117,7 +115,6 @@
 
             } catch (e) {
                 log("ERROR DE CONNEXIÓ: " + e.message);
-                console.error(e);
             }
         };
 
@@ -127,17 +124,19 @@
             btn.disabled = true;
 
             try {
+                // AQUÍ ÉS ON ES DEFINEIX QUÈ ES GUARDA A FIREBASE
                 await addDoc(collection(db, "obres"), {
                     nom: titol,
                     link: link,
-                    font: "El Sitges d'abans",
-                    autor: "Nacho Rubí",
+                    font: "EL SITGES D'ABANS", // Nom de la font (en blau a la fitxa)
+                    autor: "Nacho Rubí",       // Nom de l'autor (a la banda de baix)
                     data_creacio: new Date().toISOString(),
                     tipus: "Memòria Històrica"
                 });
+                
                 btn.innerText = "IMPORTAT ✅";
                 btn.style.background = "#10b981";
-                log("Guardat a Firebase: " + titol);
+                log(`Guardat correctament: ${titol}`);
             } catch (e) {
                 log("ERROR AL GUARDAR: " + e.message);
                 btn.disabled = false;
