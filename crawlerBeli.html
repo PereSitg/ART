@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SitgesArt - Crawler Criticartt</title>
+    <title>SitgesArt - Crawler Criticart (Beli Artigas)</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body {
             background: var(--bg-dark);
-            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.1) 0, transparent 50%);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
@@ -41,13 +41,13 @@
 
         .log-console { margin-top: 1.5rem; background: #000; border-radius: 12px; padding: 1rem; font-family: monospace; font-size: 0.8rem; color: #ef4444; height: 100px; overflow-y: auto; text-align: left; border: 1px solid var(--card-border); }
         
-        .results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
         @media (max-width: 768px) { .results-grid { grid-template-columns: 1fr; } }
         
         .response-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.5rem; border-radius: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; transition: 0.3s; }
         .ja-importat { opacity: 0.3; filter: grayscale(1); }
         
-        .import-btn { background: var(--accent); color: var(--bg-dark); padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; width: 100%; }
+        .import-btn { background: #ef4444; color: white; padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; border: none; cursor: pointer; width: 100%; }
         .status-tag { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); color: #10b981; text-transform: uppercase; }
         
         #pagination-footer { display: flex; justify-content: center; padding: 2rem 0; }
@@ -59,25 +59,25 @@
     <div class="container">
         <header>
             <div class="logo">SitgesArt <span>Beli</span></div>
-            <p style="color: var(--text-secondary)">Explorador d'obres de Criticartt</p>
+            <p style="color: var(--text-secondary)">Sincronització de continguts amb Criticart</p>
             <div id="auth-box" class="mt-4"></div>
         </header>
 
         <div id="main-content" class="hidden">
             <div class="admin-panel">
-                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🚀 BUSCAR ARTICLES RECENTS</button>
-                <div class="log-console" id="log-console">> Sistema preparat. Neteja de noms activada.</div>
+                <button onclick="executarCerca()" id="btn-cerca" class="btn-main">🚀 BUSCAR ARTICLES RECENT</button>
+                <div class="log-console" id="log-console">> Sistema llest. Noms configurats: BELI ARTIGAS / Criticart.</div>
             </div>
 
             <div id="results-grid" class="results-grid"></div>
 
             <div id="pagination-footer" class="hidden">
-                <button onclick="executarCerca(true)" id="btn-mes" class="btn-secondary">⬇️ CARREGAR MÉS ANTICS</button>
+                <button onclick="executarCerca(true)" id="btn-mes" class="btn-secondary">⬇️ CARREGAR ARTICLES ANTERIORS</button>
             </div>
         </div>
 
         <div id="login-warning" class="admin-panel">
-            <button onclick="loginGoogle()" class="btn-main" style="background: white; color: black;">Accedir com Admin</button>
+            <button onclick="loginGoogle()" class="btn-main" style="background: white; color: black;">Identifica't per importar</button>
         </div>
     </div>
 
@@ -101,15 +101,12 @@
         const provider = new GoogleAuthProvider();
 
         let ultimaDataCercada = null;
-        let guardatsGlobal = [];
+        let guardatsGlobal = new Set();
 
-        // FUNCIÓ MILLORADA PER A NOMS PROPIS I TÍTOLS
         function formatarTitol(text) {
             if (!text) return "";
             const articles = ["el", "la", "els", "les", "un", "una", "uns", "unes", "de", "del", "dels", "d'", "a", "al", "als", "i", "amb", "per", "en"];
-            
             return text.toLowerCase().trim().split(' ').map((paraula, index) => {
-                // Si és la primera paraula o no és un article de la llista, majúscula
                 if (index === 0 || !articles.includes(paraula)) {
                     return paraula.charAt(0).toUpperCase() + paraula.slice(1);
                 }
@@ -121,7 +118,7 @@
             if (user && user.email === "pbadialorenz@gmail.com") {
                 document.getElementById('main-content').classList.remove('hidden');
                 document.getElementById('login-warning').classList.add('hidden');
-                document.getElementById('auth-box').innerHTML = `<button onclick="signOut(auth)" style="color: #64748b; font-size: 0.75rem;">SORTIR</button>`;
+                document.getElementById('auth-box').innerHTML = `<button onclick="signOut(auth)" style="color: #64748b; font-size: 0.75rem; font-weight: 800;">TANCAR SESSIÓ</button>`;
             }
         });
 
@@ -130,8 +127,8 @@
 
         function log(msg) {
             const consoleBox = document.getElementById('log-console');
-            consoleBox.innerHTML += `<div>> ${msg}</div>`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
+            const d = new Date();
+            consoleBox.innerHTML = `<div>> ${d.toLocaleTimeString()}: ${msg}</div>` + consoleBox.innerHTML;
         }
 
         window.executarCerca = async (esPaginacio = false) => {
@@ -142,13 +139,13 @@
             if (!esPaginacio) {
                 resBox.innerHTML = "";
                 ultimaDataCercada = null;
-                log("Verificant base de dades...");
+                log("Escanejant base de dades per evitar duplicats...");
                 const snap = await getDocs(collection(db, "obres"));
-                guardatsGlobal = snap.docs.map(d => d.data().link);
+                guardatsGlobal = new Set(snap.docs.map(d => d.data().link));
             }
 
             try {
-                log("Connectant amb Criticartt...");
+                log("Obtenint dades de Criticart...");
                 let blogUrl = `https://criticartt.blogspot.com/feeds/posts/default?alt=rss&max-results=50`;
                 if (ultimaDataCercada) blogUrl += `&published-max=${ultimaDataCercada}`;
 
@@ -158,7 +155,7 @@
                 const items = xml.querySelectorAll("item");
 
                 if (items.length === 0) {
-                    log("Fi de l'històric.");
+                    log("No hi ha més articles per carregar.");
                     document.getElementById('pagination-footer').classList.add('hidden');
                     return;
                 }
@@ -171,28 +168,30 @@
                     
                     if (dataPub) ultimaDataCercada = new Date(dataPub).toISOString();
 
-                    const jaExisteix = guardatsGlobal.includes(link);
+                    const jaExisteix = guardatsGlobal.has(link);
                     const card = document.createElement('div');
                     card.className = `response-card ${jaExisteix ? 'ja-importat' : ''}`;
                     card.innerHTML = `
                         <div style="flex-grow: 1;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                                ${jaExisteix ? '<span class="status-tag">Ja importada</span>' : '<span></span>'}
+                                ${jaExisteix ? '<span class="status-tag">Dins l\'arxiu</span>' : '<span></span>'}
                             </div>
-                            <h3 style="font-size: 1rem; font-weight: 700; color: white;">${titol}</h3>
+                            <h3 style="font-size: 1rem; font-weight: 700; color: white; line-height: 1.4;">${titol}</h3>
                         </div>
                         <div style="margin-top: 1rem; border-top: 1px solid var(--card-border); pt-3">
-                            ${jaExisteix ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; margin-top: 10px;">ELEMENT GUARDAT</div>' : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">IMPORTAR</button>`}
+                            ${jaExisteix 
+                                ? '<div style="text-align: center; color: var(--text-secondary); font-size: 0.7rem; font-weight: 800; padding-top: 10px;">JA IMPORTAT</div>' 
+                                : `<button onclick="importar(this, '${btoa(encodeURIComponent(titol))}', '${link}')" class="import-btn">IMPORTAR A SITGESART</button>`}
                         </div>
                     `;
                     resBox.appendChild(card);
                 });
 
                 document.getElementById('pagination-footer').classList.remove('hidden');
-                log(`S'han carregat ${items.length} articles més.`);
+                log(`S'han trobat ${items.length} articles.`);
 
             } catch (e) {
-                log("ERROR: " + e.message);
+                log("ERROR DE CONNEXIÓ: " + e.message);
             } finally {
                 btn.disabled = false;
             }
@@ -200,18 +199,25 @@
 
         window.importar = async (btn, titolB64, link) => {
             const titol = decodeURIComponent(atob(titolB64));
-            btn.innerText = "⏳...";
+            btn.innerText = "ENVIANT...";
             btn.disabled = true;
             try {
                 await addDoc(collection(db, "obres"), {
-                    nom: titol, link: link, font: "Criticartt", autor: "Beli", data_creacio: new Date().toISOString()
+                    nom: titol,
+                    link: link,
+                    font: "BELI ARTIGAS", // DALT (Franja blava)
+                    autor: "Criticart",   // BAIX
+                    origen: "Criticart",
+                    data_creacio: new Date().toISOString(),
+                    tipus: "Crítica d'Art"
                 });
-                btn.innerText = "IMPORTAT ✅";
+                btn.innerText = "FET ✅";
                 btn.style.background = "#10b981";
-                log(`Importat: ${titol}`);
+                log(`Èxit: ${titol}`);
             } catch (e) {
-                alert("Error: " + e.message);
+                alert("Error Firebase: " + e.message);
                 btn.disabled = false;
+                btn.innerText = "ERROR";
             }
         };
     </script>
