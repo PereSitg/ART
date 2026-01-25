@@ -1,68 +1,73 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SitgesArt - Biografia Rusiñol</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-white min-h-screen font-sans">
+<button onclick="descarregarDadesCompletes()" style="padding: 20px; background: #059669; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold;">
+    📥 DESCARREGAR CSV TOTAL (Sitges, Picasso, Lorca, Rusiñol)
+</button>
 
-    <header class="p-10 text-center">
-        <h1 class="text-4xl font-extrabold text-blue-400 italic mb-2 tracking-tight">Santiago Rusiñol i Sitges</h1>
-        <p class="text-slate-400 max-w-xl mx-auto">La figura clau que va transformar Sitges en la Meca del Modernisme.</p>
-        <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
-    </header>
-
-    <main class="max-w-4xl mx-auto p-6">
-        <article class="bg-slate-900 border border-blue-900/30 p-8 rounded-3xl shadow-2xl mb-10">
-            <div class="flex justify-between items-center mb-6">
-                <span class="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Perfil Destacat</span>
-                <span class="text-slate-500 text-xs font-mono">Font: Enciclopèdia Catalana</span>
-            </div>
-            
-            <h2 class="text-3xl font-bold text-white mb-4">Santiago Rusiñol i Prats (1861-1931)</h2>
-            
-            <div class="prose prose-invert text-slate-300 leading-relaxed">
-                <p class="mb-4">
-                    Pintor, escriptor i col·leccionista, Rusiñol va ser el gran impulsor del **Modernisme** a Catalunya. Fill d'una família de l'alta burgesia tèxtil, va trencar amb la tradició familiar per dedicar-se a l'art "per l'art".
-                </p>
-                <p class="mb-4">
-                    La seva relació amb Sitges comença el 1891. Hi va fundar el **Cau Ferrat**, un taller i museu on guardava la seva col·lecció de ferro forjat i obres d'art. Entre 1892 i 1899, va organitzar les **Festes Modernistes**, convertint la vila en un centre d'avantguarda europea.
-                </p>
-                <p>
-                    Com a escriptor, destaca la seva faceta de dramaturg amb obres com <em>L'alegria que passa</em> o <em>L'auca del senyor Esteve</em>, on sovint explorava el conflicte entre l'artista i la societat burgesa ("el poble gris").
-                </p>
-            </div>
-
-            <div class="mt-8 flex gap-4">
-                <button onclick="descarregarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center gap-2">
-                    📥 Descarregar Bio en CSV
-                </button>
-            </div>
-        </article>
-    </main>
-
-    <script>
-        function descarregarCSV() {
-            const bio = {
-                font: "Enciclopèdia Catalana",
-                nom: "Santiago Rusiñol i Prats",
-                resum: "Pintor, escriptor i agitador cultural. Fundador del Cau Ferrat a Sitges i líder del Modernisme. Va transformar la vila amb les Festes Modernistes i la seva col·lecció de ferros i pintura.",
-                link: "https://www.enciclopedia.cat/gran-enciclopedia-catalana/santiago-rusinol-i-prats",
-                origen: "SitgesArt / Modernisme"
-            };
-
-            let csvContent = '"font";"nom";"resum";"link";"origen"\n';
-            csvContent += `"${bio.font}";"${bio.nom}";"${bio.resum}";"${bio.link}";"${bio.origen}"`;
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "biografia_rusinol.csv");
-            link.click();
+<script>
+function descarregarDadesCompletes() {
+    const columnes = ["nom", "resum", "epoca", "tags", "font", "link"];
+    const dades = [
+        {
+            nom: "Santiago Rusiñol i Prats",
+            resum: "Pintor, escriptor i líder del Modernisme. Va comprar Can Faula el 1891 i va fundar el Cau Ferrat. Organitzador de les Festes Modernistes que van situar Sitges com a referent cultural europeu.",
+            epoca: "Modernisme (1861-1931)",
+            tags: "Pintura, Literatura, Cau Ferrat",
+            font: "GEC / Viquipèdia",
+            link: "https://ca.wikipedia.org/wiki/Santiago_Rusi%C3%B1ol_i_Prats"
+        },
+        {
+            nom: "Pablo Picasso a Sitges",
+            resum: "Visites primerenques de l'artista malagueny. El Cau Ferrat conserva obres importants com 'La nena de la flor' i diversos dibuixos de la seva etapa de formació vinculada als Quatre Gats.",
+            epoca: "Modernisme / Segle XX",
+            tags: "Pintura, Cubisme, Museus",
+            font: "Museus de Sitges",
+            link: "https://museusdesitges.cat/ca/museu/cau-ferrat/pablo-picasso"
+        },
+        {
+            nom: "Federico García Lorca a Sitges",
+            resum: "Lorca va visitar Sitges el 1925 i 1927 amb Salvador Dalí. Va col·laborar amb la revista 'L'Amic de les Arts' i va fer lectures de la seva obra al grup d'intel·lectuals local.",
+            epoca: "Avantguarda (Anys 20)",
+            tags: "Poesia, Generació del 27, L'Amic de les Arts",
+            font: "GEC",
+            link: "https://www.enciclopedia.cat/gran-enciclopedia-catalana/sitges"
+        },
+        {
+            nom: "Miquel Utrillo i Morlius",
+            resum: "Enginyer i crític d'art. Arquitecte del conjunt de Maricel per a Charles Deering i figura clau dels Quatre Gats. Va dissenyar l'evolució urbana de la zona de la Punta.",
+            epoca: "Modernisme (1862-1934)",
+            tags: "Arquitectura, Maricel, Crítica d'art",
+            font: "GEC",
+            link: "https://www.enciclopedia.cat/gran-enciclopedia-catalana/miquel-utrillo-i-morlius"
+        },
+        {
+            nom: "Història de Sitges: Època dels Indians",
+            resum: "L'obertura del lliure comerç amb Amèrica (1778) va permetre l'enriquiment de famílies com els Bacardí i els Brugal. En tornar van construir les mansions neoclàssiques i modernistes de l'Eixample.",
+            epoca: "Segle XIX",
+            tags: "Comerç, Arquitectura, Americanos",
+            font: "Viquipèdia",
+            link: "https://ca.wikipedia.org/wiki/Sitges#Americanos"
+        },
+        {
+            nom: "Cova del Gegant",
+            resum: "Jaciment del Paleolític mitjà on s'han trobat restes de neandertals de fa 53.000 anys. És el punt d'inici de la història de la presència humana a la vila.",
+            epoca: "Prehistòria",
+            tags: "Arqueologia, Neandertal",
+            font: "Viquipèdia",
+            link: "https://ca.wikipedia.org/wiki/Cova_del_Gegant"
         }
-    </script>
-</body>
-</html>
+    ];
+
+    // Generar format CSV
+    let csvContent = columnes.join(";") + "\n";
+    dades.forEach(row => {
+        let fila = columnes.map(col => `"${row[col].toString().replace(/"/g, '""')}"`).join(";");
+        csvContent += fila + "\n";
+    });
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "sitges_historia_completa.csv");
+    link.click();
+}
+</script>
