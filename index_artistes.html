@@ -3,121 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artistes de Sitges - SitgesArt</title>
+    <title>SitgesArt - Biografia Rusiñol</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen font-sans">
 
     <header class="p-10 text-center">
-        <h1 class="text-4xl font-extrabold text-blue-400 italic mb-2 tracking-tight">SitgesArt - Galeria Històrica</h1>
-        <p class="text-slate-400 max-w-xl mx-auto">Explora la vida i obra dels modernistes i luministes que van immortalitzar la llum de Sitges.</p>
+        <h1 class="text-4xl font-extrabold text-blue-400 italic mb-2 tracking-tight">Santiago Rusiñol i Sitges</h1>
+        <p class="text-slate-400 max-w-xl mx-auto">La figura clau que va transformar Sitges en la Meca del Modernisme.</p>
         <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
     </header>
 
-    <section class="max-w-6xl mx-auto px-6 mb-10">
-        <div class="relative max-w-md mx-auto">
-            <input type="text" id="searchInput" onkeyup="filtrarArtistes()" 
-                placeholder="Cerca un artista (ex: Rusiñol, Casas...)" 
-                class="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-blue-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-2xl">
-            <span class="absolute right-5 top-4 text-slate-600">🔍</span>
-        </div>
-    </section>
+    <main class="max-w-4xl mx-auto p-6">
+        <article class="bg-slate-900 border border-blue-900/30 p-8 rounded-3xl shadow-2xl mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Perfil Destacat</span>
+                <span class="text-slate-500 text-xs font-mono">Font: Enciclopèdia Catalana</span>
+            </div>
+            
+            <h2 class="text-3xl font-bold text-white mb-4">Santiago Rusiñol i Prats (1861-1931)</h2>
+            
+            <div class="prose prose-invert text-slate-300 leading-relaxed">
+                <p class="mb-4">
+                    Pintor, escriptor i col·leccionista, Rusiñol va ser el gran impulsor del **Modernisme** a Catalunya. Fill d'una família de l'alta burgesia tèxtil, va trencar amb la tradició familiar per dedicar-se a l'art "per l'art".
+                </p>
+                <p class="mb-4">
+                    La seva relació amb Sitges comença el 1891. Hi va fundar el **Cau Ferrat**, un taller i museu on guardava la seva col·lecció de ferro forjat i obres d'art. Entre 1892 i 1899, va organitzar les **Festes Modernistes**, convertint la vila en un centre d'avantguarda europea.
+                </p>
+                <p>
+                    Com a escriptor, destaca la seva faceta de dramaturg amb obres com <em>L'alegria que passa</em> o <em>L'auca del senyor Esteve</em>, on sovint explorava el conflicte entre l'artista i la societat burgesa ("el poble gris").
+                </p>
+            </div>
 
-    <main id="artistes-container" class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div id="loading" class="col-span-full text-center py-20">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-            <p class="text-slate-500 font-mono text-sm tracking-widest">CONNECTANT AMB FIREBASE...</p>
-        </div>
+            <div class="mt-8 flex gap-4">
+                <button onclick="descarregarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center gap-2">
+                    📥 Descarregar Bio en CSV
+                </button>
+            </div>
+        </article>
     </main>
 
-    <script type="module">
-        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        function descarregarCSV() {
+            const bio = {
+                font: "Enciclopèdia Catalana",
+                nom: "Santiago Rusiñol i Prats",
+                resum: "Pintor, escriptor i agitador cultural. Fundador del Cau Ferrat a Sitges i líder del Modernisme. Va transformar la vila amb les Festes Modernistes i la seva col·lecció de ferros i pintura.",
+                link: "https://www.enciclopedia.cat/gran-enciclopedia-catalana/santiago-rusinol-i-prats",
+                origen: "SitgesArt / Modernisme"
+            };
 
-        // Configuració de SitgesArt
-        const config = { 
-            apiKey: "AIzaSyAV8SrQ3tDiixCRwUDgC33jI8ZJzlcceZc", 
-            authDomain: "sitgesart.firebaseapp.com", 
-            projectId: "sitgesart", 
-            storageBucket: "sitgesart.firebasestorage.app", 
-            appId: "1:673959867307:web:80607c11d79db42b4918ee" 
-        };
-        
-        const app = getApps().length === 0 ? initializeApp(config) : getApp();
-        const db = getFirestore(app);
+            let csvContent = '"font";"nom";"resum";"link";"origen"\n';
+            csvContent += `"${bio.font}";"${bio.nom}";"${bio.resum}";"${bio.link}";"${bio.origen}"`;
 
-        async function carregarDades() {
-            const container = document.getElementById('artistes-container');
-            const loading = document.getElementById('loading');
-
-            try {
-                // Demanem les dades ordenades per nom
-                const q = query(collection(db, "obres"), orderBy("nom", "asc"));
-                const querySnapshot = await getDocs(q);
-                
-                loading.style.display = 'none';
-
-                if (querySnapshot.empty) {
-                    container.innerHTML = `<p class="col-span-full text-center text-slate-500">No hi ha artistes a la base de dades. Puja el CSV primer!</p>`;
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const d = doc.data();
-                    
-                    const card = document.createElement('div');
-                    card.className = "artista-card bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col hover:bg-slate-800/50 hover:border-blue-900/50 transition-all duration-300 group shadow-lg";
-                    
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] bg-blue-900/30 text-blue-400 px-3 py-1 rounded-full font-bold uppercase tracking-tighter border border-blue-800/50">
-                                ${d.origen || 'Cultura'}
-                            </span>
-                            <span class="text-xs text-slate-600 font-mono">${d.font || 'Ref'}</span>
-                        </div>
-                        
-                        <h2 class="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                            ${d.nom}
-                        </h2>
-                        
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
-                            ${d.resum}
-                        </p>
-                        
-                        <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
-                            <a href="${d.link}" target="_blank" class="text-xs font-bold text-slate-500 hover:text-white flex items-center transition-colors">
-                                WIKIPÈDIA / GEC
-                                <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            </a>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error(error);
-                loading.innerHTML = `<p class="text-red-500 text-sm">⚠️ Error de connexió. Revisa les "Rules" de Firebase.</p>`;
-            }
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "biografia_rusinol.csv");
+            link.click();
         }
-
-        // Funció de filtratge (Global per a l'onkeyup)
-        window.filtrarArtistes = function() {
-            let search = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.querySelectorAll('.artista-card');
-            
-            cards.forEach(card => {
-                let nom = card.querySelector('h2').innerText.toLowerCase();
-                let resum = card.querySelector('p').innerText.toLowerCase();
-                
-                if (nom.includes(search) || resum.includes(search)) {
-                    card.style.display = "flex";
-                } else {
-                    card.style.display = "none";
-                }
-            });
-        }
-
-        carregarDades();
     </script>
 </body>
 </html>
